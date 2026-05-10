@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 18.102 第一讲 - 基本 Banach 空间理论</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+/* Title */
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+/* Sections */
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+/* Definition / Theorem boxes */
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+/* Math display */
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+/* Note / remark */
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+/* Summary table */
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+/* Footer */
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 18.102 泛函分析导论</h1>
+  <h2>第一讲：基本 Banach 空间理论</h2>
+  <p class="meta">Lecturer: Dr. Casey Rodriguez (<a href="https://www.youtube.com/watch?v=uoL4lQxfgwg" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. 课程简介 (Introduction)</h3>
+<p><strong>泛函分析 (Functional Analysis)</strong> 旨在研究和求解<strong>无穷维赋范空间</strong>上的线性与非线性问题。在微积分和线性代数中，我们处理的是有限个变量的方程 &mdash; 例如求 $\mathbb{R}^n$ 上函数的极值，或求解线性方程组。然而当我们遇到 <strong>ODE</strong>、<strong>PDE</strong> 以及<strong>变分/优化问题</strong>时，自变量所在的空间不再是有限维的。</p>
+
+<div class="def-box">
+  <div class="box-title">例 &mdash; 泛函问题</div>
+  <p>考虑"求两点之间最短曲线"这一问题。它是一个 <strong>泛函 (functional)</strong>：输入是一条曲线（即函数），而指定一个连续函数 $f:[0,1]\to\mathbb{R}$ 需要<strong>无穷多个</strong>实数。因此我们需要在无穷维空间中发展相应的分析工具。</p>
+</div>
+
+<p>Rodriguez 教授在视频中强调：这门学科并非纯粹的抽象练习，而是从研究具体的 PDE、优化、以及"函数的函数"问题中自然生长出来的 &mdash; 这也是 "Functional Analysis" 名称的由来。</p>
+
+<div class="remark">
+  <strong>先修知识：</strong>线性代数 + 实分析 (18.100B)。课程将大量使用这两门课的术语，初期会回顾关键定义，后续将直接使用。
+</div>
+
+<h3>2. 向量空间 (Vector Spaces)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 向量空间</div>
+  <p>设 $\mathbb{K}$ 为 $\mathbb{R}$ 或 $\mathbb{C}$。<strong>向量空间</strong> $V$ 是一个集合，配备两种运算：</p>
+  <ul>
+    <li><strong>加法</strong>：$+: V \times V \to V$，$(v_1, v_2) \mapsto v_1 + v_2$</li>
+    <li><strong>标量乘法</strong>：$\cdot: \mathbb{K} \times V \to V$，$(\alpha, v) \mapsto \alpha v$</li>
+  </ul>
+  <p>并满足交换律、结合律、单位元、逆元、分配律等公理。</p>
+</div>
+
+<h4>常见例子</h4>
+<ul>
+  <li>$\mathbb{R}^n$, $\mathbb{C}^n$ &mdash; 有限维向量空间</li>
+  <li>$C([0,1]) = \{f:[0,1]\to\mathbb{C} \mid f \text{ 连续}\}$ &mdash; 连续函数空间，也是向量空间（连续函数的和与标量倍数仍连续）</li>
+</ul>
+<p>但 $\mathbb{R}^n$ 与 $C([0,1])$ 之间有本质区别 &mdash; <strong>维数</strong>。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 有限维与无穷维</div>
+  <p>向量空间 $V$ 是<strong>有限维</strong>的，如果其中每个线性无关集都是有限集。即对所有 $E \subseteq V$，若</p>
+  $$\sum_{i=1}^N a_i v_i = 0 \;\Longrightarrow\; a_1 = a_2 = \cdots = a_N = 0, \quad \forall\, v_1,\dots,v_N \in E$$
+  <p>则 $|E| < \infty$。否则 $V$ 是<strong>无穷维</strong>的。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">例 &mdash; $C([0,1])$ 是无穷维的</div>
+  <p>集合 $E = \{f_n(x) = x^n : n \in \mathbb{Z}_{\ge 0}\}$ 线性无关（多项式的线性无关性），但 $E$ 有无穷多元素。</p>
+</div>
+
+<div class="remark">
+  <strong>关键区别：</strong>在无穷维空间中，有限维的经典结论（如 Heine-Borel 定理："$\mathbb{R}^n$ 中闭且有界的集合是紧的"）不再成立。这是从有限维分析过渡到无穷维分析时面临的核心困难。
+</div>
+
+<h3>3. 范数与赋范空间 (Norms and Normed Spaces)</h3>
+<p>为了在向量空间上做分析（讨论收敛、连续等），我们需要一个"长度"的概念 &mdash; 这就是<strong>范数</strong>。</p>
+
+<div class="thm-box">
+  <div class="box-title">定义 &mdash; 范数 (Norm)</div>
+  <p>向量空间 $V$ 上的<strong>范数</strong>是一个函数 $\|\cdot\|: V \to [0,+\infty)$，满足：</p>
+  <ol>
+    <li><strong>正定性 (Definiteness)</strong>：$\|v\| = 0 \iff v = 0$</li>
+    <li><strong>齐次性 (Homogeneity)</strong>：$\|\lambda v\| = |\lambda|\,\|v\|$，$\forall\, \lambda \in \mathbb{K},\; v \in V$</li>
+    <li><strong>三角不等式 (Triangle Inequality)</strong>：$\|v_1 + v_2\| \le \|v_1\| + \|v_2\|$，$\forall\, v_1, v_2 \in V$</li>
+  </ol>
+</div>
+
+<ul>
+  <li><strong>半范数 (Seminorm)</strong>：仅满足条件 (2) 和 (3)，不要求 (1)。允许非零向量的"长度"为零。半范数在后续内容中会自然出现。</li>
+  <li><strong>赋范空间 (Normed Space)</strong>：配备了范数的向量空间 $(V, \|\cdot\|)$。</li>
+</ul>
+
+<h3>4. 范数诱导的度量 (Metric Induced by Norm)</h3>
+
+<p>回顾：集合 $X$ 上的<strong>度量 (metric)</strong> $d: X \times X \to [0,\infty)$ 满足三条公理：</p>
+<ol type="a">
+  <li>$d(x,y)=0 \iff x=y$（同一性）</li>
+  <li>$d(x,y)=d(y,x)$（对称性）</li>
+  <li>$d(x,y) \le d(x,z)+d(z,y)$（三角不等式）</li>
+</ol>
+
+<div class="thm-box">
+  <div class="box-title">命题 &mdash; 范数诱导度量</div>
+  <p>设 $\|\cdot\|$ 是向量空间 $V$ 上的范数，则</p>
+  $$d(v,w) = \|v - w\|$$
+  <p>定义了 $V$ 上的度量，称为<strong>范数诱导的度量</strong>。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明思路</div>
+  <p>范数的三条性质分别蕴含度量的三条公理：</p>
+  <ul>
+    <li><strong>(1) $\Rightarrow$ (a)</strong>：$d(v,w)=\|v-w\|=0 \iff v-w=0 \iff v=w$</li>
+    <li><strong>(2) $\Rightarrow$ (b)</strong>：$\|v-w\| = \|(-1)(w-v)\| = |-1|\cdot\|w-v\| = \|w-v\|$</li>
+    <li><strong>(3) $\Rightarrow$ (c)</strong>：$(v-w) = (v-z)+(z-w)$，由范数三角不等式立得。$\square$</li>
+  </ul>
+</div>
+
+<h3>5. 范数的例子 (Examples of Norms)</h3>
+
+<h4>$\mathbb{R}^n$ / $\mathbb{C}^n$ 上的 $\ell^p$ 范数</h4>
+<div class="def-box">
+  <div class="box-title">定义 &mdash; $\ell^p$ 范数族</div>
+  <p>对 $x = (x_1,\dots,x_n) \in \mathbb{R}^n$（或 $\mathbb{C}^n$），定义：</p>
+  $$\|x\|_p = \left(\sum_{i=1}^n |x_i|^p\right)^{1/p}, \quad 1 \le p < \infty$$
+  $$\|x\|_\infty = \max_{1 \le i \le n} |x_i|$$
+  <p>特别地，$p=2$ 为 <strong>Euclid 范数</strong>（标准距离）。可以验证当 $p\to\infty$ 时，$\|x\|_p \to \|x\|_\infty$。</p>
+</div>
+
+<h4>单位球的几何</h4>
+<p>在 $\mathbb{R}^2$ 中，单位球 $B(0,1) = \{x : \|x\| \le 1\}$ 的形状随范数改变：</p>
+<ul>
+  <li>$\|\cdot\|_2$：<strong>圆盘</strong>（标准圆）</li>
+  <li>$\|\cdot\|_\infty$：顶点在 $(\pm1,\pm1)$ 的<strong>正方形</strong></li>
+  <li>$\|\cdot\|_1$：顶点在 $(0,\pm1),(\pm1,0)$ 的<strong>菱形</strong>（旋转 45° 的正方形）</li>
+  <li>其他 $\ell^p$ 球介于 $\ell^1$ 球与 $\ell^\infty$ 球之间</li>
+</ul>
+<div class="remark">
+  <strong>范数等价性（预告）：</strong>虽然不同范数改变了球的几何形状，但在有限维空间中，任何一个足够大的 $\ell^1$ 球总能"吞掉"一个固定大小的 $\ell^\infty$ 球，反之亦然。这意味着有限维空间上的所有范数是<strong>等价的</strong> &mdash; 详见后续课程和习题。
+</div>
+
+<h3>6. 有界连续函数空间 $C_b(X)$ (Bounded Continuous Functions)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; $C_b(X)$</div>
+  <p>设 $X$ 为度量空间，定义</p>
+  $$C_b(X) = \{f: X \to \mathbb{C} \mid f \text{ 连续且有界}\}$$
+  <p>例如 $C_b([0,1]) = C([0,1])$，因为紧集上的连续函数自动有界。</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">命题 &mdash; 上确界范数 (Uniform Norm / $\ell^\infty$ Norm)</div>
+  <p>对任意度量空间 $X$，函数</p>
+  $$\|u\|_\infty = \sup_{x \in X} |u(x)|$$
+  <p>定义了 $C_b(X)$ 上的范数。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（三角不等式）</div>
+  <p>设 $u, v \in C_b(X)$，对任意 $x \in X$：</p>
+  $$|u(x)+v(x)| \le |u(x)|+|v(x)| \le \|u\|_\infty + \|v\|_\infty$$
+  <p>对所有 $x$ 取上确界：</p>
+  $$\|u+v\|_\infty = \sup_x |u(x)+v(x)| \le \|u\|_\infty + \|v\|_\infty \qquad\square$$
+</div>
+
+<h4>收敛的含义</h4>
+<p>在 $C_b(X)$ 中，$u_n \to u$ 意味着</p>
+$$\|u_n - u\|_\infty = \sup_{x\in X}|u_n(x)-u(x)| \to 0$$
+<p>展开为 $\varepsilon$-$N$ 语言：</p>
+$$\forall\,\varepsilon>0,\;\exists\,N\in\mathbb{N}:\; \forall\,n\ge N,\;\forall\,x\in X,\; |u_n(x)-u(x)|<\varepsilon$$
+<p>这恰好就是<strong>一致收敛 (uniform convergence)</strong> 的定义。因此：</p>
+<div class="remark">
+  $C_b(X)$ 中在 $\|\cdot\|_\infty$ 范数下的收敛 $=$ 一致收敛。
+</div>
+
+<h3>7. $\ell^p$ 序列空间 (The $\ell^p$ Spaces)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; $\ell^p$ 空间</div>
+  <p>$\ell^p$ 是满足范数有限的<strong>无穷序列空间</strong>：</p>
+  $$\ell^p = \left\{\{a_j\}_{j=1}^\infty : \|a\|_p < \infty\right\}$$
+  <p>其中</p>
+  $$\|a\|_p = \left(\sum_{j=1}^\infty |a_j|^p\right)^{1/p}, \quad 1 \le p < \infty; \qquad \|a\|_\infty = \sup_{j\ge 1} |a_j|$$
+</div>
+
+<div class="def-box">
+  <div class="box-title">例</div>
+  <p>序列 $\left\{\frac{1}{j}\right\}_{j=1}^\infty \in \ell^p$ 对所有 $p>1$，但 $\notin \ell^1$（调和级数 $\sum 1/j$ 发散）。</p>
+</div>
+
+<div class="remark">
+  <strong>注意：</strong>验证 $\|\cdot\|_p$ 满足三角不等式（即 <strong>Minkowski 不等式</strong>）并非显然，这将在习题中完成。教授在视频中特别强调："你不应该能够立刻看出这满足三角不等式 &mdash; 它是非平凡的 (non-trivial)。"同样，证明两个 $\ell^p$ 序列之和仍在 $\ell^p$ 中也需要额外工作。
+</div>
+
+<h3>8. Banach 空间 (Banach Spaces)</h3>
+
+<p>我们关注的不是任意赋范空间，而是那些"没有空洞"的完备空间 &mdash; 即 Cauchy 序列总是收敛的空间。这就是泛函分析的核心对象：</p>
+
+<div class="thm-box">
+  <div class="box-title">定义 &mdash; Banach 空间 (以 Stefan Banach 命名)</div>
+  <p>一个赋范空间 $(V, \|\cdot\|)$ 如果关于范数诱导的度量是<strong>完备的</strong>（即每个 Cauchy 序列都在 $V$ 中收敛），则称其为 <strong>Banach 空间</strong>。</p>
+</div>
+
+<p><strong>类比：</strong>有理数 $\mathbb{Q}$ 不完备 &mdash; 存在有理 Cauchy 序列收敛到无理数（例如 $\sqrt{2}$ 可以写成有理数列的极限）。实数 $\mathbb{R}$ "填补了空洞"使之完备。Banach 空间正是这种"没有空洞"的赋范空间。</p>
+
+<div class="def-box">
+  <div class="box-title">基本例子</div>
+  <ul>
+    <li>对任意 $n$，$\mathbb{R}^n$ 和 $\mathbb{C}^n$ 关于任何 $\|\cdot\|_p$ 范数都是 Banach 空间。</li>
+    <li>$\ell^p$ 对所有 $1 \le p \le \infty$ 是 Banach 空间。</li>
+  </ul>
+</div>
+
+<h3>9. 核心定理：$C_b(X)$ 是 Banach 空间</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理</div>
+  <p>设 $X$ 为度量空间，则 $C_b(X)$ 关于 $\|\cdot\|_\infty$ 是<strong>完备的</strong>，因此是 Banach 空间。</p>
+</div>
+
+<h4>证明策略（通用 Blueprint）</h4>
+<p>Rodriguez 教授在视频中强调，证明赋范空间是 Banach 空间的标准方法几乎总是同一套模板：</p>
+<ol>
+  <li>取空间中一个 Cauchy 序列 $\{u_n\}$</li>
+  <li><strong>构造极限候选</strong> $u$</li>
+  <li>证明 $u$ <strong>属于该空间</strong></li>
+  <li>证明 $u_n \to u$ 在该范数下<strong>收敛</strong></li>
+</ol>
+
+<h4>完整证明</h4>
+
+<p><strong>Step 1：Cauchy 序列有界。</strong></p>
+<div class="proof-box">
+  <p>由 $\{u_n\}$ Cauchy，$\exists\, N_0$ 使得 $\forall\, n,m \ge N_0$：$\|u_n - u_m\|_\infty < 1$。</p>
+  <p>由三角不等式，$\forall\, n \ge N_0$：</p>
+  $$\|u_n\|_\infty \le \|u_n - u_{N_0}\|_\infty + \|u_{N_0}\|_\infty < 1 + \|u_{N_0}\|_\infty$$
+  <p>对所有 $n \in \mathbb{N}$：</p>
+  $$\|u_n\|_\infty \le \underbrace{\|u_1\|_\infty + \cdots + \|u_{N_0}\|_\infty + 1}_{=:\, B}$$
+</div>
+
+<p><strong>Step 2：构造逐点极限。</strong></p>
+<div class="proof-box">
+  <p>固定 $x \in X$。由于 $|u_n(x) - u_m(x)| \le \|u_n - u_m\|_\infty$，所以 $\{u_n(x)\}$ 是 $\mathbb{C}$ 中的 Cauchy 序列。由 $\mathbb{C}$ 的完备性，极限存在。定义候选极限函数：</p>
+  $$u(x) = \lim_{n\to\infty} u_n(x), \quad \forall\, x \in X$$
+</div>
+
+<p><strong>Step 3：$u$ 有界。</strong></p>
+<div class="proof-box">
+  <p>对所有 $x \in X$：</p>
+  $$|u(x)| = \lim_{n\to\infty}|u_n(x)| \le B \quad\Longrightarrow\quad \sup_{x\in X}|u(x)| \le B$$
+  <p>因此 $u$ 是有界函数。</p>
+</div>
+
+<p><strong>Step 4：$\|u_n - u\|_\infty \to 0$（一致收敛）。</strong></p>
+<div class="proof-box">
+  <p>设 $\varepsilon > 0$。由 Cauchy 性，$\exists\, N$ 使得 $\forall\, n,m \ge N$：$\|u_n - u_m\|_\infty < \varepsilon/2$。</p>
+  <p>对任意 $x \in X$，固定 $n \ge N$，令 $m \to \infty$：</p>
+  $$|u_n(x) - u_m(x)| \le \frac{\varepsilon}{2} \;\;\xrightarrow{m\to\infty}\;\; |u_n(x) - u(x)| \le \frac{\varepsilon}{2}$$
+  <p>对所有 $x$ 取 sup：</p>
+  $$\|u_n - u\|_\infty = \sup_{x\in X}|u_n(x) - u(x)| \le \frac{\varepsilon}{2} < \varepsilon$$
+  <p>因此 $u_n \to u$ 一致收敛。</p>
+</div>
+
+<p><strong>Step 5：$u$ 连续。</strong></p>
+<div class="proof-box">
+  <p>由 Step 4，$u_n \to u$ 一致收敛。<strong>连续函数的一致极限仍为连续函数</strong>（实分析经典定理）。因此 $u \in C_b(X)$。</p>
+  <p>综上，$C_b(X)$ 完备，是 Banach 空间。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>教授提示：</strong>"第一次看到这个证明时会觉得有点奇怪。但所有证明某空间是 Banach 空间的论证本质上都遵循这个 blueprint。请尝试用同样的方法证明 $\ell^\infty$（或下面的 $c_0$）是 Banach 空间 &mdash; 你会发现论证过程几乎完全相同。"
+</div>
+
+<h3>10. 补充空间：$c_0$ (The Space $c_0$)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; $c_0$ 空间</div>
+  <p>$$c_0 = \left\{a \in \ell^\infty : \lim_{j\to\infty} a_j = 0\right\}$$</p>
+  <p>即收敛到 $0$ 的有界序列空间，配备 $\|\cdot\|_\infty$ 范数。它是 $\ell^\infty$ 的子空间。</p>
+</div>
+
+<p>$c_0$ 也是 Banach 空间。证明方法与 $C_b(X)$ 完全类似：</p>
+<ol>
+  <li>取 $c_0$ 中的 Cauchy 序列 $\{a^{(n)}\}$（注意：这是一个"序列的序列"）</li>
+  <li>证明有界性，构造逐点极限 $a_j = \lim_{n\to\infty} a_j^{(n)}$</li>
+  <li>证明极限序列 $a$ 有界，且 $\lim_{j\to\infty} a_j = 0$（即 $a \in c_0$）</li>
+  <li>证明 $\|a^{(n)} - a\|_\infty \to 0$</li>
+</ol>
+
+<div class="remark">
+  <strong>教授的建议：</strong>"试着自己动手证明 $c_0$ 是 Banach 空间。这里空间中的'点'是序列，Cauchy 序列是'序列的序列' &mdash; 虽然听起来有些吓人，但序列本质上就是函数（从 $\mathbb{N}$ 到 $\mathbb{C}$），所以不必害怕。按照同样的 blueprint 走一遍，你就会掌握这个论证模式。"
+</div>
+
+<h3>本讲小结</h3>
+<table class="summary">
+  <tr><th style="width:25%">概念</th><th>要点</th></tr>
+  <tr><td><strong>向量空间</strong></td><td>域 $\mathbb{K}$ 上配备加法和标量乘法的集合；区分有限维与无穷维</td></tr>
+  <tr><td><strong>范数</strong></td><td>满足正定性、齐次性、三角不等式的非负函数；赋范空间 $=$ 向量空间 $+$ 范数</td></tr>
+  <tr><td><strong>度量</strong></td><td>范数自然诱导度量 $d(v,w)=\|v-w\|$</td></tr>
+  <tr><td><strong>$\ell^p$ 范数</strong></td><td>有限维：$\|x\|_p = (\sum|x_i|^p)^{1/p}$；无穷维序列空间 $\ell^p$</td></tr>
+  <tr><td><strong>$C_b(X)$</strong></td><td>度量空间上有界连续函数空间，上确界范数，收敛 $\Leftrightarrow$ 一致收敛</td></tr>
+  <tr><td><strong>Banach 空间</strong></td><td>完备的赋范空间；$C_b(X)$ 是 Banach 空间（本讲核心定理）</td></tr>
+  <tr><td><strong>证明 Blueprint</strong></td><td>取 Cauchy 列 $\to$ 构造候选极限 $\to$ 证属于空间 $\to$ 证收敛</td></tr>
+  <tr><td><strong>$c_0$ 空间</strong></td><td>$\{a\in\ell^\infty : a_j\to 0\}$，也是 Banach 空间（习题）</td></tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 18.102, Spring 2021 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>
