@@ -10,7 +10,7 @@
 
 | 课程 | 来源 | 状态 | 进度 |
 |------|------|------|------|
-| [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 | 1 / 23 |
+| [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 | 2 / 23 |
 | [偏微分方程](./pde/) | 待定 | 计划中 | — |
 
 ## 泛函分析 — MIT 18.102
@@ -20,7 +20,7 @@
 | # | 主题 | 笔记 |
 |---|------|------|
 | 1 | Basic Banach Space Theory | [泛函分析_L1](./functional-analysis/泛函分析_L1.pdf) |
-| 2 | Bounded Linear Operators | 待完成 |
+| 2 | Bounded Linear Operators | [泛函分析_L2](./functional-analysis/泛函分析_L2.pdf) |
 | 3 | Quotient Spaces, Baire Category Theorem | 待完成 |
 | ... | ... | ... |
 
