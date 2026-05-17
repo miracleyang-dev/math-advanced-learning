@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 18.102 第三讲 - 商空间、Baire 范畴定理与一致有界性原理</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 18.102 泛函分析导论</h1>
+  <h2>第三讲：商空间、Baire 范畴定理与一致有界性原理</h2>
+  <p class="meta">Lecturer: Dr. Casey Rodriguez (<a href="https://www.youtube.com/watch?v=58B5dEJReQ8" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. Banach 空间的子空间 (Subspaces)</h3>
+
+<p>上一讲我们建立了有界线性算子空间 $B(V,W)$ 及其完备性。本讲讨论从已有赋范空间出发构造新赋范空间的两种方式：<strong>子空间</strong>与<strong>商空间</strong>，然后进入泛函分析的核心定理。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 29 &mdash; 子空间 (Subspace)</div>
+  <p>设 $V$ 为向量空间。子集 $W \subseteq V$ 是 $V$ 的<strong>子空间</strong>，如果对所有 $w_1, w_2 \in W$ 和 $\lambda_1, \lambda_2 \in \mathbb{K}$：</p>
+  $$\lambda_1 w_1 + \lambda_2 w_2 \in W$$
+  <p>即 $W$ 对线性组合封闭。</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">命题 30 &mdash; 子空间何时是 Banach 空间</div>
+  <p>Banach 空间 $V$ 的子空间 $W$（继承 $V$ 的范数）是 Banach 空间，当且仅当 $W$ 是 $V$ 中的<strong>闭集</strong>。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明思路</div>
+  <p><strong>($\Rightarrow$)</strong> 设 $W$ Banach。取 $W$ 中收敛到 $v \in V$ 的序列 $\{w_n\}$。该序列是 Cauchy 列，由 $W$ 的完备性在 $W$ 中有极限。由极限唯一性，$v \in W$，故 $W$ 闭。</p>
+  <p><strong>($\Leftarrow$)</strong> 设 $W$ 闭。$W$ 中的 Cauchy 列也是 $V$ 中的 Cauchy 列，由 $V$ 完备有极限。$W$ 闭保证极限在 $W$ 中，故 $W$ 完备。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>要点：</strong>子空间继承外部空间的范数，判断其是否 Banach 只需检验闭性。这在判断具体函数空间完备性时非常实用。
+</div>
+
+<h3>2. 商空间 (Quotient Spaces)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 31 &mdash; 商空间 $V/W$</div>
+  <p>设 $W \subset V$ 为子空间。在 $V$ 上定义等价关系：</p>
+  $$v \sim v' \iff v - v' \in W$$
+  <p>$v$ 的等价类记为 $[v] = v + W$（陪集记号），即 $v + W = \{v + w : w \in W\}$。<strong>商空间</strong>定义为</p>
+  $$V/W = \{v + W : v \in V\}$$
+  <p>读作 "$V$ mod $W$"。</p>
+</div>
+
+<h4>等价关系验证</h4>
+<ul>
+  <li><strong>自反性：</strong>$v \sim v$，因为 $v - v = 0 \in W$</li>
+  <li><strong>对称性：</strong>$v \sim v' \Rightarrow v' \sim v$，因为 $w \in W \Rightarrow -w \in W$</li>
+  <li><strong>传递性：</strong>$v \sim v'$ 且 $v' \sim v'' \Rightarrow v \sim v''$，因为 $(v - v') + (v' - v'') = v - v'' \in W$</li>
+</ul>
+
+<h4>代数运算</h4>
+<p>$V/W$ 上的加法和标量乘法自然定义为：</p>
+$$(v_1 + W) + (v_2 + W) = (v_1 + v_2) + W, \qquad \lambda(v + W) = \lambda v + W$$
+<p>需要验证良定义性（与代表元的选取无关），这是线性代数中的标准练习。特别地，$W = 0 + W = w + W$（$\forall\, w \in W$），即 $W$ 本身对应商空间中的零元。</p>
+
+<h3>3. 从半范数到范数 (Theorem 33)</h3>
+
+<div class="def-box">
+  <div class="box-title">例 32 &mdash; 半范数的来源</div>
+  <p>考虑 $C^1([0,1])$ 上的函数 $\|f\| = \sup|f'|$。它满足齐次性和三角不等式，但<strong>不是范数</strong>：常值函数 $f \equiv c \ne 0$ 的导数恒为 $0$，故 $\|f\| = 0$ 但 $f \ne 0$。这是一个<strong>半范数 (seminorm)</strong>。</p>
+  <p>常值函数构成一个子空间，若将其"模掉"，半范数就变成了真正的范数。</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">定理 33 &mdash; 半范数诱导范数</div>
+  <p>设 $\|\cdot\|$ 是向量空间 $V$ 上的半范数。定义</p>
+  $$E = \{v \in V : \|v\| = 0\}$$
+  <p>则 $E$ 是 $V$ 的子空间，且函数</p>
+  $$\|v + E\|_{V/E} = \|v\|$$
+  <p>在 $V/E$ 上定义了一个<strong>范数</strong>。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p><strong>$E$ 是子空间：</strong>对 $v_1, v_2 \in E$ 和 $\lambda_1, \lambda_2 \in \mathbb{K}$，由三角不等式和齐次性：</p>
+  $$\|\lambda_1 v_1 + \lambda_2 v_2\| \le |\lambda_1|\|v_1\| + |\lambda_2|\|v_2\| = 0$$
+  <p>半范数非负，故 $\|\lambda_1 v_1 + \lambda_2 v_2\| = 0$，即 $\lambda_1 v_1 + \lambda_2 v_2 \in E$。</p>
+
+  <p><strong>良定义性：</strong>设 $v + E = v' + E$，则存在 $e \in E$ 使 $v = v' + e$。由三角不等式：</p>
+  $$\|v\| = \|v' + e\| \le \|v'\| + \|e\| = \|v'\|$$
+  <p>交换 $v, v'$ 的角色得 $\|v'\| \le \|v\|$，故 $\|v\| = \|v'\|$。</p>
+
+  <p><strong>范数性质：</strong>齐次性和三角不等式由半范数继承。正定性：若 $\|v + E\|_{V/E} = \|v\| = 0$，则 $v \in E$，即 $v + E = 0 + E$。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>推广：</strong>更一般地，若 $V$ 是赋范空间，$W$ 是 $V$ 的闭子空间，则 $\|v + W\|_{V/W} = \inf_{w \in W}\|v - w\|$ 定义了 $V/W$ 上的范数（习题）。
+</div>
+
+<h3>4. Baire 范畴定理 (Theorem 34)</h3>
+
+<p>至此，Banach 空间的"基本架构"部分告一段落。接下来进入泛函分析中带有<strong>名字</strong>的核心定理。首先需要度量空间理论中的一个基础结果。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 34 &mdash; Baire 范畴定理 (Baire Category Theorem)</div>
+  <p>设 $M$ 为完备度量空间，$\{C_n\}_{n \in \mathbb{N}}$ 为 $M$ 的一族闭子集，且 $M = \bigcup_{n \in \mathbb{N}} C_n$。则<strong>至少有一个 $C_n$ 包含一个开球</strong> $B(x, r)$（即至少有一个 $C_n$ 有内点）。</p>
+</div>
+
+<div class="remark">
+  <strong>等价表述：</strong>完备度量空间不能写成可数个<strong>无处稠密 (nowhere dense)</strong> 闭集的并。若 $C_n$ 不一定闭，则结论变为：至少有一个 $\overline{C_n}$ 包含开球。
+</div>
+
+<div class="remark">
+  <strong>名称说明：</strong>尽管名为"范畴定理"，它与现代范畴论 (category theory) 无关。"范畴"在这里指 Baire 的稠密性分类。此定理应用广泛，例如可用来证明<strong>存在处处连续但处处不可微的函数</strong>。
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（反证法）</div>
+  <p>假设每个 $C_n$ 都不包含任何开球（即都无处稠密）。我们将构造一个不属于任何 $C_n$ 的点，与 $M = \bigcup_n C_n$ 矛盾。</p>
+
+  <p><strong>Step 1：归纳构造序列。</strong></p>
+  <p>$M$ 包含开球但 $C_1$ 不包含开球，故 $M \ne C_1$，存在 $p_1 \in M \setminus C_1$。因 $C_1$ 闭，存在 $\varepsilon_1 > 0$ 使得</p>
+  $$B(p_1, \varepsilon_1) \cap C_1 = \varnothing$$
+
+  <p>$B(p_1, \tfrac{\varepsilon_1}{3})$ 不含于 $C_2$（否则 $C_2$ 包含开球），故存在 $p_2 \in B(p_1, \tfrac{\varepsilon_1}{3}) \setminus C_2$，取 $\varepsilon_2 < \tfrac{\varepsilon_1}{3}$ 使得 $B(p_2, \varepsilon_2) \cap C_2 = \varnothing$。</p>
+
+  <p>归纳进行：假设已有 $p_1, \dots, p_k$ 和 $\varepsilon_1, \dots, \varepsilon_k$，满足对所有 $j \ge 2$：</p>
+  $$\varepsilon_j < \frac{\varepsilon_{j-1}}{3}, \qquad p_j \in B\!\left(p_{j-1},\, \frac{\varepsilon_{j-1}}{3}\right), \qquad B(p_j, \varepsilon_j) \cap C_j = \varnothing$$
+  <p>则可构造 $p_{k+1} \in B(p_k, \tfrac{\varepsilon_k}{3}) \setminus C_{k+1}$ 和 $\varepsilon_{k+1} < \tfrac{\varepsilon_k}{3}$ 使得 $B(p_{k+1}, \varepsilon_{k+1}) \cap C_{k+1} = \varnothing$。</p>
+
+  <p><strong>Step 2：$\{p_k\}$ 是 Cauchy 列。</strong>对所有 $k, \ell \in \mathbb{N}$：</p>
+  $$d(p_k, p_{k+\ell}) \le \sum_{i=0}^{\ell-1} d(p_{k+i}, p_{k+i+1}) < \sum_{i=0}^{\ell-1} \frac{\varepsilon_{k+i}}{3} < \varepsilon_1 \sum_{m=k}^{\infty} 3^{-m} = \frac{\varepsilon_1}{2} \cdot 3^{-k+1}$$
+  <p>当 $k$ 充分大时，此上界任意小（与 $\ell$ 无关），故 $\{p_k\}$ Cauchy。由 $M$ 完备，存在 $p = \lim_{k\to\infty} p_k \in M$。</p>
+
+  <p><strong>Step 3：$p \notin C_k$，$\forall\, k$。</strong>类似计算给出：</p>
+  $$d(p_{k+1}, p) \le \frac{\varepsilon_{k+1}}{2} < \frac{\varepsilon_k}{6}$$
+  <p>因此</p>
+  $$d(p_k, p) \le d(p_k, p_{k+1}) + d(p_{k+1}, p) < \frac{\varepsilon_k}{3} + \frac{\varepsilon_k}{6} < \varepsilon_k$$
+  <p>即 $p \in B(p_k, \varepsilon_k)$，而 $B(p_k, \varepsilon_k) \cap C_k = \varnothing$，故 $p \notin C_k$。</p>
+
+  <p>$k$ 任意，故 $p \notin \bigcup_k C_k = M$，矛盾。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>证明策略回顾：</strong>关键在于让 $\varepsilon_k$ 以几何级数衰减（$\varepsilon_k < \varepsilon_1 / 3^{k-1}$），保证序列 Cauchy；同时保证每个 $B(p_k, \varepsilon_k)$ 与 $C_k$ 不交，使极限点不属于任何 $C_k$。
+</div>
+
+<h3>5. 一致有界性原理 (Theorem 36)</h3>
+
+<p>Baire 范畴定理的第一个重要应用。它将"逐点有界"提升为"一致有界"，是泛函分析三大基本定理之一。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 36 &mdash; 一致有界性原理 (Uniform Boundedness Theorem / Banach-Steinhaus)</div>
+  <p>设 $B$ 是 Banach 空间，$V$ 是赋范空间，$\{T_n\}$ 是 $B(B, V)$ 中的序列。若对所有 $b \in B$：</p>
+  $$\sup_n \|T_n b\| < \infty \qquad \text{（逐点有界）}$$
+  <p>则</p>
+  $$\sup_n \|T_n\| < \infty \qquad \text{（算子范数一致有界）}$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（使用 Baire 范畴定理）</div>
+  <p>对每个 $k \in \mathbb{N}$，定义</p>
+  $$C_k = \left\{b \in B : \|b\| \le 1,\; \sup_n \|T_n b\| \le k\right\}$$
+
+  <p><strong>Step 1：$C_k$ 是闭集。</strong>设 $\{b_m\} \subset C_k$，$b_m \to b$。则 $\|b\| = \lim \|b_m\| \le 1$。对任意固定的 $n$：</p>
+  $$\|T_n b\| = \lim_{m\to\infty}\|T_n b_m\| \le k$$
+  <p>（利用了 $T_n$ 有界故连续。）因此 $\sup_n \|T_n b\| \le k$，故 $b \in C_k$。</p>
+
+  <p><strong>Step 2：闭单位球是 $C_k$ 的并。</strong>由逐点有界假设，对每个 $\|b\| \le 1$，$\sup_n \|T_n b\| < \infty$，故存在某个 $k$ 使得 $b \in C_k$。因此</p>
+  $$\{b \in B : \|b\| \le 1\} = \bigcup_{k \in \mathbb{N}} C_k$$
+
+  <p><strong>Step 3：应用 Baire 定理。</strong>闭单位球是完备度量空间（作为 $B$ 的闭子集）的可数闭集覆盖。由 Baire 范畴定理，某个 $C_k$ 包含开球 $B(b_0, \delta_0)$。</p>
+
+  <p><strong>Step 4：推导一致界。</strong>对任意 $b \in B(0, \delta_0)$（即 $\|b\| < \delta_0$），$b_0 + b \in B(b_0, \delta_0) \subset C_k$，故</p>
+  $$\sup_n \|T_n(b_0 + b)\| \le k$$
+  <p>由三角不等式：</p>
+  $$\sup_n \|T_n b\| \le \sup_n \|T_n b_0\| + \sup_n \|T_n(b_0 + b)\| \le k + k = 2k$$
+
+  <p>对任意 $\|b\| = 1$，向量 $\tfrac{\delta_0}{2}b$ 满足 $\|\tfrac{\delta_0}{2}b\| < \delta_0$，故</p>
+  $$\left\|T_n\!\left(\frac{\delta_0}{2}b\right)\right\| \le 2k \;\;\Longrightarrow\;\; \|T_n b\| \le \frac{4k}{\delta_0}$$
+  <p>对所有 $\|b\|=1$ 取 sup：$\|T_n\| \le \frac{4k}{\delta_0}$。此界与 $n$ 无关，故</p>
+  $$\sup_n \|T_n\| \le \frac{4k}{\delta_0} < \infty \qquad\square$$
+</div>
+
+<div class="remark">
+  <strong>定理的本质：</strong>Banach 空间的完备性通过 Baire 定理起作用 &mdash; 保证了至少有一个 $C_k$ "足够大"（包含开球）。逐点的有限性被提升为全局的一致有界性。注意假设中<strong>$B$ 必须是 Banach 空间</strong>，不能仅为赋范空间。
+</div>
+<h3>本讲小结</h3>
+<table class="summary">
+  <tr><th style="width:28%">概念</th><th>要点</th></tr>
+  <tr><td><strong>子空间与完备性</strong></td><td>命题 30：Banach 空间的子空间是 Banach $\iff$ 它是闭集</td></tr>
+  <tr><td><strong>商空间 $V/W$</strong></td><td>通过等价关系 $v \sim v' \iff v-v' \in W$ 构造；陪集 $v+W$ 为元素</td></tr>
+  <tr><td><strong>半范数 $\to$ 范数</strong></td><td>定理 33：模掉零半范数子空间 $E=\{v:\|v\|=0\}$ 后，$V/E$ 成为赋范空间</td></tr>
+  <tr><td><strong>Baire 范畴定理</strong></td><td>完备度量空间不能写成可数个无处稠密闭集的并；反证法 + Cauchy 序列构造</td></tr>
+  <tr><td><strong>一致有界性原理</strong></td><td>定理 36：Banach 空间上的算子族逐点有界 $\Rightarrow$ 算子范数一致有界；证明用 Baire 定理</td></tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 18.102, Spring 2021 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>
