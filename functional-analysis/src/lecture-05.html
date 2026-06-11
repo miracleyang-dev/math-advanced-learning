@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 18.102 第五讲 - Zorn 引理与 Hahn-Banach 定理</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 18.102 泛函分析导论</h1>
+  <h2>第五讲：Zorn 引理与 Hahn-Banach 定理</h2>
+  <p class="meta">Lecturer: Dr. Casey Rodriguez (<a href="https://www.youtube.com/watch?v=KlAjiDivJoQ" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. Hamel 基的存在性 (Theorem 47)</h3>
+
+<p>上一讲我们介绍了集合论中的 <strong>Zorn 引理</strong>：若偏序集中每条链都有上界，则该偏序集存在极大元。本讲首先将 Zorn 引理用于向量空间，证明 <strong>Hamel basis</strong> 的存在性，然后证明泛函分析中极其重要的 <strong>Hahn-Banach 定理</strong>。</p>
+
+<p>回顾：向量空间 $V$ 的 <strong>Hamel basis</strong> 是一个线性无关集 $H$，使得 $V$ 中每个元素都可以写成 $H$ 中元素的<strong>有限</strong>线性组合。在有限维空间中，基的存在性是显然的；下面的定理将此推广到任意维数。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 47 &mdash; Hamel 基的存在性</div>
+  <p>若 $V$ 是一个向量空间，则 $V$ 具有 Hamel basis。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（使用 Zorn 引理）</div>
+  <p><strong>构造偏序集。</strong>令 $E$ 为 $V$ 的所有线性无关子集构成的集合，以集合包含关系 $\subseteq$ 作为偏序 $\preceq$。</p>
+
+  <p><strong>验证 Zorn 条件。</strong>设 $C$ 是 $E$ 中的一条链（即 $C$ 中任意两个元素可比较）。定义</p>
+  $$c = \bigcup_{e \in C} e$$
+  <p>断言 $c$ 是线性无关集。任取 $v_1, v_2, \ldots, v_n \in c$，对每个 $v_j$ 选取 $e_j \in C$ 使得 $v_j \in e_j$。因为 $C$ 是链，有限个元素 $e_1, \ldots, e_n$ 中必有一个最大的 $e_J$，满足 $e_j \subseteq e_J$，$\forall\, j$。于是 $v_1, \ldots, v_n$ 全部属于 $e_J$，而 $e_J$ 线性无关，故 $\{v_1,\ldots,v_n\}$ 线性无关。由 $n$ 的任意性，$c$ 线性无关。</p>
+
+  <p>显然 $e \subseteq c$，$\forall\, e \in C$，故 $c$ 是链 $C$ 的上界。Zorn 引理的条件已验证。</p>
+
+  <p><strong>得到极大元。</strong>由 Zorn 引理，$E$ 有极大元 $H$。</p>
+
+  <p><strong>$H$ 张成 $V$。</strong>若不然，存在 $v \in V$ 不是 $H$ 中元素的有限线性组合，这意味着 $H \cup \{v\}$ 仍为线性无关集。于是 $H \subsetneq H \cup \{v\}$，即 $H \prec H \cup \{v\}$，与 $H$ 的极大性矛盾。因此 $H$ 张成 $V$，故 $H$ 是 $V$ 的 Hamel basis。$\square$</p>
+</div>
+
+<h3>2. Hahn-Banach 定理 (Theorem 48)</h3>
+
+<p>掌握了 Zorn 引理的使用方法后，我们来证明泛函分析的核心定理之一 &mdash; <strong>Hahn-Banach 定理</strong>。它回答了一个基本问题：赋范空间的对偶空间是否非平凡？答案是肯定的，因为子空间上的有界线性泛函总可以扩张到整个空间。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 48 &mdash; Hahn-Banach 定理</div>
+  <p>设 $V$ 为赋范向量空间，$M \subset V$ 为子空间，$u : M \to \mathbb{C}$ 为有界线性泛函，满足</p>
+  $$|u(t)| \le C\|t\| \quad \forall\, t \in M$$
+  <p>则存在连续线性扩张 $U : V \to \mathbb{C}$（即 $U \in V' = B(V, \mathbb{C})$），使得 $U\big|_M = u$ 且</p>
+  $$|U(t)| \le C\|t\| \quad \forall\, t \in V$$
+  <p>其中常数 $C$ 与原来的相同。</p>
+</div>
+
+<div class="remark">
+  <strong>重要性：</strong>Hahn-Banach 定理保证了赋范空间的对偶空间足够丰富。例如，利用此定理可以证明 $(\ell^\infty)'$ 不是 $\ell^1$（尽管 $(\ell^1)' = \ell^\infty$）。该定理的证明策略是：先证明可以"一维一维"地扩张（引理 49），再用 Zorn 引理一步到位。
+</div>
+
+<h3>3. 一维扩张引理 (Lemma 49)</h3>
+
+<div class="thm-box">
+  <div class="box-title">引理 49 &mdash; 一维扩张</div>
+  <p>设 $V$ 为赋范空间，$M \subset V$ 为子空间，$u : M \to \mathbb{C}$ 为线性映射且 $|u(t)| \le C\|t\|$，$\forall\, t \in M$。若 $x \notin M$，则存在线性映射 $u' : M' \to \mathbb{C}$，其中 $M' = M + \mathbb{C}x = \{t + ax : t \in M,\, a \in \mathbb{C}\}$，满足 $u'\big|_M = u$ 且 $|u'(t')| \le C\|t'\|$，$\forall\, t' \in M'$。</p>
+</div>
+
+<p>几何直觉：$M$ 可以看作一个超平面，$x$ 是平面外的一个向量。引理说我们可以把 $u$ 沿 $x$ 方向多扩张一维，且不增大范数界。这一引理是证明 Hahn-Banach 定理的关键技术工具 &mdash; 它用于 Zorn 引理的反证步骤：若极大扩张的定义域不是全空间，就可以再扩张一维，产生矛盾。</p>
+
+<h3>4. Hahn-Banach 定理的证明</h3>
+
+<div class="proof-box">
+  <div class="box-title">定理 48 的证明（假设引理 49 成立）</div>
+  <p><strong>构造偏序集。</strong>令 $E$ 为 $u$ 的所有连续扩张的集合：</p>
+  $$E = \{(v, N) : N \text{ 是 } V \text{ 的子空间},\; M \subset N,\; v : N \to \mathbb{C} \text{ 是 } u \text{ 的连续扩张且 } |v(t)| \le C\|t\|,\; \forall\, t \in N\}$$
+  <p>$E$ 非空，因为 $(u, M) \in E$。定义偏序：</p>
+  $$(v_1, N_1) \preceq (v_2, N_2) \iff N_1 \subset N_2 \text{ 且 } v_2\big|_{N_1} = v_1$$
+  <p>即 $v_2$ 是 $v_1$ 的扩张。</p>
+
+  <p><strong>验证 Zorn 条件。</strong>设 $C = \{(v_i, N_i) : i \in I\}$ 为 $E$ 中的一条链。令</p>
+  $$N = \bigcup_{i \in I} N_i$$
+  <p>$N$ 是 $V$ 的子空间：取 $x_1, x_2 \in N$ 和 $a_1, a_2 \in \mathbb{C}$，则存在 $i_1, i_2$ 使得 $x_1 \in N_{i_1}$，$x_2 \in N_{i_2}$。因为 $C$ 是链，不妨设 $N_{i_1} \subset N_{i_2}$，则 $x_1, x_2 \in N_{i_2}$，故 $a_1 x_1 + a_2 x_2 \in N_{i_2} \subset N$。</p>
+
+  <p>定义 $v : N \to \mathbb{C}$：对任意 $t \in N$，存在某个 $i$ 使得 $t \in N_i$，令 $v(t) = v_i(t)$。良定义性：若 $t \in N_{i_1} \cap N_{i_2}$，因 $C$ 是链，其中一个是另一个的扩张，故 $v_{i_1}(t) = v_{i_2}(t)$。类似地可验证 $v$ 线性，$|v(t)| \le C\|t\|$，且 $(v_i, N_i) \preceq (v, N)$，$\forall\, i$。故 $(v, N)$ 是链 $C$ 的上界。</p>
+
+  <p><strong>得到极大元。</strong>Zorn 引理给出极大元 $(U, N)$。</p>
+
+  <p><strong>$N = V$。</strong>若不然，存在 $x \in V \setminus N$。由引理 49，$U$ 可扩张为 $N + \mathbb{C}x$ 上的连续线性泛函 $v$，满足相同的界 $C$。于是 $(v, N + \mathbb{C}x) \in E$ 且 $(U, N) \prec (v, N + \mathbb{C}x)$，与 $(U, N)$ 的极大性矛盾。故 $N = V$，$U$ 即为所求的扩张。$\square$</p>
+</div>
+
+<h3>5. 引理的证明（计算部分）</h3>
+
+<div class="proof-box">
+  <div class="box-title">引理 49 的证明</div>
+  <p><strong>Step 1：$M'$ 中表示的唯一性。</strong>$M' = M + \mathbb{C}x$ 是子空间。任意 $t' \in M'$ 可写成 $t' = t + ax$（$t \in M$，$a \in \mathbb{C}$），且此表示唯一。若 $t + ax = \tilde{t} + \tilde{a}x$，则 $(a - \tilde{a})x = \tilde{t} - t \in M$。因为 $x \notin M$，必须 $a = \tilde{a}$，从而 $t = \tilde{t}$。</p>
+
+  <p><strong>Step 2：定义扩张。</strong>选定任意 $\lambda \in \mathbb{C}$，定义</p>
+  $$u'(t + ax) = u(t) + a\lambda$$
+  <p>由唯一性，$u'$ 在 $M'$ 上良定义且线性，并满足 $u'\big|_M = u$。</p>
+
+  <p><strong>Step 3：化简。</strong>若 $C = 0$，则 $u \equiv 0$，取 $u' \equiv 0$ 即可。否则，两边除以 $C$，不妨设 $C = 1$。需要选择 $\lambda$ 使得</p>
+  $$|u(t) + a\lambda| \le \|t + ax\| \quad \forall\, t \in M,\; a \in \mathbb{C}$$
+  <p>当 $a = 0$ 时此式自动成立（因为 $|u(t)| \le \|t\|$ 在 $M$ 上已知）。对 $a \ne 0$，两边除以 $|a|$，并将 $t/(-a)$ 替换为 $t$（仍遍历整个 $M$），等价于：</p>
+  $$|u(t) - \lambda| \le \|t - x\| \quad \forall\, t \in M$$
+
+  <p><strong>Step 4：选择实部 $\alpha = \operatorname{Re}\lambda$。</strong>记 $w(t) = \operatorname{Re} u(t) = \frac{u(t) + \overline{u(t)}}{2}$。注意 $|w(t)| = |\operatorname{Re} u(t)| \le |u(t)| \le \|t\|$。因为 $w$ 取实值，对任意 $t_1, t_2 \in M$：</p>
+  $$w(t_1) - w(t_2) = w(t_1 - t_2) \le |w(t_1 - t_2)| \le \|t_1 - t_2\|$$
+  <p>加减 $x$ 并用三角不等式：</p>
+  $$w(t_1) - w(t_2) \le \|t_1 - x\| + \|t_2 - x\|$$
+  <p>移项得：</p>
+  $$w(t_1) - \|t_1 - x\| \le w(t_2) + \|t_2 - x\| \quad \forall\, t_1, t_2 \in M$$
+  <p>对 $t_1$ 取上确界，对 $t_2$ 取下确界：</p>
+  $$\sup_{t \in M}\big(w(t) - \|t - x\|\big) \le \inf_{t \in M}\big(w(t) + \|t - x\|\big)$$
+  <p>选取 $\alpha \in \mathbb{R}$ 满足</p>
+  $$\sup_{t \in M}\big(w(t) - \|t - x\|\big) \le \alpha \le \inf_{t \in M}\big(w(t) + \|t - x\|\big)$$
+  <p>则对所有 $t \in M$：</p>
+  $$w(t) - \|t - x\| \le \alpha \le w(t) + \|t - x\|$$
+  <p>即 $|w(t) - \alpha| \le \|t - x\|$，实部的界已满足。</p>
+
+  <p><strong>Step 5：选择虚部。</strong>对 $ix$ 重复上述论证：将 $x$ 替换为 $ix$，同样可以选取 $\beta \in \mathbb{R}$ 使得 $|\operatorname{Re} u(t) - \beta| \le \|t - ix\|$ 对所有 $t \in M$ 成立。令 $\lambda = \alpha + i\beta$（具体形式根据实部/虚部的分解确定），则</p>
+  $$|u(t) - \lambda| \le \|t - x\| \quad \forall\, t \in M$$
+  <p>由此 $u'$ 满足所需的界，引理得证。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>证明策略回顾：</strong>核心难点在于选择 $\lambda$。先处理实部：利用 $w$ 取实值的性质推导出 sup $\le$ inf 的关键不等式，从中选取 $\alpha$。再对虚部重复相同的论证。整个证明的结构是"分析选择 + 代数验证"。
+</div>
+
+<h3>本讲小结</h3>
+<table class="summary">
+  <tr><th style="width:28%">概念</th><th>要点</th></tr>
+  <tr><td><strong>Hamel basis 存在性</strong></td><td>定理 47：任何向量空间都有 Hamel basis；证明用 Zorn 引理：线性无关子集按包含排序，链的并仍线性无关，极大元即为 basis</td></tr>
+  <tr><td><strong>Hahn-Banach 定理</strong></td><td>定理 48：子空间上的有界线性泛函 $u$ 可扩张到全空间 $V$，且保持范数界 $C$ 不变；保证对偶空间 $V'$ 非平凡</td></tr>
+  <tr><td><strong>一维扩张引理</strong></td><td>引理 49：$u$ 可从 $M$ 扩张到 $M + \mathbb{C}x$，关键在于选择 $\lambda = u'(x)$</td></tr>
+  <tr><td><strong>Zorn 引理的应用模式</strong></td><td>构造偏序集 $\to$ 验证链有上界 $\to$ 得极大元 $\to$ 反证极大元满足目标；本讲中出现两次（定理 47 和定理 48）</td></tr>
+  <tr><td><strong>$\lambda$ 的选取</strong></td><td>实部：$\sup_t(w(t)-\|t-x\|) \le \alpha \le \inf_t(w(t)+\|t-x\|)$；虚部：对 $ix$ 重复</td></tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 18.102, Spring 2021 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>

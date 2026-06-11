@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 18.102 第四讲 - 开映射定理与闭图定理</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 18.102 泛函分析导论</h1>
+  <h2>第四讲：开映射定理与闭图定理</h2>
+  <p class="meta">Lecturer: Dr. Casey Rodriguez (<a href="https://www.youtube.com/watch?v=G3mAXHuoDSw" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. 开映射定理 (Theorem 37)</h3>
+
+<p>上一讲我们利用 Baire 范畴定理证明了一致有界性原理。本讲继续证明泛函分析中其余几个"有名字的定理"，从开映射定理开始。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 37 &mdash; 开映射定理 (Open Mapping Theorem)</div>
+  <p>设 $B_1, B_2$ 为两个 Banach 空间，$T \in B(B_1, B_2)$ 为<strong>满射</strong>有界线性算子。则 $T$ 是<strong>开映射 (open map)</strong>，即对所有开集 $U \subset B_1$，$T(U)$ 在 $B_2$ 中是开集。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+
+  <p><strong>Step 1：$T(B(0,1))$ 的闭包包含一个开球。</strong></p>
+  <p>因为 $T$ 满射，$B_2$ 中的每个元素都在 $T$ 的值域中。$B_1$ 中的任何元素与原点的距离有限，所以必属于某个 $B(0,n)$，因此</p>
+  $$B_2 = \bigcup_{n \in \mathbb{N}} T(B(0, n))$$
+  <p>我们将 $B_2$ 写成了可数个集合的并。取闭包后，$B_2 = \bigcup_{n} \overline{T(B(0, n))}$，这是可数个闭集的并。由 Baire 范畴定理，存在某个 $n_0$ 使得 $\overline{T(B(0, n_0))}$ 包含一个开球。由 $T$ 的线性性，$T(B(0, n_0)) = n_0 \, T(B(0, 1))$，闭包对伸缩保持，因此 $\overline{T(B(0, 1))}$ 本身也包含一个开球。</p>
+
+  <p><strong>Step 2：$\overline{T(B(0,1))}$ 包含以 $0$ 为中心的开球。</strong></p>
+  <p>由 Step 1，存在 $v_0 \in B_2$ 和 $r > 0$ 使得 $B(v_0, 4r) \subset \overline{T(B(0, 1))}$。取 $v_1 = Tu_1 \in T(B(0, 1))$（即 $\|u_1\| < 1$）使得 $\|v_0 - v_1\| < 2r$。则 $B(v_1, 2r) \subset B(v_0, 4r) \subset \overline{T(B(0, 1))}$。</p>
+  <p>对任意 $\|v\| < r$，向量 $\frac{1}{2}(2v + v_1) \in \frac{1}{2}B(v_1, 2r) \subset \frac{1}{2}\overline{T(B(0, 1))} = \overline{T(B(0, \tfrac{1}{2}))}$。因此</p>
+  $$v = -T\!\left(\frac{u_1}{2}\right) + \frac{1}{2}(2v + v_1) \;\in\; -T\!\left(\frac{u_1}{2}\right) + \overline{T\!\left(B\!\left(0, \tfrac{1}{2}\right)\right)}$$
+  <p>由线性性，$v \in \overline{T\!\left(-\frac{u_1}{2} + B\!\left(0, \tfrac{1}{2}\right)\right)}$。因为 $\left\|-\frac{u_1}{2}\right\| + \frac{1}{2} \le 1$，该集合包含在 $\overline{T(B(0, 1))}$ 中。故 $B(0, r) \subset \overline{T(B(0, 1))}$。</p>
+  <p>由齐次性，对每个 $n \in \mathbb{N}$：</p>
+  $$B(0, 2^{-n}r) \subset \overline{T(B(0, 2^{-n}))}$$
+
+  <p><strong>Step 3：去掉闭包 &mdash; 迭代逼近。</strong></p>
+  <p>目标：证明 $B(0, \frac{r}{2}) \subset T(B(0, 1))$。取任意 $\|v\| < \frac{r}{2}$。</p>
+  <p>由 Step 2（取 $n=1$），$v \in \overline{T(B(0, \tfrac{1}{2}))}$，故存在 $b_1 \in B(0, \tfrac{1}{2})$ 使得 $\|v - Tb_1\| < \frac{r}{4}$。</p>
+  <p>由 Step 2（取 $n=2$），$v - Tb_1 \in \overline{T(B(0, \tfrac{1}{4}))}$，故存在 $b_2 \in B(0, \tfrac{1}{4})$ 使得 $\|v - Tb_1 - Tb_2\| < \frac{r}{8}$。</p>
+  <p>依此类推，构造序列 $\{b_k\}$ 满足 $\|b_k\| < 2^{-k}$ 且</p>
+  $$\left\|v - \sum_{k=1}^{n} Tb_k\right\| < 2^{-n-1}r$$
+  <p>级数 $\sum_{k=1}^{\infty} b_k$ 绝对可和：$\sum_{k=1}^{\infty} \|b_k\| < \sum_{k=1}^{\infty} 2^{-k} = 1$。由 $B_1$ 的完备性，令 $b = \sum_{k=1}^{\infty} b_k \in B_1$，则 $\|b\| < 1$，即 $b \in B(0, 1)$。</p>
+  <p>又因为 $T$ 有界（连续），</p>
+  $$Tb = T\!\left(\lim_{n\to\infty}\sum_{k=1}^{n} b_k\right) = \lim_{n\to\infty}\sum_{k=1}^{n} Tb_k = v$$
+  <p>故 $v = Tb \in T(B(0, 1))$。因此 $B(0, \frac{r}{2}) \subset T(B(0, 1))$。</p>
+
+  <p><strong>Step 4：对一般开集的平移论证。</strong></p>
+  <p>设 $U \subset B_1$ 为开集，$b_2 = Tb_1$ 为 $T(U)$ 中的任意一点。因 $U$ 开，存在 $\varepsilon > 0$ 使得 $B(b_1, \varepsilon) \subset U$。由上述结论，存在 $\delta > 0$ 使得 $B(0, \delta) \subset T(B(0, 1))$。于是</p>
+  $$B(b_2, \varepsilon\delta) = b_2 + \varepsilon B(0, \delta) \subset T(b_1) + \varepsilon\, T(B(0, 1)) = T(b_1 + B(0, \varepsilon)) \subset T(U)$$
+  <p>故 $T(U)$ 中每点都是内点，$T(U)$ 是开集。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>要点：</strong>开映射定理的证明用到了两个空间的完备性 &mdash; $B_2$ 的完备性使 Baire 范畴定理适用（Step 1），$B_1$ 的完备性保证绝对可和级数收敛（Step 3）。定理告诉我们，Banach 空间之间的满射有界线性算子自动保持开集结构。
+</div>
+
+<h3>2. 推论：有界逆定理 (Corollary 38)</h3>
+
+<div class="thm-box">
+  <div class="box-title">推论 38 &mdash; 有界逆定理 (Bounded Inverse Theorem)</div>
+  <p>设 $B_1, B_2$ 为 Banach 空间，$T \in B(B_1, B_2)$ 为<strong>双射</strong>线性算子。则 $T^{-1} \in B(B_2, B_1)$，即逆映射也是有界线性算子。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>$T^{-1}$ 连续等价于：对所有开集 $U \subset B_1$，$(T^{-1})^{-1}(U) = T(U)$ 是 $B_2$ 中的开集。$T$ 满射且有界，由开映射定理，$T$ 是开映射，故 $T(U)$ 确实是开集。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>意义：</strong>有界逆定理说明，如果两个 Banach 空间之间存在一个有界线性双射，则它自动是同构 (isomorphism)。不需要额外验证逆映射的有界性 &mdash; 这是"免费"获得的。
+</div>
+
+<h3>3. 乘积 Banach 空间 (Proposition 39)</h3>
+
+<div class="def-box">
+  <div class="box-title">命题 39 &mdash; 乘积空间 $B_1 \times B_2$</div>
+  <p>设 $B_1, B_2$ 为 Banach 空间。在乘积空间 $B_1 \times B_2$（按分量进行加法和标量乘法）上定义范数</p>
+  $$\|(b_1, b_2)\| = \|b_1\| + \|b_2\|$$
+  <p>则 $(B_1 \times B_2, \|\cdot\|)$ 是 <strong>Banach 空间</strong>。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明思路</div>
+  <p>范数公理的验证是直接的。完备性：$B_1 \times B_2$ 中的 Cauchy 列 $\{(b_1^{(n)}, b_2^{(n)})\}$ 对应 $B_1$ 中的 Cauchy 列 $\{b_1^{(n)}\}$ 和 $B_2$ 中的 Cauchy 列 $\{b_2^{(n)}\}$（由分量范数的控制）。各自由完备性收敛，则乘积序列在乘积范数下也收敛。（类似于证明 $\mathbb{R}^2$ 的完备性。）$\square$</p>
+</div>
+
+<h3>4. 闭图定理 (Theorem 40)</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 40 &mdash; 闭图定理 (Closed Graph Theorem)</div>
+  <p>设 $B_1, B_2$ 为 Banach 空间，$T : B_1 \to B_2$ 为（不一定有界的）线性算子。则</p>
+  $$T \in B(B_1, B_2) \quad\Longleftrightarrow\quad \Gamma(T) = \{(u, Tu) : u \in B_1\} \;\text{在}\; B_1 \times B_2 \;\text{中是闭集}$$
+</div>
+
+<div class="remark">
+  <strong>实际意义：</strong>通常证明连续性需要验证：对序列 $u_n \to u$，$Tu_n$ 收敛<strong>且</strong>极限等于 $Tu$。闭图定理简化了这一过程 &mdash; 只需要验证：若 $u_n \to u$ 且 $Tu_n \to v$，则 $v = Tu$。换言之，不需要自己构造极限的存在性，只需要确认"如果极限存在，它必须是正确的"。
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p><strong>($\Rightarrow$) 正方向：有界 $\Rightarrow$ 图是闭的。</strong></p>
+  <p>设 $T$ 有界（因此连续）。设 $\{(u_n, Tu_n)\}$ 是 $\Gamma(T)$ 中的序列，且 $u_n \to u$，$Tu_n \to v$。由 $T$ 的连续性：</p>
+  $$v = \lim_{n\to\infty} Tu_n = T\!\left(\lim_{n\to\infty} u_n\right) = Tu$$
+  <p>因此 $(u, v) = (u, Tu) \in \Gamma(T)$，故 $\Gamma(T)$ 闭。</p>
+
+  <p><strong>($\Leftarrow$) 反方向：图闭 $\Rightarrow$ 有界。</strong></p>
+  <p>考虑交换图：</p>
+  <div class="math-display">
+  $\Gamma(T) \xrightarrow{\;\pi_1\;} B_1, \qquad \Gamma(T) \xrightarrow{\;\pi_2\;} B_2, \qquad T = \pi_2 \circ \pi_1^{-1}$
+  </div>
+  <p>其中 $\pi_1(u, Tu) = u$，$\pi_2(u, Tu) = Tu$ 为投影映射。</p>
+  <ul>
+    <li>$\Gamma(T)$ 由假设是 $B_1 \times B_2$ 中的闭子空间。由命题 39，$B_1 \times B_2$ 是 Banach 空间，故 $\Gamma(T)$ 也是 Banach 空间。</li>
+    <li>$\pi_1, \pi_2$ 是连续的：例如 $\|\pi_2(u, v)\| = \|v\| \le \|u\| + \|v\| = \|(u, v)\|$，故 $\|\pi_2\| \le 1$。类似地 $\|\pi_1\| \le 1$。</li>
+    <li>$\pi_1 : \Gamma(T) \to B_1$ 是<strong>双射</strong>（图中每个 $u$ 恰好对应一个点 $(u, Tu)$）。由推论 38（有界逆定理），$S = \pi_1^{-1} : B_1 \to \Gamma(T)$ 是有界线性算子。</li>
+  </ul>
+  <p>因此 $T = \pi_2 \circ S$ 是两个有界线性算子的复合，故 $T$ 也是有界线性算子。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>注 41：</strong>开映射定理蕴含闭图定理，反之也可以从闭图定理推出开映射定理，因此两者是<strong>逻辑等价的</strong>。
+</div>
+
+<h3>5. 预备：偏序、链与 Zorn 引理 (Definitions 42-46)</h3>
+
+<p>接下来的目标是 Hahn-Banach 定理，它回答的问题是：一般赋范空间的对偶空间是否非平凡？为此我们需要集合论中的一个重要工具。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 42 &mdash; 偏序 (Partial Order)</div>
+  <p>集合 $E$ 上的<strong>偏序</strong>是一个关系 $\preceq$，满足：</p>
+  <ul>
+    <li><strong>自反性：</strong>对所有 $e \in E$，$e \preceq e$</li>
+    <li><strong>反对称性：</strong>若 $e \preceq f$ 且 $f \preceq e$，则 $e = f$</li>
+    <li><strong>传递性：</strong>若 $e \preceq f$ 且 $f \preceq g$，则 $e \preceq g$</li>
+  </ul>
+  <p>子集 $D \subset E$ 的<strong>上界 (upper bound)</strong>是元素 $e \in E$，使得对所有 $d \in D$ 有 $d \preceq e$。</p>
+  <p>$E$ 的<strong>极大元 (maximal element)</strong>是元素 $e \in E$，使得对任何 $f \in E$，$e \preceq f \Rightarrow e = f$。</p>
+  <p>注意：偏序中不要求任意两个元素可比较；极大元也不一定"大于"所有其他元素 &mdash; 可以有"并列"的元素。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">例 43 &mdash; 幂集上的偏序</div>
+  <p>设 $S$ 为集合，在 $S$ 的幂集 $\mathcal{P}(S)$ 上定义 $E \preceq F \iff E \subseteq F$。这是一个偏序，但不是全序：并非任意两个子集都可比较（例如 $\{1\}$ 与 $\{2\}$ 不可比）。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 44 &mdash; 链 (Chain)</div>
+  <p>设 $(E, \preceq)$ 为偏序集。子集 $C \subset E$ 称为<strong>链 (chain)</strong>，如果 $C$ 中的任意两个元素可比较：对所有 $e, f \in C$，$e \preceq f$ 或 $f \preceq e$。</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">命题 45 &mdash; Zorn 引理 (Zorn's Lemma)</div>
+  <p>设 $E$ 为非空偏序集。若 $E$ 中的<strong>每一条链</strong>都有上界，则 $E$ 包含至少一个<strong>极大元</strong>。</p>
+</div>
+
+<div class="remark">
+  <strong>说明：</strong>Zorn 引理在这里作为集合论的<strong>公理</strong>接受，它等价于选择公理 (Axiom of Choice)。下一讲将用它来证明 Hahn-Banach 定理。
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 46 &mdash; Hamel 基 (Hamel Basis)</div>
+  <p>设 $V$ 为向量空间。$V$ 的一个 <strong>Hamel 基</strong> $H \subset V$ 是一个线性无关集，使得 $V$ 中的每个元素都可以写成 $H$ 中元素的<strong>有限</strong>线性组合。</p>
+</div>
+
+<div class="remark">
+  <strong>预告：</strong>在有限维线性代数中，我们通过找基并计算其基数来确定维数（例如 $\mathbb{R}^n$ 的标准基有 $n$ 个元素，$\ell^1$ 的 Hamel 基是 $(1,0,0,\ldots), (0,1,0,\ldots), \ldots$）。下一讲将用 Zorn 引理证明每个向量空间都有 Hamel 基，并由此推出 Hahn-Banach 定理。
+</div>
+
+<h3>本讲小结</h3>
+<table class="summary">
+  <tr><th style="width:28%">概念</th><th>要点</th></tr>
+  <tr><td><strong>开映射定理</strong></td><td>定理 37：Banach 空间间的满射有界线性算子是开映射；证明用 Baire 定理 + 迭代逼近去掉闭包</td></tr>
+  <tr><td><strong>有界逆定理</strong></td><td>推论 38：双射有界线性算子的逆自动有界；由开映射定理直接推出</td></tr>
+  <tr><td><strong>乘积空间</strong></td><td>命题 39：$B_1 \times B_2$ 配范数 $\|(b_1,b_2)\| = \|b_1\| + \|b_2\|$ 是 Banach 空间</td></tr>
+  <tr><td><strong>闭图定理</strong></td><td>定理 40：$T$ 有界 $\iff$ 图 $\Gamma(T)$ 闭；证明用投影映射 + 有界逆定理</td></tr>
+  <tr><td><strong>Zorn 引理</strong></td><td>命题 45：偏序集中每条链有上界 $\Rightarrow$ 存在极大元；下一讲用于 Hahn-Banach 定理</td></tr>
+  <tr><td><strong>Hamel 基</strong></td><td>定义 46：线性无关集，使每个向量都是其有限线性组合</td></tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 18.102, Spring 2021 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>

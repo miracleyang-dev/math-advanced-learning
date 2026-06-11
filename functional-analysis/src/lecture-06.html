@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 18.102 第六讲 - 双对偶空间与外测度</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 18.102 泛函分析导论</h1>
+  <h2>第六讲：双对偶空间与外测度</h2>
+  <p class="meta">Lecturer: Dr. Casey Rodriguez (<a href="https://www.youtube.com/watch?v=pWs93gASTJk" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. Hahn-Banach 的应用 (Theorem 50)</h3>
+
+<p>回顾上一讲的 Hahn-Banach 定理：子空间上满足 $|u(t)| \le C\|t\|$ 的有界线性泛函可以扩展到整个空间，且保持同样的界。本讲首先给出一个重要应用。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 50 &mdash; Hahn-Banach 的推论</div>
+  <p>设 $V$ 为赋范空间。对任意 $v \in V \setminus \{0\}$，存在 $f \in V'$（有界线性泛函）使得</p>
+  $$\|f\| = 1 \quad \text{且} \quad f(v) = \|v\|.$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>定义线性映射 $u : \mathbb{C}v \to \mathbb{C}$（其中 $\mathbb{C}v$ 为 $v$ 的 span）为</p>
+  $$u(\lambda v) = \lambda \|v\|.$$
+  <p>这是良定义的，因为 $\mathbb{C}v$ 中每个元素可唯一表示为 $\lambda v$。验证 $|u(t)| \le \|t\|$：对 $t = \lambda v$，</p>
+  $$|u(\lambda v)| = |\lambda| \cdot \|v\| = \|\lambda v\| = \|t\|.$$
+  <p>且 $u(v) = \|v\|$。由 Hahn-Banach 定理，存在 $f \in V'$ 扩展 $u$，使得 $|f(t)| \le \|t\|$ 对所有 $t \in V$ 成立。因此 $f(v) = u(v) = \|v\|$，且 $\|f\| \le 1$。又因为 $f\!\left(\frac{v}{\|v\|}\right) = 1$，故 $\|f\| = 1$。$\square$</p>
+</div>
+
+<h3>2. 双对偶空间 (Double Dual)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 51 &mdash; 双对偶空间 (Double Dual)</div>
+  <p>赋范空间 $V$ 的<strong>双对偶空间</strong>定义为</p>
+  $$V'' = (V')' = B(V', \mathbb{C}),$$
+  <p>即 $V'$ 上的所有有界线性泛函构成的空间。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">例 52 &mdash; 典范嵌入映射</div>
+  <p>固定 $v \in V$，定义 $T_v : V' \to \mathbb{C}$ 为</p>
+  $$T_v(v') = v'(v), \qquad \forall\, v' \in V'.$$
+  <p>则 $T_v \in V''$。验证：</p>
+  <ul>
+    <li><strong>线性性：</strong>$T_v(v'_1 + v'_2) = (v'_1 + v'_2)(v) = v'_1(v) + v'_2(v) = T_v(v'_1) + T_v(v'_2)$。</li>
+    <li><strong>有界性：</strong>$|T_v(v')| = |v'(v)| \le \|v\| \cdot \|v'\|$，因此 $\|T_v\| \le \|v\|$，故 $T_v$ 确实是有界线性泛函。</li>
+  </ul>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 53 &mdash; 等距算子 (Isometric Operator)</div>
+  <p>设 $V, W$ 为赋范空间。有界线性算子 $T \in B(V, W)$ 称为<strong>等距的 (isometric)</strong>，如果对所有 $v \in V$：</p>
+  $$\|Tv\| = \|v\|.$$
+</div>
+
+<h3>3. 典范嵌入定理 (Theorem 54)</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 54 &mdash; 典范嵌入是等距的</div>
+  <p>设 $v \in V$，定义 $T_v(v') = v'(v)$。则映射 $T : V \to V''$，$v \mapsto T_v$ 是<strong>等距</strong>的，即</p>
+  $$\|T_v\| = \|v\|, \qquad \forall\, v \in V.$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>在例 52 中已证 $\|T_v\| \le \|v\|$。反方向：若 $v = 0$ 则 $\|T_0\| = 0 = \|0\|$，结论成立。</p>
+  <p>若 $v \ne 0$，由定理 50，存在 $f \in V'$ 使得 $\|f\| = 1$ 且 $f(v) = \|v\|$。于是</p>
+  $$\|v\| = f(v) = |f(v)| = |T_v(f)| \le \|T_v\| \cdot \|f\| = \|T_v\|.$$
+  <p>结合 $\|T_v\| \le \|v\|$ 得 $\|T_v\| = \|v\|$，故 $T$ 是等距的。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>注意：</strong>等距算子一定是单射（injective），因为 $\|Tv\| = \|v\|$ 意味着只有零向量可以映为零。因此 $T : V \to V''$ 是一个等距嵌入（isometric embedding），即 $V$ 可以等距地嵌入到 $V''$ 中。
+</div>
+
+<h3>4. 自反空间 (Reflexive Spaces)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 55 &mdash; 自反空间 (Reflexive Space)</div>
+  <p>Banach 空间 $V$ 称为<strong>自反的 (reflexive)</strong>，如果典范嵌入 $v \mapsto T_v$ 是<strong>满射</strong>（surjective），即 $V = V''$（在典范嵌入的意义下）。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">例 56 &mdash; 自反与非自反空间</div>
+  <ul>
+    <li>对所有 $1 < p < \infty$，$\ell^p$ 是自反的：$(\ell^p)' = \ell^q$，$(\ell^q)' = \ell^p$（其中 $\frac{1}{p} + \frac{1}{q} = 1$）。</li>
+    <li>$\ell^1$ <strong>不是</strong>自反的：$(\ell^1)' = \ell^\infty$，但 $(\ell^\infty)' \ne \ell^1$。</li>
+    <li>$c_0$（收敛到 $0$ 的序列空间）<strong>不是</strong>自反的：$(c_0)' = \ell^1$，$(\ell^1)' = \ell^\infty \ne c_0$。</li>
+  </ul>
+</div>
+
+<div class="remark">
+  <strong>阶段性总结：</strong>至此，关于一般 Banach 空间的理论讨论告一段落。接下来我们转向 Lebesgue 测度与积分理论，这是构建 $L^p$ 空间的基础。
+</div>
+
+<h3>5. Lebesgue 测度的动机</h3>
+
+<p>我们已经在序列空间上讨论了 $\ell^p$ 空间。自然地，我们希望对函数定义类似的 $L^p$ 空间。但 Riemann 积分不够用 &mdash; 例如 Dirichlet 函数 $\mathbf{1}_{\mathbb{Q}}$（有理数的指示函数）不是 Riemann 可积的。</p>
+
+<p>考虑 Riemann 可积函数空间 $L^1_R([0,1])$，配备范数</p>
+$$\|f\|_1 = \int_0^1 |f(x)|\,dx.$$
+<p>（严格来说这只是半范数，因为单点处非零的函数积分为零。）问题在于：<strong>这个空间不完备</strong>，因此不是 Banach 空间。我们需要更一般的积分来获得完备性。</p>
+
+<p><strong>策略：</strong>先在 $\mathbb{R}$ 的子集上定义测度 $m(E)$（"集合的长度"），然后基于测度构建积分。对指示函数 $\mathbf{1}_E$，积分应等于 $m(E)$。</p>
+
+<h4>对测度的四个期望</h4>
+<ol>
+  <li><strong>定义域：</strong>$m$ 定义在 $\mathcal{P}(\mathbb{R})$（幂集）上，即能测量任意子集。</li>
+  <li><strong>区间长度：</strong>若 $I$ 为区间，则 $m(I) = \ell(I)$（区间长度），无论开闭。</li>
+  <li><strong>可数可加性：</strong>若 $\{E_n\}$ 两两不交，则 $m\!\left(\bigcup_n E_n\right) = \sum_n m(E_n)$。</li>
+  <li><strong>平移不变性：</strong>$m(x + E) = m(E)$，$\forall\, x \in \mathbb{R}$。</li>
+</ol>
+
+<div class="remark">
+  <strong>Vitali 构造：</strong>不幸的是，不存在同时满足以上四条的函数 $m : \mathcal{P}(\mathbb{R}) \to [0,\infty]$。Vitali 构造给出了反例。解决方案：放弃条件 (1)，只在 $\mathbb{R}$ 的部分子集（Lebesgue 可测集）上定义 $m$，同时保持 (2)、(3)、(4)。可测集的族足够大，满足实际需求。
+</div>
+
+<h3>6. 外测度 (Outer Measure)</h3>
+
+<p>Carath&eacute;odory 的策略：先定义在<strong>所有</strong>子集上的外测度 $m^*$，它满足条件 (2)、(4) 和"几乎 (3)"，然后限制到行为良好的子集上得到真正的测度。</p>
+
+<div class="thm-box">
+  <div class="box-title">定义 58 &mdash; 外测度 (Outer Measure)</div>
+  <p>对任意区间 $I \subset \mathbb{R}$，记 $\ell(I)$ 为其长度。对任意子集 $A \subset \mathbb{R}$，定义</p>
+  $$m^*(A) = \inf\!\left\{\sum_n \ell(I_n) : \{I_n\} \text{ 为可数族开区间，且 } A \subset \bigcup_n I_n\right\}.$$
+  <p>即用开区间族覆盖 $A$，取所有覆盖的总长度的下确界。显然 $m^*(A) \ge 0$。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">例 59 &mdash; 单点集的外测度</div>
+  <p>$m^*(\{0\}) = 0$。对任意 $\varepsilon > 0$，用开区间 $\left(-\frac{\varepsilon}{2},\, \frac{\varepsilon}{2}\right)$ 覆盖 $\{0\}$，其长度为 $\varepsilon$。故</p>
+  $$0 \le m^*(\{0\}) \le \varepsilon.$$
+  <p>令 $\varepsilon \to 0$ 得 $m^*(\{0\}) = 0$。类似地，任何有限集的外测度都为 $0$。</p>
+</div>
+
+<h3>7. 外测度的性质</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 60 &mdash; 可数集的外测度为零</div>
+  <p>若 $A \subset \mathbb{R}$ 是可数集，则 $m^*(A) = 0$。</p>
+  <p>特别地，$m^*(\mathbb{Q}) = 0$ &mdash; 尽管有理数在 $\mathbb{R}$ 中稠密，但它们的"测度"为零。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>设 $A$ 可数无穷（有限情形类似）。将 $A$ 枚举为 $A = \{a_1, a_2, a_3, \dots\}$。取任意 $\varepsilon > 0$，对每个 $n \in \mathbb{N}$，令</p>
+  $$I_n = \left(a_n - \frac{\varepsilon}{2^{n+1}},\; a_n + \frac{\varepsilon}{2^{n+1}}\right).$$
+  <p>则 $a_n \in I_n$，故 $A \subset \bigcup_n I_n$。各区间长度之和为</p>
+  $$\sum_n \ell(I_n) = \sum_n \frac{\varepsilon}{2^n} = \varepsilon.$$
+  <p>因此 $m^*(A) \le \varepsilon$。令 $\varepsilon \to 0$ 得 $m^*(A) = 0$。$\square$</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">引理 61 &mdash; 单调性 (Monotonicity)</div>
+  <p>若 $A \subset B$，则 $m^*(A) \le m^*(B)$。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>$B$ 的任何覆盖也是 $A$ 的覆盖。因此，对 $A$ 的所有覆盖取下确界只可能更小或相等：</p>
+  $$m^*(A) = \inf\!\left\{\sum \ell(I_n) : A \subset \bigcup I_n\right\} \le \inf\!\left\{\sum \ell(I_n) : B \subset \bigcup I_n\right\} = m^*(B). \quad\square$$
+</div>
+
+<div class="thm-box">
+  <div class="box-title">定理 62 &mdash; 可数次可加性 (Countable Subadditivity)</div>
+  <p>设 $\{A_n\}$ 为 $\mathbb{R}$ 的可数族子集（不必不交）。则</p>
+  $$m^*\!\left(\bigcup_n A_n\right) \le \sum_n m^*(A_n).$$
+  <p>这是可加性条件 (3) 的"半边"：不等式方向。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>若某个 $m^*(A_n) = \infty$ 或 $\sum_n m^*(A_n) = \infty$，则右端已经为 $\infty$，不等式自动成立。</p>
+  <p>设所有 $m^*(A_n) < \infty$ 且级数收敛。取 $\varepsilon > 0$，对每个 $n$，选取可数族开区间 $\{I_{nk}\}_{k \in \mathbb{N}}$ 覆盖 $A_n$，使得</p>
+  $$\sum_{k=1}^{\infty} \ell(I_{nk}) < m^*(A_n) + \frac{\varepsilon}{2^n}.$$
+  <p>则 $\{I_{nk}\}_{n,k \in \mathbb{N}}$ 是可数族开区间，且</p>
+  $$\bigcup_n A_n \subset \bigcup_{n,k} I_{nk}.$$
+  <p>因此</p>
+  $$m^*\!\left(\bigcup_n A_n\right) \le \sum_{n,k} \ell(I_{nk}) = \sum_n \sum_k \ell(I_{nk}) < \sum_n \left(m^*(A_n) + \frac{\varepsilon}{2^n}\right) = \sum_n m^*(A_n) + \varepsilon.$$
+  <p>令 $\varepsilon \to 0$ 得 $m^*\!\left(\bigcup_n A_n\right) \le \sum_n m^*(A_n)$。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>证明技巧：</strong>这里使用了泛函分析中常见的 "$\varepsilon$-trick"：为了证明 $X \le Y$，等价地证明对任意 $\varepsilon > 0$ 有 $X \le Y + \varepsilon$。对每个 $A_n$ 选覆盖时多留 $\varepsilon/2^n$ 的余量，保证总余量为 $\varepsilon$。
+</div>
+
+<h3>本讲小结</h3>
+<table class="summary">
+  <tr><th style="width:28%">概念</th><th>要点</th></tr>
+  <tr><td><strong>Hahn-Banach 应用</strong></td><td>定理 50：对任意 $v \ne 0$，存在 $f \in V'$ 使 $\|f\|=1$，$f(v)=\|v\|$</td></tr>
+  <tr><td><strong>双对偶空间 $V''$</strong></td><td>定义 51：$V'' = (V')'$；典范映射 $T_v(v') = v'(v)$ 给出 $V \hookrightarrow V''$</td></tr>
+  <tr><td><strong>等距嵌入</strong></td><td>定理 54：$v \mapsto T_v$ 是等距的，即 $\|T_v\| = \|v\|$</td></tr>
+  <tr><td><strong>自反空间</strong></td><td>定义 55：$V$ 自反 $\iff$ $v \mapsto T_v$ 满射；$\ell^p$（$1 < p < \infty$）自反，$\ell^1, c_0$ 不自反</td></tr>
+  <tr><td><strong>Lebesgue 测度动机</strong></td><td>Riemann 积分不完备；四条期望性质不能同时满足（Vitali 构造）</td></tr>
+  <tr><td><strong>外测度 $m^*$</strong></td><td>定义 58：用开区间覆盖取下确界；可数集外测度为零（定理 60）</td></tr>
+  <tr><td><strong>外测度性质</strong></td><td>单调性（引理 61）与可数次可加性（定理 62）：$m^*(\bigcup A_n) \le \sum m^*(A_n)$</td></tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 18.102, Spring 2021 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>
