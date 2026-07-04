@@ -10,7 +10,7 @@
 
 | 课程 | 来源 | 状态 | 进度 |
 |------|------|------|------|
-| [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 | 6 / 23 |
+| [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 | 10 / 23 |
 | [偏微分方程](./pde/) | 待定 | 计划中 | — |
 
 ## 泛函分析 — MIT 18.102
@@ -25,6 +25,10 @@
 | 4 | Open Mapping Theorem, Closed Graph Theorem | [泛函分析_L4](./functional-analysis/泛函分析_L4.pdf) |
 | 5 | Zorn's Lemma, Hahn-Banach Theorem | [泛函分析_L5](./functional-analysis/泛函分析_L5.pdf) |
 | 6 | Double Dual, Outer Measure | [泛函分析_L6](./functional-analysis/泛函分析_L6.pdf) |
+| 7 | Sigma Algebras | [泛函分析_L7](./functional-analysis/泛函分析_L7.pdf) |
+| 8 | Lebesgue Measurable Subsets and Measure | [泛函分析_L8](./functional-analysis/泛函分析_L8.pdf) |
+| 9 | Lebesgue Measurable Functions | [泛函分析_L9](./functional-analysis/泛函分析_L9.pdf) |
+| 10 | Simple Functions | [泛函分析_L10](./functional-analysis/泛函分析_L10.pdf) |
 | ... | ... | ... |
 
 ### 涵盖内容

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 18.102 第七讲 - Sigma 代数</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 18.102 泛函分析导论</h1>
+  <h2>第七讲：$\sigma$-代数</h2>
+  <p class="meta">Lecturer: Dr. Casey Rodriguez (<a href="https://www.youtube.com/watch?v=OHiu2F18dFA" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. 外测度回顾与目标</h3>
+
+<p>上一讲我们引入了<strong>外测度 (outer measure)</strong> $m^*$，其定义为：对任意 $A \subseteq \mathbb{R}$，</p>
+$$m^*(A) = \inf\left\{\sum_{n=1}^{\infty} \ell(I_n) : A \subseteq \bigcup_{n=1}^{\infty} I_n,\; I_n \text{ 为开区间}\right\}$$
+<p>其中 $\ell((a,b)) = b - a$ 表示开区间的长度。</p>
+
+<h4>外测度的四个期望性质</h4>
+<p>我们希望构造的"测度"应满足以下四个性质：</p>
+<ol>
+  <li><strong>非负性：</strong>$m^*(A) \ge 0$ 对所有 $A \subseteq \mathbb{R}$；</li>
+  <li><strong>区间长度：</strong>$m^*(I) = \ell(I)$ 对所有区间 $I$；</li>
+  <li><strong>平移不变性：</strong>$m^*(A + x) = m^*(A)$ 对所有 $x \in \mathbb{R}$；</li>
+  <li><strong>可数可加性：</strong>若 $\{E_n\}$ 两两不交，则 $m^*\!\left(\bigcup_n E_n\right) = \sum_n m^*(E_n)$。</li>
+</ol>
+
+<p>上一讲已证明 $m^*$ 满足性质 1、3，以及<strong>可数次可加性</strong>（subadditivity）：</p>
+$$m^*\!\left(\bigcup_n E_n\right) \le \sum_n m^*(E_n)$$
+<p>但等号并不总成立 &mdash; 可数可加性在全体子集 $\mathcal{P}(\mathbb{R})$ 上不成立（Vitali 集的存在性说明了这一点）。</p>
+
+<h4>本讲策略</h4>
+<p>解决方案：<strong>限制定义域</strong>。我们将 $m^*$ 的定义域从 $\mathcal{P}(\mathbb{R})$ 缩小到一个"表现良好"的子集族 $\mathcal{M}$（称为 Lebesgue 可测集族），在 $\mathcal{M}$ 上 $m^*$ 将满足可数可加性。本讲的目标是：</p>
+<ul>
+  <li>证明 $m^*(I) = \ell(I)$（性质 2）；</li>
+  <li>定义 Lebesgue 可测集，建立基本性质；</li>
+  <li>引入代数与 $\sigma$-代数的概念，为证明 $\mathcal{M}$ 是 $\sigma$-代数做准备。</li>
+</ul>
+
+<h3>2. 区间的外测度 (Proposition 63)</h3>
+
+<div class="thm-box">
+  <div class="box-title">命题 63 &mdash; 区间的外测度</div>
+  <p>若 $I$ 是 $\mathbb{R}$ 的任意区间（有界或无界、开或闭或半开），则</p>
+  $$m^*(I) = \ell(I)$$
+  <p>其中 $\ell(I)$ 为 $I$ 的长度（无界区间时为 $+\infty$）。换言之，不可能用总长度更短的开区间覆盖 $I$。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p><strong>情形 1：$I = [a, b]$ 为有界闭区间。</strong></p>
+
+  <p><strong>上界 $m^*([a,b]) \le b - a$：</strong>对任意 $\varepsilon > 0$，注意到 $[a,b] \subseteq (a - \varepsilon, b + \varepsilon)$。因此，取单个开区间 $(a-\varepsilon, b+\varepsilon)$ 作为覆盖，其长度为 $b - a + 2\varepsilon$。由外测度的定义（所有覆盖的总长度的下确界），得</p>
+  $$m^*([a,b]) \le \ell\big((a-\varepsilon, b+\varepsilon)\big) = b - a + 2\varepsilon$$
+  <p>由于 $\varepsilon > 0$ 任意，令 $\varepsilon \to 0$，得 $m^*([a,b]) \le b - a$。特别地，$m^*([a,b])$ 是有限值。</p>
+
+  <p><strong>下界 $m^*([a,b]) \ge b - a$：</strong>这是更关键的方向。设 $\{I_n\}_{n=1}^{\infty}$ 是任意一族开区间，满足 $[a,b] \subseteq \bigcup_{n=1}^{\infty} I_n$。我们需要证明 $\sum_{n=1}^{\infty} \ell(I_n) \ge b - a$。</p>
+
+  <p><strong>Step 1（应用 Heine-Borel 定理）：</strong>$[a,b]$ 是紧集，而 $\{I_n\}$ 构成 $[a,b]$ 的开覆盖。由 Heine-Borel 定理，存在有限子覆盖 $\{J_1, J_2, \ldots, J_N\}$，使得 $[a,b] \subseteq \bigcup_{k=1}^N J_k$。</p>
+
+  <p><strong>Step 2（重新排列有限覆盖）：</strong>在有限覆盖 $\{J_1, \ldots, J_N\}$ 中，左端点 $a$ 必属于某个区间。将该区间重新标记为 $J_1 = (a_1, b_1)$，则 $a_1 < a < b_1$。</p>
+  <ul>
+    <li>若 $b_1 > b$，则 $J_1$ 已覆盖整个 $[a,b]$，且 $\ell(J_1) = b_1 - a_1 > b - a$，证明结束。</li>
+    <li>若 $b_1 \le b$，则点 $b_1$ 未被 $J_1$ 覆盖（$J_1$ 是开区间），但 $b_1 \in [a,b]$，故必有另一区间包含 $b_1$。将该区间标记为 $J_2 = (a_2, b_2)$，则 $a_2 < b_1 < b_2$。</li>
+  </ul>
+  <p>继续此过程：在每一步中，若 $b_k \le b$，则存在某个区间包含 $b_k$，标记为 $J_{k+1} = (a_{k+1}, b_{k+1})$，满足 $a_{k+1} < b_k < b_{k+1}$。由于只有有限个区间，此过程必须终止，即存在 $K \le N$ 使得 $b_K > b$。</p>
+
+  <p><strong>Step 3（链式不等式）：</strong>经过重排后，我们有关系：</p>
+  <ul>
+    <li>$a_1 < a$（$J_1$ 包含 $a$）</li>
+    <li>对 $k = 1, \ldots, K-1$：$a_{k+1} < b_k < b_{k+1}$（相邻区间链接）</li>
+    <li>$b_K > b$（最后一个区间超过 $b$）</li>
+  </ul>
+
+  <p><strong>Step 4（伸缩求和）：</strong>计算这 $K$ 个区间的长度之和：</p>
+  $$\sum_{k=1}^K \ell(J_k) = \sum_{k=1}^K (b_k - a_k) = (b_1 - a_1) + (b_2 - a_2) + \cdots + (b_K - a_K)$$
+  <p>将此和重新分组：</p>
+  $$= b_K + (b_{K-1} - a_K) + (b_{K-2} - a_{K-1}) + \cdots + (b_1 - a_2) - a_1$$
+  <p>由链式关系 $a_{k+1} < b_k$，每个括号 $(b_k - a_{k+1}) > 0$，故</p>
+  $$\sum_{k=1}^K (b_k - a_k) \ge b_K - a_1 > b - a$$
+  <p>（最后一步使用了 $b_K > b$ 和 $a_1 < a$。）</p>
+
+  <p><strong>结论：</strong>由于 $\sum_{n=1}^{\infty} \ell(I_n) \ge \sum_{k=1}^N \ell(J_k) \ge \sum_{k=1}^K \ell(J_k) > b - a$，对任意覆盖 $\{I_n\}$ 都成立，取下确界得 $m^*([a,b]) \ge b-a$。</p>
+  <p>综合两个方向：$m^*([a,b]) = b - a = \ell([a,b])$。</p>
+
+  <p><strong>情形 2：$I$ 为其他有界区间类型。</strong></p>
+  <p>设 $I$ 为 $[a,b)$, $(a,b]$, 或 $(a,b)$ 之一。对任意 $\varepsilon > 0$（充分小使得 $\varepsilon < (b-a)/2$），有夹逼：</p>
+  $$[a+\varepsilon,\; b-\varepsilon] \;\subseteq\; I \;\subseteq\; [a-\varepsilon,\; b+\varepsilon]$$
+  <p>由外测度的单调性和情形 1 的结论：</p>
+  $$m^*([a+\varepsilon, b-\varepsilon]) \le m^*(I) \le m^*([a-\varepsilon, b+\varepsilon])$$
+  $$\Longrightarrow\quad (b-a) - 2\varepsilon \le m^*(I) \le (b-a) + 2\varepsilon$$
+  <p>令 $\varepsilon \to 0$，得 $m^*(I) = b - a = \ell(I)$。</p>
+
+  <p><strong>情形 3：$I$ 为无界区间。</strong></p>
+  <p>设 $I$ 为 $(a, +\infty)$, $[a, +\infty)$, $(-\infty, a)$, $(-\infty, a]$, 或 $(-\infty, +\infty)$ 之一。对任意 $M > 0$，$I$ 包含一个长度为 $M$ 的有界闭区间，故由单调性 $m^*(I) \ge M$。由 $M$ 的任意性，$m^*(I) = +\infty = \ell(I)$。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>关键洞察：</strong>证明中最核心的思想是利用 <strong>Heine-Borel 紧致性定理</strong>将可数覆盖问题化为有限覆盖问题，然后通过精巧的重排和伸缩求和得到下界。这体现了紧致性在测度论中的基础作用。
+</div>
+
+<h3>3. 开集逼近 (Theorem 64)</h3>
+
+<p>下面的定理说明，就外测度而言，任何集合都可以被开集以任意精度逼近。这是一个技术性但非常有用的结果。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 64 &mdash; 开集逼近</div>
+  <p>对任意子集 $A \subseteq \mathbb{R}$ 和任意 $\varepsilon > 0$，存在开集 $O$ 使得 $A \subseteq O$ 且</p>
+  $$m^*(A) \le m^*(O) \le m^*(A) + \varepsilon$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p><strong>情形 1：$m^*(A) = +\infty$。</strong>取 $O = \mathbb{R}$（整个实数轴）。则 $O$ 是开集，$A \subseteq O$，且 $m^*(O) = +\infty = m^*(A)$，不等式自然成立。</p>
+
+  <p><strong>情形 2：$m^*(A) < +\infty$。</strong>由外测度的定义（下确界），对给定的 $\varepsilon > 0$，存在一族开区间 $\{I_n\}_{n=1}^{\infty}$ 满足：</p>
+  $$A \subseteq \bigcup_{n=1}^{\infty} I_n \qquad \text{且} \qquad \sum_{n=1}^{\infty} \ell(I_n) \le m^*(A) + \varepsilon$$
+  <p>（因为 $m^*(A)$ 是所有覆盖总长度的下确界，所以可以找到总长度与 $m^*(A)$ 之差不超过 $\varepsilon$ 的覆盖。）</p>
+
+  <p>定义 $O = \bigcup_{n=1}^{\infty} I_n$。则：</p>
+  <ul>
+    <li><strong>$O$ 是开集：</strong>$O$ 是开区间（开集）的并集，开集的任意并仍为开集。</li>
+    <li><strong>$A \subseteq O$：</strong>由覆盖条件直接得到。</li>
+    <li><strong>$m^*(A) \le m^*(O)$：</strong>由外测度的单调性（$A \subseteq O \Rightarrow m^*(A) \le m^*(O)$）。</li>
+    <li><strong>$m^*(O) \le m^*(A) + \varepsilon$：</strong>由可数次可加性和命题 63：</li>
+  </ul>
+  $$m^*(O) = m^*\!\left(\bigcup_{n=1}^{\infty} I_n\right) \le \sum_{n=1}^{\infty} m^*(I_n) = \sum_{n=1}^{\infty} \ell(I_n) \le m^*(A) + \varepsilon$$
+  <p>（第二个等号使用了命题 63：每个开区间的外测度等于其长度。）</p>
+
+  <p>综合以上四点，$m^*(A) \le m^*(O) \le m^*(A) + \varepsilon$。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>直观意义：</strong>每个集合的外测度都可以通过开集从外部"无限接近"地逼近。这意味着外测度具有良好的正则性。此定理在后续证明可测集的性质时会反复使用。
+</div>
+
+<h3>4. Lebesgue 可测集 (Definition 65)</h3>
+
+<p>现在我们给出"表现良好"的集合的精确定义。这个定义归功于 Carath&eacute;odory，其核心思想是：一个集合 $E$ 是可测的，当且仅当它能将任何集合"干净地切成两半"。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 65 &mdash; Lebesgue 可测集</div>
+  <p>集合 $E \subseteq \mathbb{R}$ 称为 <strong>Lebesgue 可测的</strong>，如果对所有 $A \subseteq \mathbb{R}$，</p>
+  $$m^*(A) = m^*(A \cap E) + m^*(A \cap E^c)$$
+  <p>其中 $E^c = \mathbb{R} \setminus E$ 表示 $E$ 的补集。</p>
+</div>
+
+<div class="remark">
+  <strong>关于定义的简化：</strong>注意对任意集合 $A$，由 $A = (A \cap E) \cup (A \cap E^c)$ 和外测度的可数次可加性，我们总有
+  $$m^*(A) \le m^*(A \cap E) + m^*(A \cap E^c)$$
+  因此，要验证 $E$ 可测，只需证明<strong>反方向</strong>的不等式：
+  $$m^*(A \cap E) + m^*(A \cap E^c) \le m^*(A)$$
+  对所有 $A \subseteq \mathbb{R}$ 成立。此外，当 $m^*(A) = +\infty$ 时不等式自动成立，故实际上只需对 $m^*(A) < +\infty$ 的集合 $A$ 验证。
+</div>
+
+<div class="remark">
+  <strong>Carath&eacute;odory 条件的直观：</strong>可测集 $E$ 对测度"透明"&mdash; 用 $E$ 和 $E^c$ 切割任何集合 $A$ 时，两部分的外测度之和恰好等于 $A$ 本身的外测度，没有"损失"也没有"重叠效应"。这正是可数可加性所需要的性质。
+</div>
+
+<h3>5. 基本可测集 (Lemma 66, Proposition 67)</h3>
+
+<div class="thm-box">
+  <div class="box-title">引理 66 &mdash; 基本可测集</div>
+  <p>(i) $\varnothing$ 和 $\mathbb{R}$ 是可测集。</p>
+  <p>(ii) $E$ 可测当且仅当 $E^c$ 可测。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p><strong>(i) $\varnothing$ 可测：</strong>对任意 $A \subseteq \mathbb{R}$，</p>
+  $$m^*(A \cap \varnothing) + m^*(A \cap \varnothing^c) = m^*(\varnothing) + m^*(A \cap \mathbb{R}) = 0 + m^*(A) = m^*(A)$$
+  <p>故 Carath&eacute;odory 条件成立，$\varnothing$ 可测。</p>
+
+  <p><strong>$\mathbb{R}$ 可测：</strong>对任意 $A \subseteq \mathbb{R}$，</p>
+  $$m^*(A \cap \mathbb{R}) + m^*(A \cap \mathbb{R}^c) = m^*(A) + m^*(\varnothing) = m^*(A) + 0 = m^*(A)$$
+  <p>故 $\mathbb{R}$ 可测。</p>
+
+  <p><strong>(ii) 对称性：</strong>注意定义 65 中的条件关于 $E$ 和 $E^c$ 完全对称 &mdash; 将 $E$ 换成 $E^c$ 时，$A \cap E$ 和 $A \cap E^c$ 只是互换了位置，加法满足交换律，因此条件不变。故 $E$ 可测当且仅当 $E^c$ 可测。$\square$</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">命题 67 &mdash; 零测集可测</div>
+  <p>若 $m^*(E) = 0$，则 $E$ 是 Lebesgue 可测的。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>设 $m^*(E) = 0$。我们需要证明对任意 $A \subseteq \mathbb{R}$：</p>
+  $$m^*(A \cap E) + m^*(A \cap E^c) \le m^*(A)$$
+  <p>（反方向不等式由次可加性自动成立。）</p>
+
+  <p><strong>Step 1：估计 $m^*(A \cap E)$。</strong>由于 $A \cap E \subseteq E$，外测度的单调性给出</p>
+  $$m^*(A \cap E) \le m^*(E) = 0$$
+  <p>又因为外测度非负，所以 $m^*(A \cap E) = 0$。</p>
+
+  <p><strong>Step 2：估计 $m^*(A \cap E^c)$。</strong>由于 $A \cap E^c \subseteq A$，外测度的单调性给出</p>
+  $$m^*(A \cap E^c) \le m^*(A)$$
+
+  <p><strong>Step 3：合并。</strong></p>
+  $$m^*(A \cap E) + m^*(A \cap E^c) = 0 + m^*(A \cap E^c) = m^*(A \cap E^c) \le m^*(A)$$
+
+  <p>这正是所需的不等式，故 $E$ 可测。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>意义：</strong>命题 67 表明所有"零测集"（例如可数集、Cantor 集等）都是 Lebesgue 可测的。这是 Lebesgue 测度相对于 Jordan 测度的一大优势 &mdash; Lebesgue 测度是<strong>完备的</strong>：零测集的任何子集仍然可测（因为零测集的子集仍然是零测集）。
+</div>
+
+<h3>6. 可测集的有限并 (Proposition 68, Corollary 69)</h3>
+
+<div class="thm-box">
+  <div class="box-title">命题 68 &mdash; 两个可测集的并可测</div>
+  <p>若 $E_1$ 和 $E_2$ 都是可测集，则 $E_1 \cup E_2$ 也是可测集。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>设 $A \subseteq \mathbb{R}$ 为任意集合。我们需要证明：</p>
+  $$m^*\big(A \cap (E_1 \cup E_2)\big) + m^*\big(A \cap (E_1 \cup E_2)^c\big) \le m^*(A)$$
+
+  <p><strong>Step 1：简化补集。</strong>由 De Morgan 律：</p>
+  $$(E_1 \cup E_2)^c = E_1^c \cap E_2^c$$
+
+  <p><strong>Step 2：对 $A \cap E_1^c$ 使用 $E_2$ 的可测性。</strong>由于 $E_2$ 可测，对集合 $A \cap E_1^c$ 应用 Carath&eacute;odory 条件：</p>
+  $$m^*(A \cap E_1^c) = m^*\big((A \cap E_1^c) \cap E_2\big) + m^*\big((A \cap E_1^c) \cap E_2^c\big)$$
+  <p>即：</p>
+  $$m^*(A \cap E_1^c) = m^*(A \cap E_1^c \cap E_2) + m^*(A \cap E_1^c \cap E_2^c) \tag{$*$}$$
+
+  <p><strong>Step 3：对 $A$ 使用 $E_1$ 的可测性。</strong>由 $E_1$ 可测：</p>
+  $$m^*(A) = m^*(A \cap E_1) + m^*(A \cap E_1^c) \tag{$**$}$$
+
+  <p><strong>Step 4：将 $(*)$ 代入 $(**)$。</strong></p>
+  $$m^*(A) = m^*(A \cap E_1) + m^*(A \cap E_1^c \cap E_2) + m^*(A \cap E_1^c \cap E_2^c) \tag{$***$}$$
+
+  <p><strong>Step 5：处理 $A \cap (E_1 \cup E_2)$。</strong>注意：</p>
+  $$A \cap (E_1 \cup E_2) = (A \cap E_1) \cup (A \cap E_2) = (A \cap E_1) \cup (A \cap E_2 \cap E_1^c)$$
+  <p>（最后一步是因为 $A \cap E_2$ 中属于 $E_1$ 的部分已被 $A \cap E_1$ 包含。）由次可加性：</p>
+  $$m^*\big(A \cap (E_1 \cup E_2)\big) \le m^*(A \cap E_1) + m^*(A \cap E_2 \cap E_1^c) \tag{$\dagger$}$$
+
+  <p><strong>Step 6：合并得出结论。</strong>由 $(***)$ 和 $(\dagger)$，以及 $(E_1 \cup E_2)^c = E_1^c \cap E_2^c$：</p>
+  $$m^*\big(A \cap (E_1 \cup E_2)\big) + m^*\big(A \cap (E_1 \cup E_2)^c\big)$$
+  $$\le \big[m^*(A \cap E_1) + m^*(A \cap E_1^c \cap E_2)\big] + m^*(A \cap E_1^c \cap E_2^c)$$
+  $$= m^*(A)$$
+  <p>最后的等号正是 $(***)$。这就证明了 $E_1 \cup E_2$ 满足 Carath&eacute;odory 条件。$\square$</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">推论 69 &mdash; 有限并可测</div>
+  <p>若 $E_1, E_2, \ldots, E_n$ 都是可测集，则 $\bigcup_{k=1}^n E_k$ 也是可测集。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（数学归纳法）</div>
+  <p><strong>基础：</strong>$n = 1$ 时，$\bigcup_{k=1}^1 E_k = E_1$ 可测，平凡成立。</p>
+  <p><strong>归纳假设：</strong>假设对某个 $n \ge 1$，$\bigcup_{k=1}^n E_k$ 可测。</p>
+  <p><strong>归纳步骤：</strong>考虑 $\bigcup_{k=1}^{n+1} E_k = \left(\bigcup_{k=1}^n E_k\right) \cup E_{n+1}$。由归纳假设 $\bigcup_{k=1}^n E_k$ 可测，且 $E_{n+1}$ 可测。由命题 68，两个可测集的并可测，故 $\bigcup_{k=1}^{n+1} E_k$ 可测。</p>
+  <p>由数学归纳原理，对一切 $n \in \mathbb{N}$，$\bigcup_{k=1}^n E_k$ 可测。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>注意：</strong>推论 69 仅保证<strong>有限并</strong>可测。由有限步归纳法无法直接推出可数并可测 &mdash; 那需要额外的论证（将在下一讲完成），这正是 $\sigma$-代数概念的核心所在。
+</div>
+
+<h3>7. 代数与 $\sigma$-代数 (Definition 70)</h3>
+
+<p>为了系统地描述可测集的结构，我们引入代数和 $\sigma$-代数的一般定义。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 70 &mdash; 代数 (Algebra of Sets)</div>
+  <p>$\mathcal{P}(\mathbb{R})$ 的一个非空子集族 $\mathcal{A}$ 称为<strong>代数</strong>（集合代数），如果满足：</p>
+  <ol>
+    <li><strong>对补封闭：</strong>若 $E \in \mathcal{A}$，则 $E^c \in \mathcal{A}$；</li>
+    <li><strong>对有限并封闭：</strong>若 $E_1, E_2, \ldots, E_n \in \mathcal{A}$，则 $\bigcup_{k=1}^n E_k \in \mathcal{A}$。</li>
+  </ol>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 70（续）&mdash; $\sigma$-代数 (Sigma-Algebra)</div>
+  <p>代数 $\mathcal{A}$ 进一步称为 <strong>$\sigma$-代数</strong>，如果还满足：</p>
+  <ol start="3">
+    <li><strong>对可数并封闭：</strong>若 $\{E_n\}_{n=1}^{\infty} \subseteq \mathcal{A}$，则 $\bigcup_{n=1}^{\infty} E_n \in \mathcal{A}$。</li>
+  </ol>
+  <p>换言之，$\sigma$-代数在补运算和可数并运算下封闭。</p>
+</div>
+
+<h4>由定义推出的性质</h4>
+
+<p><strong>性质 1：$\varnothing$ 和 $\mathbb{R}$ 属于任何代数。</strong></p>
+<p>由于 $\mathcal{A}$ 非空，存在 $E \in \mathcal{A}$。对补封闭给出 $E^c \in \mathcal{A}$。对有限并封闭给出 $E \cup E^c = \mathbb{R} \in \mathcal{A}$。再取补得 $\varnothing = \mathbb{R}^c \in \mathcal{A}$。</p>
+
+<p><strong>性质 2：对有限交封闭。</strong></p>
+<p>由 De Morgan 律：若 $E_1, \ldots, E_n \in \mathcal{A}$，则</p>
+$$\bigcap_{k=1}^n E_k = \left(\bigcup_{k=1}^n E_k^c\right)^c$$
+<p>由于 $\mathcal{A}$ 对补封闭，$E_k^c \in \mathcal{A}$；对有限并封闭给出 $\bigcup_k E_k^c \in \mathcal{A}$；再取补得 $\bigcap_k E_k \in \mathcal{A}$。</p>
+
+<p><strong>性质 3：$\sigma$-代数对可数交封闭。</strong></p>
+<p>类似地，若 $\{E_n\} \subseteq \mathcal{A}$（$\mathcal{A}$ 为 $\sigma$-代数），则</p>
+$$\bigcap_{n=1}^{\infty} E_n = \left(\bigcup_{n=1}^{\infty} E_n^c\right)^c \in \mathcal{A}$$
+
+<p><strong>性质 4：对差集封闭。</strong>若 $E, F \in \mathcal{A}$，则 $E \setminus F = E \cap F^c \in \mathcal{A}$。</p>
+
+<h4>例 71 &mdash; $\sigma$-代数的例子</h4>
+
+<p><strong>例 1（平凡 $\sigma$-代数）：</strong>$\mathcal{A} = \{\varnothing, \mathbb{R}\}$。对补封闭显然；可数并：$\varnothing$ 的任何并为 $\varnothing$ 或包含 $\mathbb{R}$ 则为 $\mathbb{R}$，均在 $\mathcal{A}$ 中。</p>
+
+<p><strong>例 2（幂集）：</strong>$\mathcal{A} = \mathcal{P}(\mathbb{R})$（所有子集的全体）。显然对一切运算封闭。这是最大的 $\sigma$-代数。</p>
+
+<p><strong>例 3（余可数 $\sigma$-代数）：</strong></p>
+$$\mathcal{A} = \{E \subseteq \mathbb{R} : E \text{ 可数或 } E^c \text{ 可数}\}$$
+
+<div class="proof-box">
+  <div class="box-title">证明 $\mathcal{A}$ 是 $\sigma$-代数</div>
+
+  <p><strong>非空：</strong>$\varnothing$ 是可数集（有限集是可数集的特例），故 $\varnothing \in \mathcal{A}$。</p>
+
+  <p><strong>对补封闭：</strong>设 $E \in \mathcal{A}$。则 $E$ 可数或 $E^c$ 可数。对于 $E^c$：它的补集是 $(E^c)^c = E$，所以 $E^c$ 可数或 $(E^c)^c = E$ 可数。这正是 $E^c \in \mathcal{A}$ 的条件。</p>
+
+  <p><strong>对可数并封闭：</strong>设 $\{E_n\}_{n=1}^{\infty} \subseteq \mathcal{A}$。需证 $\bigcup_{n=1}^{\infty} E_n \in \mathcal{A}$。分两种情况：</p>
+
+  <p><em>情形 (a)：</em>每个 $E_n$ 都是可数集。则 $\bigcup_n E_n$ 是可数集的可数并，仍为可数集。故 $\bigcup_n E_n \in \mathcal{A}$。</p>
+
+  <p><em>情形 (b)：</em>存在某个 $N_0$ 使得 $E_{N_0}$ 不可数。由 $E_{N_0} \in \mathcal{A}$ 的定义，必有 $E_{N_0}^c$ 可数。此时：</p>
+  $$\left(\bigcup_{n=1}^{\infty} E_n\right)^c = \bigcap_{n=1}^{\infty} E_n^c \subseteq E_{N_0}^c$$
+  <p>（交集是每个集合的子集。）由于 $E_{N_0}^c$ 可数，其子集 $\left(\bigcup_n E_n\right)^c$ 也可数。故 $\bigcup_n E_n$ 的补集可数，即 $\bigcup_n E_n \in \mathcal{A}$。</p>
+
+  <p>综合以上三点，$\mathcal{A}$ 是 $\sigma$-代数。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>与可测集的联系：</strong>由引理 66、命题 67 和推论 69，我们已证明 Lebesgue 可测集族 $\mathcal{M}$ 满足：(i) 包含 $\varnothing$ 和 $\mathbb{R}$；(ii) 对补封闭；(iii) 对有限并封闭。因此 $\mathcal{M}$ 至少是一个代数。下一讲将证明 $\mathcal{M}$ 还对可数并封闭，从而是 $\sigma$-代数。
+</div>
+
+<h3>8. Borel $\sigma$-代数 (Proposition 72)</h3>
+
+<p>在所有包含开集的 $\sigma$-代数中，存在一个"最小的" &mdash; 这就是 Borel $\sigma$-代数。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; Borel $\sigma$-代数</div>
+  <p>定义集族</p>
+  $$\Sigma = \{\mathcal{A} : \mathcal{A} \text{ 是包含 } \mathbb{R} \text{ 的所有开子集的 } \sigma\text{-代数}\}$$
+  <p>（例如 $\mathcal{P}(\mathbb{R}) \in \Sigma$，故 $\Sigma$ 非空。）<strong>Borel $\sigma$-代数</strong>定义为</p>
+  $$\mathcal{B} = \bigcap_{\mathcal{A} \in \Sigma} \mathcal{A}$$
+  <p>即 $\Sigma$ 中所有 $\sigma$-代数的交集。$\mathcal{B}$ 中的元素称为 <strong>Borel 集</strong>。</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">命题 72 &mdash; Borel $\sigma$-代数的性质</div>
+  <p>$\mathcal{B}$ 是包含 $\mathbb{R}$ 的所有开子集的<strong>最小</strong> $\sigma$-代数。具体地：</p>
+  <ol>
+    <li>$\mathcal{B}$ 本身是一个 $\sigma$-代数；</li>
+    <li>$\mathbb{R}$ 的每个开子集都属于 $\mathcal{B}$；</li>
+    <li>若 $\mathcal{A}$ 是任何包含所有开集的 $\sigma$-代数，则 $\mathcal{B} \subseteq \mathcal{A}$（最小性）。</li>
+  </ol>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p><strong>性质 2 的证明：</strong>设 $O \subseteq \mathbb{R}$ 是任意开集。由 $\Sigma$ 的定义，每个 $\mathcal{A} \in \Sigma$ 都包含所有开集，特别地 $O \in \mathcal{A}$ 对所有 $\mathcal{A} \in \Sigma$。故 $O \in \bigcap_{\mathcal{A} \in \Sigma} \mathcal{A} = \mathcal{B}$。</p>
+
+  <p><strong>性质 3 的证明（最小性）：</strong>设 $\mathcal{A}_0$ 是任何包含所有开集的 $\sigma$-代数。则 $\mathcal{A}_0 \in \Sigma$（它满足 $\Sigma$ 的定义条件）。由于 $\mathcal{B} = \bigcap_{\mathcal{A} \in \Sigma} \mathcal{A}$，而 $\mathcal{A}_0$ 是被交的集合之一，故 $\mathcal{B} \subseteq \mathcal{A}_0$。</p>
+
+  <p><strong>性质 1 的证明（$\mathcal{B}$ 是 $\sigma$-代数）：</strong>这是主要部分。需验证三个条件。</p>
+
+  <p><em>(i) $\mathcal{B}$ 非空：</em>由性质 2，$\mathbb{R}$（作为开集）属于 $\mathcal{B}$，故 $\mathcal{B} \ne \varnothing$。</p>
+
+  <p><em>(ii) 对补封闭：</em>设 $E \in \mathcal{B}$。则对所有 $\mathcal{A} \in \Sigma$，$E \in \mathcal{A}$。由于每个 $\mathcal{A}$ 是 $\sigma$-代数，$E^c \in \mathcal{A}$ 对所有 $\mathcal{A} \in \Sigma$。故 $E^c \in \bigcap_{\mathcal{A} \in \Sigma} \mathcal{A} = \mathcal{B}$。</p>
+
+  <p><em>(iii) 对可数并封闭：</em>设 $\{E_n\}_{n=1}^{\infty} \subseteq \mathcal{B}$。则对每个 $n$，$E_n \in \mathcal{A}$ 对所有 $\mathcal{A} \in \Sigma$。固定任意 $\mathcal{A} \in \Sigma$：由于 $\mathcal{A}$ 是 $\sigma$-代数且 $\{E_n\} \subseteq \mathcal{A}$，得 $\bigcup_{n=1}^{\infty} E_n \in \mathcal{A}$。这对所有 $\mathcal{A} \in \Sigma$ 成立，故</p>
+  $$\bigcup_{n=1}^{\infty} E_n \in \bigcap_{\mathcal{A} \in \Sigma} \mathcal{A} = \mathcal{B}$$
+
+  <p>三个条件均已验证，故 $\mathcal{B}$ 是 $\sigma$-代数。$\square$</p>
+</div>
+
+<h4>Borel 集的内容</h4>
+<p>Borel $\sigma$-代数包含非常丰富的集合：</p>
+<ul>
+  <li>所有<strong>开集</strong>（由定义）；</li>
+  <li>所有<strong>闭集</strong>（开集的补）；</li>
+  <li>所有 $G_\delta$ <strong>集</strong>（可数个开集的交）；</li>
+  <li>所有 $F_\sigma$ <strong>集</strong>（可数个闭集的并）；</li>
+  <li>更高层次的 $G_{\delta\sigma}$, $F_{\sigma\delta}$ 集，以及任何通过可数次并、交、补运算从开集出发能得到的集合。</li>
+</ul>
+
+<h4>预告：Lebesgue 可测集与 Borel 集的关系</h4>
+
+<div class="remark">
+  <strong>下一讲的目标：</strong>我们将证明 Lebesgue 可测集族 $\mathcal{M}$ 是一个 $\sigma$-代数（即还需证明可数并封闭）。由于每个开集都是 Lebesgue 可测的（这需要单独证明），$\mathcal{M}$ 包含所有开集。由 $\mathcal{B}$ 的最小性，得
+  $$\mathcal{B} \subseteq \mathcal{M}$$
+  即每个 Borel 集都是 Lebesgue 可测的。但反过来不成立：存在 Lebesgue 可测集不是 Borel 集（例如某些零测集的子集）。包含关系为
+  $$\{\varnothing, \mathbb{R}\} \;\subsetneq\; \mathcal{B} \;\subsetneq\; \mathcal{M} \;\subsetneq\; \mathcal{P}(\mathbb{R})$$
+</div>
+
+<h3>本讲小结</h3>
+
+<table class="summary">
+  <tr><th style="width:28%">结果</th><th>内容</th></tr>
+  <tr><td><strong>命题 63</strong></td><td>$m^*(I) = \ell(I)$：任何区间的外测度等于其长度。证明核心：Heine-Borel 定理提取有限子覆盖，链式重排后伸缩求和。</td></tr>
+  <tr><td><strong>定理 64</strong></td><td>开集逼近：对任意 $A$ 和 $\varepsilon > 0$，存在开集 $O \supseteq A$ 使得 $m^*(O) \le m^*(A) + \varepsilon$。</td></tr>
+  <tr><td><strong>定义 65</strong></td><td>Lebesgue 可测：$E$ 可测 $\iff$ 对所有 $A$：$m^*(A) = m^*(A \cap E) + m^*(A \cap E^c)$（Carath&eacute;odory 条件）。</td></tr>
+  <tr><td><strong>引理 66</strong></td><td>$\varnothing$, $\mathbb{R}$ 可测；$E$ 可测 $\iff$ $E^c$ 可测。</td></tr>
+  <tr><td><strong>命题 67</strong></td><td>$m^*(E) = 0 \Rightarrow E$ 可测（零测集可测）。</td></tr>
+  <tr><td><strong>命题 68</strong></td><td>$E_1, E_2$ 可测 $\Rightarrow$ $E_1 \cup E_2$ 可测。</td></tr>
+  <tr><td><strong>推论 69</strong></td><td>有限个可测集的并可测（归纳法）。</td></tr>
+  <tr><td><strong>定义 70</strong></td><td>代数：对补和有限并封闭。$\sigma$-代数：对补和可数并封闭。推论：也对有限/可数交封闭。</td></tr>
+  <tr><td><strong>例 71</strong></td><td>$\sigma$-代数实例：$\{\varnothing, \mathbb{R}\}$、$\mathcal{P}(\mathbb{R})$、余可数 $\sigma$-代数。</td></tr>
+  <tr><td><strong>命题 72</strong></td><td>Borel $\sigma$-代数 $\mathcal{B} = \bigcap\{\mathcal{A} : \mathcal{A} \supseteq \text{所有开集的 } \sigma\text{-代数}\}$ 是包含所有开集的最小 $\sigma$-代数。</td></tr>
+</table>
+
+<div class="remark">
+  <strong>下一讲预告：</strong>证明可测集族 $\mathcal{M}$ 对可数并封闭（从而是 $\sigma$-代数），证明每个开集可测（从而 $\mathcal{B} \subseteq \mathcal{M}$），并建立 Lebesgue 测度的可数可加性。
+</div>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 18.102, Spring 2021 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>
