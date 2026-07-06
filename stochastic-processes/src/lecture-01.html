@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 6.262 第一讲 - 导论与概率论回顾</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 6.262 离散随机过程</h1>
+  <h2>第一讲：导论与概率论回顾</h2>
+  <p class="meta">Lecturer: Prof. Robert Gallager (<a href="https://www.youtube.com/watch?v=7CYXy9J4Aao" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. 概率论在现实中的角色</h3>
+
+<h4>赌博与直觉</h4>
+<p>博弈游戏起源于古代文明。与赌博的天性相伴，人类对<strong>可能性</strong>和<strong>平均行为</strong>有着天然的直觉感知。博弈的核心特征是<strong>可重复性</strong>（repeatability）——在本质上相同的条件下重复进行实验，使得对概率的实验验证成为可能。</p>
+
+<p>生活中的大多数决策都涉及不确定性。明智的人会学着对不确定的可能性赋予某种"似然度"（likelihood）。但概率论最有用的场景，正是那些在本质上相同的条件下可以重复的情境。</p>
+
+<h4>精确性的困难</h4>
+<p>然而，"本质上相同"这个词本身就充满了模糊性。以抛硬币为例：结果取决于初始速度、方向、硬币表面特性以及地面条件——<strong>此过程中并无真正的"随机性"</strong>。每次抛掷之间也通过硬币和抛掷者产生联系。对于更复杂的问题（如"明年再次发生灾难性石油泄漏的概率是多少？""Google 股价在五年内翻倍的概率是多少？"），精确化就更加困难。</p>
+
+<h4>建模的两个核心问题</h4>
+<p>使用概率模型面临两个根本性问题：</p>
+<ol>
+  <li><strong>如何为实际问题建立概率模型？</strong>
+    <ul>
+      <li>首先在标准模型内学习估计（estimation）与决策（decision）理论；</li>
+      <li>然后深入了解实际问题本身；</li>
+      <li>最后运用常识、谨慎行事。</li>
+    </ul>
+    <p>更好的策略：先尝试<strong>过度简化的模型</strong>，用简单模型的数学帮助理解现实问题，然后逐步修正和扩展模型。通常没有完美的模型（看看抛硬币的例子就知道了）。</p>
+  </li>
+  <li><strong>如何保证概率模型没有隐藏的悖论？</strong>
+    <p>回答：遵循 Kolmogorov 公理。Kolmogorov 在 1933 年建立了概率的公理化基础，将概率论置于严格的数学根基之上，从此开启了这一领域的稳步发展。这些公理本质上是说<strong>概率论是测度论的一个分支</strong>。</p>
+  </li>
+</ol>
+
+<div class="remark">
+  <strong>Alfred North Whitehead:</strong> "Seek simplicity and distrust it."（追求简洁，但要对它保持怀疑。）这正是概率建模的指导原则——模型应当简洁，但我们不应盲目相信简化模型能完美捕捉现实。
+</div>
+
+<h3>2. 离散随机过程简介</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 随机过程 (Stochastic Process)</div>
+  <p>随机过程是一种特殊类型的概率模型，其中<strong>样本点代表时间的函数</strong>。它通常可以被视为一系列随时间演化的随机变量。有时存在连续统个随机变量，对应每一个实值时间点。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 离散随机过程 (Discrete Stochastic Process)</div>
+  <p>如果一个随机过程满足以下任一条件，则称为<strong>离散随机过程</strong>：</p>
+  <ul>
+    <li>随机变量在<strong>时间上是离散</strong>的（即只在离散时间点 $n=0,1,2,\ldots$ 上取值）；或</li>
+    <li>随机变量的<strong>取值集合是离散</strong>的（即取值空间是可数集）。</li>
+  </ul>
+  <p>精确界定哪些随机过程属于"离散"并不是最重要的——我们关注的是它们的数学结构和应用。</p>
+</div>
+
+<h4>本课程研究的过程</h4>
+<ul>
+  <li><strong>计数过程 (Counting Processes)：</strong>每个样本点是一个"到达时间"序列。特殊情形包括 <strong>Poisson 过程</strong>（第 2 章）和<strong>更新过程 (Renewal Processes)</strong>（第 4 章）。</li>
+  <li><strong>Markov 过程：</strong>未来状态仅通过当前状态依赖于过去。特殊情形包括：
+    <ul>
+      <li>有限状态 Markov 链（第 3 章）</li>
+      <li>可数状态 Markov 链（第 5 章）</li>
+      <li>可数状态空间 Markov 过程（第 6 章）</li>
+    </ul>
+  </li>
+  <li><strong>随机游走 (Random Walks) 与鞅 (Martingales)</strong>（第 7 章）</li>
+</ul>
+
+<div class="remark">
+  <strong>应用领域：</strong>概率与随机过程是以下领域的关键组件——通信系统与网络、计算机系统、各类排队论问题、风险管理、灾难管理、系统失效分析、运筹学、生物学、医学、光学系统、控制系统等。更广泛地说，概率与随机过程是对所有人类活动和科学研究进行理性思考的重要辅助工具。
+</div>
+
+<h3>3. 概率论公理 (Kolmogorov)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 概率模型三要素</div>
+  <p>一个概率模型由三个部分组成：</p>
+  <ol>
+    <li><strong>样本空间 $\Omega$：</strong>一个任意的集合，其元素称为样本点 (sample points)。</li>
+    <li><strong>事件集合 (collection of events)：</strong>$\Omega$ 的一族子集，满足特定的公理（见下）。</li>
+    <li><strong>概率测度 (probability measure)：</strong>对每个事件指定一个 $[0,1]$ 中的数。</li>
+  </ol>
+</div>
+
+<h4>事件集合公理</h4>
+<p>事件集合（也称 $\sigma$-代数）必须满足以下公理：</p>
+<ol>
+  <li>$\Omega$ 是一个事件。</li>
+  <li>若 $A_1, A_2, \ldots$ 是事件，则 $\bigcup_{n=1}^{\infty} A_n$ 也是事件（对<strong>可数并</strong>封闭）。</li>
+  <li>若 $A$ 是事件，则其<strong>补集</strong> $A^c$ 也是事件（对补集封闭）。</li>
+</ol>
+
+<p>并非所有子集都必须是事件。通常我们取每个样本点为 singleton event（单点事件）。在此约定下，所有有限集和可数集都是事件（因为它们是单点事件的有限或可数并）。</p>
+
+<h4>由 De Morgan 定律得到的推论</h4>
+<p>由 De Morgan 定律：</p>
+$$\left(\bigcup_n A_n\right)^c = \bigcap_n A_n^c$$
+<p>因此，事件的<strong>可数交</strong>也是事件（先取补得到各事件的补，做可数并后再取补）。所有事件的交并组合也仍是事件。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 概率测度公理</div>
+  <p>概率测度 $\Pr$ 满足以下公理：</p>
+  <ol>
+    <li>$\Pr\{\Omega\} = 1$</li>
+    <li>对任何事件 $A$，$\Pr\{A\} \geq 0$</li>
+    <li><strong>可数可加性 (Countable Additivity)：</strong>若 $A_1, A_2, \ldots$ 是两两不相交的事件，则
+    $$\Pr\!\left\{\bigcup_{n=1}^{\infty} A_n\right\} = \sum_{n=1}^{\infty} \Pr\{A_n\} = \lim_{m\to\infty} \sum_{n=1}^{m} \Pr\{A_n\}$$</li>
+  </ol>
+</div>
+
+<p>令人惊讶的是，仅凭这些公理就足以避免概率论中的所有悖论。以下是几个简单推论：</p>
+<ul>
+  <li>$\Pr\{\varnothing\} = 0$（令 $A_1 = \Omega$，$A_n = \varnothing$ for $n \geq 2$）</li>
+  <li>$\Pr\{A^c\} = 1 - \Pr\{A\}$（由 $A \cup A^c = \Omega$ 且不相交）</li>
+  <li>若 $A \subseteq B$，则 $\Pr\{A\} \leq \Pr\{B\} \leq 1$（将 $B$ 分解为 $A \cup (B \cap A^c)$）</li>
+</ul>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 并集上界 (Union Bound)</div>
+  <p>对于有限或可数个事件 $A_1, A_2, \ldots$：</p>
+  $$\Pr\!\left\{\bigcup_n A_n\right\} \leq \sum_n \Pr\{A_n\}$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>对两个事件的情形，注意到：</p>
+  $$A_1 \cup A_2 = A_1 \cup (A_2 \cap A_1^c)$$
+  <p>右边是两个不相交事件的并，由可数可加性：</p>
+  $$\Pr\{A_1 \cup A_2\} = \Pr\{A_1\} + \Pr\{A_2 \cap A_1^c\}$$
+  <p>又因为 $A_2 \cap A_1^c \subseteq A_2$，故 $\Pr\{A_2 \cap A_1^c\} \leq \Pr\{A_2\}$。因此：</p>
+  $$\Pr\{A_1 \cup A_2\} \leq \Pr\{A_1\} + \Pr\{A_2\}$$
+  <p>对一般情形，构造不相交分解：令 $B_1 = A_1$，$B_n = A_n \cap \left(\bigcup_{k=1}^{n-1} A_k\right)^c$ for $n \geq 2$。则 $\{B_n\}$ 两两不相交且 $\bigcup_n B_n = \bigcup_n A_n$。由于 $B_n \subseteq A_n$，得 $\Pr\{B_n\} \leq \Pr\{A_n\}$，故：</p>
+  $$\Pr\!\left\{\bigcup_n A_n\right\} = \sum_n \Pr\{B_n\} \leq \sum_n \Pr\{A_n\} \qquad\square$$
+</div>
+
+<div class="remark">
+  <strong>备注：</strong>这些公理看似平凡，在日常运算中我们通常可以忽略它们。但当涉及无穷求和和极限运算时，它们是不可或缺的。正如初等概率课程中强调随机变量和期望一样，公理告诉我们<strong>事件和事件的概率</strong>才是最基本的量。
+</div>
+
+<h3>4. 独立事件与组合模型</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 独立 (Independence)</div>
+  <p>两个事件 $A_1$ 和 $A_2$ 称为<strong>独立的</strong>，如果：</p>
+  $$\Pr\{A_1 \cap A_2\} = \Pr\{A_1\}\,\Pr\{A_2\}$$
+  <p>（简记为 $\Pr\{A_1 A_2\} = \Pr\{A_1\}\Pr\{A_2\}$）</p>
+</div>
+
+<h4>组合模型 (Combined Model)</h4>
+<p>给定两个概率模型 $(\Omega_1, \mathcal{F}_1, \Pr_1)$ 和 $(\Omega_2, \mathcal{F}_2, \Pr_2)$，可以定义一个<strong>组合模型</strong>：</p>
+<ul>
+  <li>样本空间为笛卡尔积 $\Omega = \Omega_1 \times \Omega_2$；</li>
+  <li>对模型 1 中的每个事件 $A$ 和模型 2 中的每个事件 $B$，令 $\Pr\{A \cap B\} = \Pr_1\{A\}\,\Pr_2\{B\}$。</li>
+</ul>
+<p>在组合模型中，两个原始模型称为<strong>独立的</strong>。</p>
+
+<div class="remark">
+  <strong>关键性质：</strong>如果公理在每个子模型中分别成立，则在组合模型中也成立。这意味着可以从简单模型<strong>组合构建复杂模型</strong>——例如，$n$ 次独立抛币可以通过 $n$ 个单次抛币模型的笛卡尔积来建模，且无需担心公理被违反。
+</div>
+
+<h3>5. 随机变量</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 随机变量 (Random Variable)</div>
+  <p>随机变量 $X$（或 $X(\omega)$）是从样本空间到实数的函数 $X: \Omega \to \mathbb{R}$，需要满足约束条件：</p>
+  $$\{\omega : X(\omega) \leq a\} \text{ 是一个事件，}\quad \forall\, a \in \mathbb{R}$$
+  <p>此外，若 $X_1, X_2, \ldots, X_n$ 各自是随机变量，则联合事件</p>
+  $$\{\omega : X_1(\omega) \leq a_1,\; X_2(\omega) \leq a_2,\; \ldots,\; X_n(\omega) \leq a_n\}$$
+  <p>对所有 $a_1, \ldots, a_n \in \mathbb{R}$ 都是事件。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 分布函数 (Distribution Function / CDF)</div>
+  <p>每个随机变量 $X$ 都有一个<strong>分布函数</strong>（累积分布函数）：</p>
+  $$F_X(x) = \Pr\{X \leq x\}$$
+  <p>它是一个<strong>非递减函数</strong>，满足：</p>
+  $$\lim_{x \to -\infty} F_X(x) = 0, \qquad \lim_{x \to +\infty} F_X(x) = 1$$
+</div>
+
+<h4>离散随机变量</h4>
+<p>若 $X$ 仅取有限或可数个值，则 $X$ 是<strong>离散的</strong>，拥有概率质量函数 (PMF)：</p>
+$$p_X(x) = \Pr\{X = x\}$$
+
+<h4>连续随机变量</h4>
+<p>若 $dF_X(x)/dx$ 存在且对所有 $x$ 有限，则 $X$ 是<strong>连续的</strong>，拥有概率密度函数 (PDF)：</p>
+$$f_X(x) = \frac{dF_X(x)}{dx}$$
+
+<p>若 $X$ 既有离散分量又有连续分量，有时可以将其视为一个带有冲激函数（impulses）的密度。一般情况下，$F_X(x) = \Pr\{X \leq x\}$ 总是存在的。由于事件 $\{X = x\}$ 包含在 $\{X \leq x\}$ 中，若 $F_X(x)$ 在点 $x$ 有跳跃，则 $F_X(x)$ 取跳跃顶部的值。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; $F_X(x)$ 的右连续性</div>
+  <p>分布函数 $F_X(x)$ 是<strong>右连续</strong>的，即：</p>
+  $$\lim_{k \to \infty} F_X\!\left(x + \frac{1}{k}\right) = F_X(x)$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>定义事件序列：</p>
+  $$A_k = \left\{\omega : X(\omega) > x + \frac{1}{k}\right\}, \quad k = 1, 2, 3, \ldots$$
+  <p>由于 $x + \frac{1}{k}$ 随 $k$ 增大而递减，我们有 $A_{k-1} \subseteq A_k$（满足 $X > x + \frac{1}{k-1}$ 的 $\omega$ 一定满足 $X > x + \frac{1}{k}$）。</p>
+
+  <p>取极限事件：</p>
+  $$\{X > x\} = \bigcup_{k=1}^{\infty} A_k$$
+  <p>这是因为 $X(\omega) > x$ 当且仅当存在某个 $k$ 使得 $X(\omega) > x + \frac{1}{k}$。</p>
+
+  <p>现在利用可数可加性。定义不相交事件 $B_1 = A_1$，$B_k = A_k \setminus A_{k-1}$（$k \geq 2$）。则 $\{B_k\}$ 两两不相交且 $\bigcup_k B_k = \bigcup_k A_k$。由可数可加性：</p>
+  $$\Pr\!\left\{\bigcup_{k=1}^{\infty} A_k\right\} = \Pr\!\left\{\bigcup_{k=1}^{\infty} B_k\right\} = \sum_{k=1}^{\infty} \Pr\{B_k\} = \lim_{m\to\infty} \sum_{k=1}^{m} \Pr\{B_k\} = \lim_{k\to\infty} \Pr\{A_k\}$$
+
+  <p>因此：</p>
+  $$\Pr\{X > x\} = \lim_{k\to\infty} \Pr\{A_k\} = \lim_{k\to\infty} \Pr\!\left\{X > x + \frac{1}{k}\right\}$$
+
+  <p>等价地：</p>
+  $$1 - F_X(x) = \lim_{k\to\infty}\left[1 - F_X\!\left(x + \frac{1}{k}\right)\right]$$
+
+  <p>两边化简即得 $F_X(x) = \lim_{k\to\infty} F_X(x + \frac{1}{k})$。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>证明要点：</strong>关键步骤是将 $\{X > x\}$ 表示为递增事件序列 $A_1 \subseteq A_2 \subseteq \cdots$ 的可数并，然后利用概率测度的可数可加性公理将"取并"转化为"取极限"。这一手法在后续课程中（尤其是讨论收敛定理时）会反复出现。
+</div>
+
+<h3>本讲小结</h3>
+
+<table class="summary">
+  <tr><th style="width:28%">主题</th><th>要点</th></tr>
+  <tr><td><strong>概率与现实</strong></td><td>概率模型源于可重复实验；建模面临两大问题：如何选择模型、如何保证无悖论</td></tr>
+  <tr><td><strong>随机过程</strong></td><td>样本点代表时间函数的概率模型；离散指时间离散或取值离散</td></tr>
+  <tr><td><strong>研究对象</strong></td><td>计数过程（Poisson, Renewal）、Markov 链（有限/可数状态）、随机游走与鞅</td></tr>
+  <tr><td><strong>Kolmogorov 公理</strong></td><td>三要素：$\Omega$、事件集合（$\sigma$-代数）、概率测度；可数可加性是核心</td></tr>
+  <tr><td><strong>Union Bound</strong></td><td>$\Pr\{\bigcup_n A_n\} \leq \sum_n \Pr\{A_n\}$；通过不相交分解证明</td></tr>
+  <tr><td><strong>独立与组合</strong></td><td>$\Pr\{A_1 A_2\} = \Pr\{A_1\}\Pr\{A_2\}$；笛卡尔积构造保持公理</td></tr>
+  <tr><td><strong>随机变量</strong></td><td>$X:\Omega\to\mathbb{R}$；CDF $F_X(x)$ 非递减、右连续；PMF / PDF</td></tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 6.262, Spring 2011 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>

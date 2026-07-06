@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 6.262 第三讲 - 大数定律与收敛性</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 6.262 离散随机过程</h1>
+  <h2>第三讲：大数定律与收敛性</h2>
+  <p class="meta">Lecturer: Prof. Robert Gallager (<a href="https://www.youtube.com/watch?v=k0UZNZwPO8Q" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. 概率模型与可重复性回顾</h3>
+
+<p>概率模型适用于现实世界中<strong>可重复</strong>的情境。一个合法的概率模型对应的实验（trial）需要满足以下四个条件：</p>
+
+<ul>
+  <li><strong>相同的初始条件 (Same initial conditions)：</strong>每次试验在相同的初始条件下进行，确保不同试验之间具有可比性。</li>
+  <li><strong>本质隔离 (Essentially isolated)：</strong>各次试验之间本质上相互独立，一次试验的结果不影响另一次试验的条件。</li>
+  <li><strong>固定的可能结果集合 (Fixed set of possible outcomes)：</strong>样本空间 $\Omega$ 是预先确定的，每次试验的所有可能结果不随时间变化。</li>
+  <li><strong>个体结果本质随机 (Random individual outcomes)：</strong>虽然在大量重复中有规律性，但单次试验的结果本质上不可预测。</li>
+</ul>
+
+<h4>扩展模型 (Extended Model)</h4>
+
+<p>对于任何满足上述条件的概率模型，我们可以构造一个<strong>扩展模型</strong>：将原模型的 IID（独立同分布）重复序列 $X_1, X_2, \ldots, X_n$ 作为一个良定义的新概率模型。在扩展模型中：</p>
+
+<ul>
+  <li>相对频率（relative frequencies）和样本均值（sample averages）随 $n$ 增大而"趋于确定性"。</li>
+  <li>这些确定性量可以与真实世界重复实验中的相对频率和样本均值进行比较。</li>
+  <li>概率理论提供了大量一致性检验手段，使得不必每次都依赖大量实验。</li>
+</ul>
+
+<p><strong>大数定律 (LLN)</strong> 精确描述了"趋于确定性"的含义。LLN 仅在扩展模型中运作，但它提供了我们将模型与重复实验进行比较的唯一真正的实验方式。大量试验中的确定性是概率理论价值的重要基石。</p>
+
+<h3>2. Markov 不等式</h3>
+
+<p>不等式（bounds）在概率论中扮演着异常重要的角色。原因之一是它们在极限定理中的频繁使用，另一个原因是概率应用中固有的不精确性。Markov 不等式是最简单、最有用的界之一。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; Markov 不等式 (Markov Inequality)</div>
+  <p>设 $Y$ 为非负随机变量且期望 $E[Y]$ 存在，则对任意实数 $y > 0$：</p>
+  $$\Pr\{Y \geq y\} \leq \frac{E[Y]}{y}$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明 &mdash; 几何论证</div>
+  <p>考虑 $Y$ 的互补分布函数 $F^c(y) = \Pr\{Y \geq y\}$。对非负随机变量，有：</p>
+  $$E[Y] = \int_0^{\infty} F^c(t)\, dt = \int_0^{\infty} \Pr\{Y \geq t\}\, dt$$
+  <p>这是 $F^c(y)$ 曲线下方的总面积。现在考虑矩形区域：高为 $\Pr\{Y \geq y\}$，宽为 $y$，面积为 $y \cdot \Pr\{Y \geq y\}$。</p>
+  <p>由于 $F^c(t)$ 是单调不增函数，对所有 $t \in [0, y]$ 有 $F^c(t) \geq F^c(y) = \Pr\{Y \geq y\}$。因此该矩形被 $F^c$ 下方面积所包含：</p>
+  $$y \cdot \Pr\{Y \geq y\} \leq \int_0^{\infty} F^c(t)\, dt = E[Y]$$
+  <p>两边除以 $y$ 即得结论。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>紧致性：</strong>当 $Y$ 是取值为 $0$ 或 $y$ 的二值随机变量时，Markov 不等式取等号（紧致）。此时 $E[Y] = y \cdot \Pr\{Y = y\}$，代入得 $\Pr\{Y \geq y\} = E[Y]/y$。<br>
+  <strong>衰减速度：</strong>Markov 界随 $y$ 增大仅以 $1/y$ 的速度衰减，这通常非常松散。但它的优势在于<strong>仅需期望存在</strong>，不需要任何更高阶矩信息。
+</div>
+
+<h3>3. Chebyshev 不等式</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; Chebyshev 不等式 (Chebyshev Inequality)</div>
+  <p>设随机变量 $Z$ 有均值 $\bar{Z} = E[Z]$ 和方差 $\sigma_Z^2 = \text{Var}(Z)$，则对任意 $\varepsilon > 0$：</p>
+  $$\Pr\{|Z - \bar{Z}| \geq \varepsilon\} \leq \frac{\sigma_Z^2}{\varepsilon^2}$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>令 $Y = (Z - \bar{Z})^2$。则 $Y$ 是非负随机变量，且 $E[Y] = \sigma_Z^2$。</p>
+  <p>对 $Y$ 应用 Markov 不等式：对任意 $y > 0$，</p>
+  $$\Pr\{Y \geq y\} \leq \frac{\sigma_Z^2}{y}$$
+  <p>即：</p>
+  $$\Pr\{(Z - \bar{Z})^2 \geq y\} \leq \frac{\sigma_Z^2}{y}$$
+  <p>注意 $(Z - \bar{Z})^2 \geq y$ 等价于 $|Z - \bar{Z}| \geq \sqrt{y}$。令 $\varepsilon = \sqrt{y}$（即 $y = \varepsilon^2$），代入得：</p>
+  $$\Pr\{|Z - \bar{Z}| \geq \varepsilon\} \leq \frac{\sigma_Z^2}{\varepsilon^2} \qquad\square$$
+</div>
+
+<div class="remark">
+  <strong>条件：</strong>Chebyshev 不等式要求方差 $\sigma_Z^2$ 存在（有限）。<br>
+  <strong>衰减速度：</strong>以 $1/\varepsilon^2$ 衰减——比 Markov 的 $1/y$ 更快，但代价是需要二阶矩存在。<br>
+  <strong>应用意义：</strong>Chebyshev 不等式直接将偏离均值的概率与方差联系起来，是证明弱大数定律的关键工具。
+</div>
+
+<h3>4. Chernoff 界</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; Chernoff 界 (Chernoff Bound)</div>
+  <p>设随机变量 $Z$ 的矩生成函数 $g_Z(r) = E[e^{rZ}]$ 在 $r > 0$ 时存在，则对任意 $z > 0$ 和 $r > 0$：</p>
+  $$\Pr\{Z \geq z\} \leq g_Z(r)\, e^{-rz}$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>令 $Y = e^{rZ}$，这是非负随机变量。其期望为：</p>
+  $$E[Y] = E[e^{rZ}] = g_Z(r)$$
+  <p>对 $Y$ 应用 Markov 不等式，令阈值为 $e^{rz}$（当 $r > 0, z > 0$ 时 $e^{rz} > 0$）：</p>
+  $$\Pr\{Y \geq e^{rz}\} \leq \frac{g_Z(r)}{e^{rz}}$$
+  <p>注意事件 $\{e^{rZ} \geq e^{rz}\}$ 等价于 $\{rZ \geq rz\}$（因为 $r > 0$，指数函数单调），即 $\{Z \geq z\}$。因此：</p>
+  $$\Pr\{Z \geq z\} \leq g_Z(r)\, e^{-rz} \qquad\square$$
+</div>
+
+<div class="remark">
+  <strong>指数衰减：</strong>Chernoff 界随 $z$ 的增大以<strong>指数速度</strong>衰减，远优于 Markov（$1/z$）和 Chebyshev（$1/z^2$）。<br>
+  <strong>优化：</strong>由于对所有 $r > 0$ 界都成立，可以对 $r$ 取最小值以获得最紧的界：$\Pr\{Z \geq z\} \leq \inf_{r>0} g_Z(r) e^{-rz}$。<br>
+  <strong>大偏差分析：</strong>Chernoff 界是<strong>大偏差理论 (Large Deviation Theory)</strong> 的基础工具，用于分析随机变量远离均值的极端行为。对 IID 和 $S_n = \sum_{i=1}^n X_i$，有 $g_{S_n}(r) = [g_X(r)]^n$，代入可得关于 $S_n$ 的指数紧界。
+</div>
+
+<h3>5. 弱大数定律 (WLLN)</h3>
+
+<p>设 $X_1, X_2, \ldots, X_n$ 为 IID 随机变量，均值 $\bar{X} = E[X]$，方差 $\sigma^2 = \text{Var}(X)$。定义部分和：</p>
+$$S_n = X_1 + X_2 + \cdots + X_n$$
+
+<h4>样本均值的方差衰减</h4>
+
+<p>样本均值 $S_n/n$ 是均值为 $\bar{X}$、方差为 $\sigma^2/n$ 的随机变量。具体地：</p>
+$$\text{Var}\!\left(\frac{S_n}{n}\right) = E\!\left[\left(\frac{S_n}{n} - \bar{X}\right)^{\!2}\right] = \frac{\sigma^2}{n}$$
+
+<p>因此：</p>
+$$\lim_{n \to \infty} E\!\left[\left(\frac{S_n}{n} - \bar{X}\right)^{\!2}\right] = 0$$
+
+<p>这表明 $S_n/n$ <strong>均方收敛</strong>到 $\bar{X}$。注意 $\sigma^2/n$ 不仅告诉我们收敛，还精确给出了收敛速度（$1/n$）。</p>
+
+<h4>从 Chebyshev 到 WLLN</h4>
+
+<p>对 $S_n/n$ 应用 Chebyshev 不等式：</p>
+$$\Pr\!\left\{\left|\frac{S_n}{n} - \bar{X}\right| \geq \varepsilon\right\} \leq \frac{\sigma^2}{n\varepsilon^2} \qquad \text{对所有 } \varepsilon > 0$$
+
+<p>这意味着：对任意精度 $\varepsilon$ 和任意置信水平 $1 - \delta$，只要 $n$ 足够大（$n \geq \sigma^2/(\delta \varepsilon^2)$），样本均值与真实均值的偏差不超过 $\varepsilon$ 的概率就至少为 $1 - \delta$。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 弱大数定律 (Weak Law of Large Numbers, WLLN)</div>
+  <p>设 $X_1, X_2, \ldots$ 为 IID 随机变量，$E[|X|] < \infty$，$\bar{X} = E[X]$，$S_n = \sum_{i=1}^n X_i$。则对所有 $\varepsilon > 0$：</p>
+  $$\lim_{n \to \infty} \Pr\!\left\{\left|\frac{S_n}{n} - \bar{X}\right| \geq \varepsilon\right\} = 0$$
+  <p>即 $S_n/n$ <strong>依概率收敛</strong>到 $\bar{X}$。</p>
+</div>
+
+<div class="remark">
+  <strong>条件讨论：</strong>上述用 Chebyshev 的证明需要方差有限（$\sigma^2 < \infty$）。但 WLLN 的最一般版本<strong>仅需 $E[|X|] < \infty$</strong>（即一阶矩存在），不要求方差有限。只不过在没有方差时，我们失去了 $\sigma^2/(n\varepsilon^2)$ 这个显式收敛速度。<br>
+  <strong>直观含义：</strong>$S_n/n$ 的分布函数趋近于在 $\bar{X}$ 处的单位阶跃函数 $u(x - \bar{X})$。即分布越来越集中在均值附近。
+</div>
+
+<h3>6. 收敛的类型</h3>
+
+<p>随机变量是比实数复杂得多的对象，因此随机变量序列的"收敛"有多种不同的定义。理解这些定义及其层次关系是概率论的核心内容之一。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 均方收敛 (Convergence in Mean Square)</div>
+  <p>随机变量序列 $Y_1, Y_2, \ldots$ <strong>均方收敛</strong>到随机变量 $Y$，如果：</p>
+  $$\lim_{n \to \infty} E\!\left[(Y_n - Y)^2\right] = 0$$
+  <p>记作 $Y_n \xrightarrow{\text{m.s.}} Y$。</p>
+</div>
+
+<p>对于 WLLN 的情形：$\text{Var}(S_n/n) = \sigma^2/n \to 0$，故 $S_n/n$ 均方收敛到常数 $\bar{X}$（此时 $E[(S_n/n - \bar{X})^2] = \sigma^2/n$）。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 依概率收敛 (Convergence in Probability)</div>
+  <p>随机变量序列 $Y_1, Y_2, \ldots$ <strong>依概率收敛</strong>到随机变量 $Y$，如果对所有 $\varepsilon > 0$：</p>
+  $$\lim_{n \to \infty} \Pr\{|Y_n - Y| \geq \varepsilon\} = 0$$
+  <p>等价地：对所有 $\varepsilon > 0, \delta > 0$，存在 $N$ 使得当 $n \geq N$ 时 $\Pr\{|Y_n - Y| \geq \varepsilon\} \leq \delta$。记作 $Y_n \xrightarrow{P} Y$。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 依分布收敛 (Convergence in Distribution)</div>
+  <p>随机变量序列 $Z_1, Z_2, \ldots$ <strong>依分布收敛</strong>到随机变量 $Z$，如果：</p>
+  $$\lim_{n \to \infty} F_{Z_n}(z) = F_Z(z) \qquad \text{在 } F_Z \text{ 的所有连续点 } z \text{ 处成立}$$
+  <p>记作 $Z_n \xrightarrow{d} Z$。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 以概率 1 收敛 (Convergence with Probability 1 / Almost Sure Convergence)</div>
+  <p>随机变量序列 $Z_1, Z_2, \ldots$ <strong>以概率 1 收敛</strong>（WP1，又称 almost surely, a.s.）到随机变量 $Z$，如果：</p>
+  $$\Pr\!\left\{\omega \in \Omega : \lim_{n \to \infty} Z_n(\omega) = Z(\omega)\right\} = 1$$
+  <p>记作 $Z_n \xrightarrow{\text{a.s.}} Z$。</p>
+  <p>解读：每个样本点 $\omega$ 被映射为实数序列 $Z_1(\omega), Z_2(\omega), \ldots$。WP1 收敛要求：使得该实数序列收敛到 $Z(\omega)$ 的那些 $\omega$ 组成的事件具有概率 1。</p>
+</div>
+
+<h4>层次关系</h4>
+
+<p>四种收敛之间的蕴含关系如下：</p>
+
+$$\text{均方收敛} \;\Longrightarrow\; \text{依概率收敛} \;\Longrightarrow\; \text{依分布收敛}$$
+$$\text{以概率 1 收敛} \;\Longrightarrow\; \text{依概率收敛} \;\Longrightarrow\; \text{依分布收敛}$$
+
+<p>重要的是，以上<strong>反向蕴含均不成立</strong>：</p>
+<ul>
+  <li><strong>依概率 $\not\Rightarrow$ 均方：</strong>WLLN 在仅有一阶矩时成立（依概率收敛），但此时方差可能不存在，均方收敛无从谈起。</li>
+  <li><strong>依概率 $\not\Rightarrow$ WP1：</strong>存在依概率收敛到 0 但在每个 $\omega$ 上无穷次远离 0 的序列（经典反例）。</li>
+  <li><strong>依分布 $\not\Rightarrow$ 依概率：</strong>依分布收敛太弱，见下面的注记。</li>
+</ul>
+
+<div class="remark">
+  <strong>依分布收敛的"弱"：</strong>依分布收敛几乎是一个误称，因为随机变量本身不必在任何通常意义上彼此接近。例如，任何 IID 随机变量序列 $X_1, X_2, \ldots$（它们有相同的分布函数）自动满足依分布收敛——因为 $F_{X_n}$ 从一开始就完全相同！但 IID 序列的各元素之间当然没有在"接近"彼此。<br><br>
+  <strong>从依概率到依分布的证明思路：</strong>依概率收敛到 $Y$ 意味着 $Y_n - Y$ 的分布趋近于在 0 处的单位阶跃，这直接蕴含了分布函数的逐点收敛。
+</div>
+
+<h3>7. 中心极限定理 (CLT)</h3>
+
+<p>继续考虑 IID 序列 $X_1, X_2, \ldots$，均值 $\bar{X}$，方差 $\sigma^2$。标准化的部分和为：</p>
+$$Z_n = \frac{S_n - n\bar{X}}{\sigma\sqrt{n}}$$
+<p>$Z_n$ 有均值 0、方差 1（对所有 $n$）。中心极限定理进一步告诉我们它的<strong>分布形状</strong>趋于正态。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 中心极限定理 (Central Limit Theorem, CLT)</div>
+  <p>设 $X_1, X_2, \ldots$ IID，$E[X] = \bar{X}$，$0 < \sigma^2 = \text{Var}(X) < \infty$，$S_n = \sum_{i=1}^n X_i$。则：</p>
+  $$\lim_{n \to \infty} \Pr\!\left\{\frac{S_n - n\bar{X}}{\sigma\sqrt{n}} \leq y\right\} = \Phi(y) = \int_{-\infty}^{y} \frac{1}{\sqrt{2\pi}}\, e^{-x^2/2}\, dx$$
+  <p>即 $(S_n - n\bar{X})/(\sigma\sqrt{n})$ <strong>依分布收敛</strong>到标准正态分布 $\Phi$。</p>
+</div>
+
+<div class="remark">
+  <strong>含义：</strong>CLT 不仅告诉我们 $S_n/n$ 的均值和方差，还告诉我们适当标准化后的<strong>分布形状</strong>趋于高斯。CLT 作用于分布函数 $F_{S_n}$，而非 PMF 或 PDF。证明通常使用 Fourier 变换（特征函数），虽然严谨但不直观。
+</div>
+
+<h4>CLT 与 WLLN 的"悖论"</h4>
+
+<p>CLT 给出了关于 $S_n/n$ 收敛到 $\bar{X}$ 的非常强的信息，但依分布收敛本身却是非常弱的收敛形式。如何理解这个表面上的矛盾？</p>
+
+<p><strong>解答：</strong>关键在于<strong>标准化的尺度不同</strong>：</p>
+<ul>
+  <li>CLT 中依分布收敛的随机变量是 $(S_n - n\bar{X})/(\sigma\sqrt{n})$——偏差被 $\sqrt{n}$ 尺度放大。</li>
+  <li>WLLN 中依概率收敛到 0 的随机变量是 $(S_n - n\bar{X})/n$——偏差被 $n$ 尺度压缩。</li>
+  <li>后者是前者的 $\sigma/\sqrt{n}$ 倍，随 $n$ 趋于 0——所以 WLLN 的收敛与 CLT 完全一致。</li>
+</ul>
+
+<p><strong>具体例子：</strong>CLT 告诉我们（当 $0 < \sigma < \infty$ 时）：</p>
+$$\lim_{n \to \infty} \Pr\!\left\{\frac{S_n - n\bar{X}}{n} \leq 0\right\} = \lim_{n \to \infty} \Pr\!\left\{\frac{S_n - n\bar{X}}{\sigma\sqrt{n}} \leq 0\right\} = \Phi(0) = \frac{1}{2}$$
+
+<p>即 $S_n/n$ 在 $\bar{X}$ 两侧的概率趋于各 $1/2$。这个结论<strong>无法从 WLLN 推出</strong>——WLLN 只说概率集中在 $\bar{X}$ 附近，但不给出两侧的分配方式。</p>
+
+<h3>8. 强大数定律 (SLLN)</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 强大数定律 (Strong Law of Large Numbers, SLLN)</div>
+  <p>设 $X_1, X_2, \ldots$ 为 IID 随机变量，$E[|X|] < \infty$，$\bar{X} = E[X]$。则：</p>
+  $$\Pr\!\left\{\omega : \lim_{n \to \infty} \frac{S_n(\omega)}{n} = \bar{X}\right\} = 1$$
+  <p>即 $S_n/n$ <strong>以概率 1 收敛</strong>到 $\bar{X}$。</p>
+</div>
+
+<p>SLLN 与 WLLN 的条件相同（均为 $E[|X|] < \infty$），但结论<strong>更强</strong>：</p>
+
+<ul>
+  <li><strong>WLLN（依概率收敛）：</strong>对每个固定的 $\varepsilon > 0$，事件 $\{|S_n/n - \bar{X}| \geq \varepsilon\}$ 的概率趋于 0。但这<strong>不排除</strong>某些样本路径偶尔远离 $\bar{X}$。</li>
+  <li><strong>SLLN（a.s. 收敛）：</strong>除了概率为 0 的样本路径集合外，<strong>所有</strong>样本路径 $S_n(\omega)/n$ 都收敛到 $\bar{X}$。</li>
+</ul>
+
+<p>换言之，SLLN 断言：对"几乎所有"$\omega \in \Omega$，实数序列 $S_1(\omega)/1,\; S_2(\omega)/2,\; S_3(\omega)/3,\; \ldots$ 在通常的实分析意义下收敛到 $\bar{X}$。"概率为 0 的坏集"可能非空，但它的测度为 0。</p>
+
+<div class="remark">
+  <strong>实用意义：</strong>在后续学习更新过程 (Renewal Processes) 时，我们会看到 SLLN 比 WLLN 更容易使用。直觉上的理解——特别是对"概率 1 的集合"的真正含义——需要时间积累，将在第 4 章深入讨论。<br><br>
+  <strong>条件对比：</strong>SLLN 的证明（此处略）远比 WLLN 困难，需要更精细的截断和 Borel-Cantelli 引理等工具。但最终条件与 WLLN 相同：仅需 $E[|X|] < \infty$。
+</div>
+
+<h3>本讲小结</h3>
+
+<table class="summary">
+  <tr><th style="width:22%">工具/概念</th><th style="width:38%">内容</th><th>条件与备注</th></tr>
+  <tr>
+    <td><strong>Markov 不等式</strong></td>
+    <td>$\Pr\{Y \geq y\} \leq E[Y]/y$</td>
+    <td>$Y \geq 0$，仅需期望存在；衰减 $O(1/y)$</td>
+  </tr>
+  <tr>
+    <td><strong>Chebyshev 不等式</strong></td>
+    <td>$\Pr\{|Z-\bar{Z}|\geq\varepsilon\} \leq \sigma_Z^2/\varepsilon^2$</td>
+    <td>需方差有限；衰减 $O(1/\varepsilon^2)$</td>
+  </tr>
+  <tr>
+    <td><strong>Chernoff 界</strong></td>
+    <td>$\Pr\{Z \geq z\} \leq g_Z(r)e^{-rz}$</td>
+    <td>需 MGF 存在；指数衰减，用于大偏差</td>
+  </tr>
+  <tr>
+    <td><strong>WLLN</strong></td>
+    <td>$S_n/n \xrightarrow{P} \bar{X}$</td>
+    <td>IID, $E[|X|]<\infty$；依概率收敛</td>
+  </tr>
+  <tr>
+    <td><strong>CLT</strong></td>
+    <td>$(S_n - n\bar{X})/(\sigma\sqrt{n}) \xrightarrow{d} \Phi$</td>
+    <td>IID, $0 < \sigma^2 < \infty$；依分布收敛到正态</td>
+  </tr>
+  <tr>
+    <td><strong>SLLN</strong></td>
+    <td>$S_n/n \xrightarrow{\text{a.s.}} \bar{X}$</td>
+    <td>IID, $E[|X|]<\infty$；几乎必然收敛</td>
+  </tr>
+  <tr>
+    <td><strong>均方收敛</strong></td>
+    <td>$E[(Y_n - Y)^2] \to 0$</td>
+    <td>需二阶矩存在；蕴含依概率收敛</td>
+  </tr>
+  <tr>
+    <td><strong>依概率收敛</strong></td>
+    <td>$\Pr\{|Y_n-Y|\geq\varepsilon\}\to 0$</td>
+    <td>蕴含依分布收敛；被均方和 WP1 蕴含</td>
+  </tr>
+  <tr>
+    <td><strong>依分布收敛</strong></td>
+    <td>$F_{Z_n}(z) \to F_Z(z)$ 在连续点</td>
+    <td>最弱形式；IID 序列自动满足</td>
+  </tr>
+  <tr>
+    <td><strong>WP1 收敛</strong></td>
+    <td>$\Pr\{\lim Z_n = Z\} = 1$</td>
+    <td>逐样本路径收敛；蕴含依概率但反之不然</td>
+  </tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 6.262, Spring 2011 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>

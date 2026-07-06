@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 6.262 第二讲 - 期望、独立性与 Bernoulli 过程</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 6.262 离散随机过程</h1>
+  <h2>第二讲：期望、独立性与 Bernoulli 过程</h2>
+  <p class="meta">Lecturer: Prof. Robert Gallager (<a href="https://www.youtube.com/watch?v=d4xfax4_Iww" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. 期望 (Expectation)</h3>
+
+<p>随机变量 $X$ 的分布函数通常包含比实际需要更多的细节。<strong>期望</strong> $\bar{X} = E[X]$ 是对随机变量最简洁的单一数值概括，它提供了"平均值"的精确数学含义。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 期望 (Expectation)</div>
+  <p><strong>离散情形：</strong>若 $X$ 是离散随机变量，取值为 $a_1, a_2, \ldots$，则</p>
+  $$E[X] = \sum_i a_i \, p_X(a_i)$$
+  <p><strong>连续情形：</strong>若 $X$ 具有概率密度函数 $f_X(x)$，则</p>
+  $$E[X] = \int_{-\infty}^{\infty} x \, f_X(x) \, dx$$
+  <p>上述两种定义要求级数或积分绝对收敛，否则期望不存在。</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 互补 CDF 表示（非负随机变量）</div>
+  <p>对于<strong>任意非负</strong>随机变量 $X \ge 0$（不要求离散或连续），期望等于互补分布函数下的面积：</p>
+  $$E[X] = \int_0^{\infty} F_X^c(x) \, dx, \qquad F_X^c(x) = \Pr\{X > x\} = 1 - F_X(x)$$
+  <p><strong>几何解释：</strong>考虑离散情形，$X$ 取正值 $a_1 < a_2 < a_3 < \cdots$。互补 CDF $F_X^c(x)$ 是一个递减阶梯函数。将 $\int_0^\infty F_X^c(x)\,dx$ 理解为阶梯下方的面积，可以按水平切片重排：在高度 $a_i$ 处的水平条对应宽度为 $(a_i - a_{i-1})$、高度为 $\Pr\{X \ge a_i\}$ 的矩形。将所有水平条累加恰好等于 $\sum_i a_i \, p_X(a_i) = E[X]$。对连续情形，同样的论证可通过对 Riemann 和取极限推广。</p>
+</div>
+
+<h4>一般随机变量的互补 CDF 表示</h4>
+
+<p>对于可正可负的一般随机变量 $X$，将其分解为正部与负部后可得：</p>
+$$E[X] = -\int_{-\infty}^{0} F_X(x) \, dx + \int_0^{\infty} F_X^c(x) \, dx$$
+<p>其中第一项的几何含义是：对于 $x < 0$，$F_X(x) = \Pr\{X \le x\}$ 是 $X$ 落在负半轴某处的概率，对其在 $(-\infty, 0)$ 上积分给出负部的贡献（带负号）。这一公式比直接按密度积分在很多问题中更加方便。</p>
+
+<div class="remark">
+  <strong>实用提示：</strong>在许多排队论和可靠性理论问题中，随机变量天然非负（如服务时间、寿命），此时 $E[X] = \int_0^\infty F_X^c(x)\,dx$ 是最简洁的期望计算公式。它也是证明大量不等式（如 Markov 不等式）的起点。
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 标准差 (Standard Deviation)</div>
+  <p>随机变量 $X$ 的<strong>标准差</strong>定义为方差的平方根：</p>
+  $$\sigma_X = \sqrt{E\!\left[(X - \bar{X})^2\right]}$$
+  <p>其中 $\bar{X} = E[X]$。标准差与 $X$ 量纲相同，衡量 $X$ 相对于其均值的"典型偏离程度"。方差 $\sigma_X^2 = E[(X-\bar{X})^2]$ 常更便于计算。</p>
+</div>
+
+<h3>2. 指示随机变量 (Indicator Random Variables)</h3>
+
+<p>指示随机变量是连接<strong>事件</strong>与<strong>随机变量</strong>理论的桥梁。通过它，关于随机变量的一切定理都可以直接应用到事件上。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 指示随机变量 (Indicator RV)</div>
+  <p>对于概率模型中的事件 $A$，定义指示随机变量 $I_A$ 为：</p>
+  $$I_A(\omega) = \begin{cases} 1, & \omega \in A \\ 0, & \omega \notin A \end{cases}$$
+  <p>$I_A$ 是一个二值（binary）随机变量，其 PMF 为：</p>
+  $$p_{I_A}(1) = \Pr\{A\}, \qquad p_{I_A}(0) = 1 - \Pr\{A\}$$
+</div>
+
+<h4>期望与标准差</h4>
+
+<p>直接由 PMF 计算：</p>
+$$E[I_A] = 1 \cdot \Pr\{A\} + 0 \cdot (1 - \Pr\{A\}) = \Pr\{A\}$$
+$$E[I_A^2] = \Pr\{A\}, \qquad \text{Var}(I_A) = \Pr\{A\}(1 - \Pr\{A\})$$
+$$\sigma_{I_A} = \sqrt{\Pr\{A\}\,(1 - \Pr\{A\})}$$
+
+<p>注意当 $\Pr\{A\} = 1/2$ 时标准差最大（$= 1/2$），当 $\Pr\{A\}$ 趋近 0 或 1 时标准差趋近 0 &mdash; 这符合直觉：越确定的事件，波动越小。</p>
+
+<div class="remark">
+  <strong>核心观察：</strong>关于随机变量的定理可以直接通过指示随机变量应用到事件上。例如，大数定律应用到 $I_A$ 就得到频率的稳定性；中心极限定理应用到 $I_A$ 就得到二项分布的正态近似。这一视角贯穿整个课程。
+</div>
+
+<h3>3. 多个随机变量与独立性</h3>
+
+<p>单个随机变量的分布函数 $F_X(x)$ 并不能完全刻画该随机变量与其他随机变量之间的关系。为此需要引入<strong>联合分布</strong>的概念。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 联合分布函数 (Joint CDF)</div>
+  <p>两个随机变量 $X, Y$ 的联合分布函数为：</p>
+  $$F_{XY}(x, y) = \Pr\{X \le x,\; Y \le y\} = \Pr\!\big(\{\omega : X(\omega) \le x\} \cap \{\omega : Y(\omega) \le y\}\big)$$
+  <p>更一般地，$n$ 个随机变量 $X_1, \ldots, X_n$ 的联合 CDF 为：</p>
+  $$F_{\mathbf{X}}(x_1, \ldots, x_n) = \Pr\{X_1 \le x_1, \ldots, X_n \le x_n\}$$
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 独立性 (Independence)</div>
+  <p>随机变量 $X_1, \ldots, X_n$ <strong>相互独立</strong>当且仅当对所有 $x_1, \ldots, x_n \in \mathbb{R}$：</p>
+  $$F_{\mathbf{X}}(x_1, \ldots, x_n) = \prod_{m=1}^n F_{X_m}(x_m)$$
+  <p>即联合 CDF 等于各边际 CDF 的乘积。这一乘积形式同样适用于联合 PMF 和联合 PDF。</p>
+</div>
+
+<h4>条件 PMF 与独立性的等价刻画</h4>
+
+<p>对于离散随机变量，条件 PMF 定义为：</p>
+$$p_{X|Y}(x|y) = \frac{p_{XY}(x, y)}{p_Y(y)}, \qquad \text{（当 } p_Y(y) > 0 \text{）}$$
+
+<p>利用条件 PMF，独立性有一个更直觉的等价表述：</p>
+$$X \text{ 与 } Y \text{ 独立} \iff p_{X|Y}(x|y) = p_X(x), \quad \forall\, x, y$$
+
+<p>即"知道 $Y$ 的值不改变 $X$ 的分布"。对密度函数类似：$f_{X|Y}(x|y) = f_X(x)$。</p>
+
+<div class="remark">
+  <strong>细节注意：</strong>若 $X_1, \ldots, X_n$ 相互独立，则它们的任意子集也相互独立。这对独立事件并不总是成立（两两独立不蕴含相互独立），但对独立随机变量是自动成立的，因为边际化联合 CDF 的乘积仍保持乘积结构。
+</div>
+
+<h3>4. IID 随机变量与扩展模型</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; IID (Independent and Identically Distributed)</div>
+  <p>随机变量 $X_1, X_2, \ldots, X_n$ 是<strong>独立同分布 (IID)</strong> 的，如果对所有 $x_1, \ldots, x_n$：</p>
+  $$F_{\mathbf{X}}(x_1, \ldots, x_n) = \prod_{k=1}^n F_X(x_k)$$
+  <p>即它们相互独立，且每个 $X_k$ 都具有相同的边际分布 $F_X$。该乘积形式同样适用于 PMF 和 PDF。</p>
+</div>
+
+<h4>扩展模型的构造</h4>
+
+<p>给定一个概率模型（样本空间 $\mathbb{R}$，随机变量 $X$），我们总可以构造一个<strong>扩展模型</strong>：以 $\mathbb{R}^n$ 为样本空间，其上定义 IID 随机变量 $X_1, X_2, \ldots, X_n$。进一步令 $n \to \infty$，得到 IID 随机过程 $X_1, X_2, \ldots$。这对应于现实中"重复独立实验"的数学抽象。</p>
+
+<h4>样本均值与大数定律</h4>
+
+<p>定义部分和 $S_n = X_1 + X_2 + \cdots + X_n$，样本均值为 $S_n / n$。</p>
+
+<p><strong>大数定律的直觉：</strong>$S_n/n$ 随着 $n$ 增大"本质上变为确定性的"（essentially becomes deterministic），趋近于 $\bar{X} = E[X]$。</p>
+
+<p>定量分析方差的行为：</p>
+<ul>
+  <li>$\sigma^2_{S_n} = n\sigma^2$：部分和的方差线性增长，分布的"宽度" $\sigma_{S_n} = \sigma\sqrt{n}$ 按 $\sqrt{n}$ 增长。</li>
+  <li>$\sigma^2_{S_n/n} = \sigma^2 / n$：样本均值的方差按 $1/n$ 缩小，分布的宽度按 $1/\sqrt{n}$ 缩小。</li>
+</ul>
+
+<p>因此样本均值的分布越来越集中于 $\bar{X}$ 附近。当 $X$ 是事件 $A$ 的指示变量 $I_A$ 时，$S_n/n$ 即为事件 $A$ 的<strong>相对频率</strong>，大数定律就是"频率趋近概率"的严格表述。</p>
+
+<div class="remark">
+  <strong>模型的两类困难：</strong>(1) 现实中的重复实验不够"相似且独立"，不能用 IID 扩展模型来描述；(2) IID 扩展本身可以，但基本模型选取不当。理解模型局限性是应用概率论时的核心判断力。
+</div>
+
+<h3>5. Bernoulli 过程</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; Bernoulli 过程</div>
+  <p>Bernoulli 过程是一个 IID 二值随机变量序列 $Y_1, Y_2, Y_3, \ldots$，其中每个 $Y_k$ 的 PMF 为：</p>
+  $$p_Y(1) = p > 0, \qquad p_Y(0) = 1 - p = q > 0$$
+  <p>$Y_k = 1$ 通常称为"成功"（success），$Y_k = 0$ 称为"失败"（failure）。参数 $p$ 称为成功概率。</p>
+</div>
+
+<h4>$S_n$ 的二项分布</h4>
+
+<p>令 $S_n = Y_1 + Y_2 + \cdots + Y_n$ 为前 $n$ 次试验中的成功总数。则 $S_n$ 服从参数 $(n, p)$ 的二项分布：</p>
+$$p_{S_n}(k) = \binom{n}{k} p^k q^{n-k}, \qquad k = 0, 1, \ldots, n$$
+
+<p><strong>推导：</strong>任何具有 $k$ 个 1 和 $n-k$ 个 0 的特定 $n$-tuple 的概率为 $p^k q^{n-k}$（由 IID 性）。这样的 $n$-tuple 共有 $\binom{n}{k}$ 个（选择 $k$ 个位置放 1），因此 $p_{S_n}(k) = \binom{n}{k} p^k q^{n-k}$。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 二项分布的比率分析</div>
+  <p>相邻概率值的比为：</p>
+  $$\frac{p_{S_n}(k+1)}{p_{S_n}(k)} = \frac{(n-k)\,p}{(k+1)\,q}$$
+  <p>该比率关于 $k$ <strong>严格递减</strong>。具体地：</p>
+  <ul>
+    <li>当 $k \ge pn$ 时，比率 $< 1$，即 $p_{S_n}(k)$ 递减</li>
+    <li>当 $k + 1 \le pn$ 时，比率 $> 1$，即 $p_{S_n}(k)$ 递增</li>
+    <li>当 $k < pn < k+1$ 时，比率 $\approx 1$，即 $p_{S_n}(k)$ 取峰值</li>
+  </ul>
+  <p>因此 PMF 的<strong>峰值（mode）位于 $k \approx pn$</strong> 附近，恰等于期望 $E[S_n] = np$。</p>
+</div>
+
+<p><strong>推导：</strong></p>
+$$\frac{p_{S_n}(k+1)}{p_{S_n}(k)} = \frac{\binom{n}{k+1} p^{k+1} q^{n-k-1}}{\binom{n}{k} p^k q^{n-k}} = \frac{n!/(k+1)!(n-k-1)!}{n!/k!(n-k)!} \cdot \frac{p}{q} = \frac{n-k}{k+1} \cdot \frac{p}{q}$$
+
+<p>令比率等于 1：$(n-k)p = (k+1)q$，解得 $k = pn - q$，即模在 $\lfloor pn \rfloor$ 或 $\lceil pn \rceil - 1$ 处取到。</p>
+
+<h3>6. Bernoulli 过程的中心极限定理推导</h3>
+
+<p>本节利用比率公式，通过对数近似直接推导 Bernoulli 和 $S_n$ 的 PMF 在峰值附近的 Gaussian 形状。这是中心极限定理的一个优美的初等证明。</p>
+
+<h4>Step 1：在 $k = pn$ 附近取对数</h4>
+
+<p>为简化代数，假设 $pn$ 为整数。设 $k = pn + i$（$i$ 相对较小），代入比率公式：</p>
+$$\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)} = \frac{n - pn - i}{pn + i + 1} \cdot \frac{p}{q} = \frac{nq - i}{pn + i + 1} \cdot \frac{p}{q}$$
+
+<p>改写为更便于取对数的形式：</p>
+$$\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)} = \frac{1 - \dfrac{i}{nq}}{1 + \dfrac{i+1}{np}}$$
+
+<p>取对数：</p>
+$$\ln\!\left[\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)}\right] = \ln\!\left(1 - \frac{i}{nq}\right) - \ln\!\left(1 + \frac{i+1}{np}\right)$$
+
+<h4>Step 2：Taylor 展开</h4>
+
+<p>当 $|i| \ll n$ 时，利用 $\ln(1+x) \approx x - x^2/2 + \cdots$：</p>
+$$\ln\!\left(1 - \frac{i}{nq}\right) \approx -\frac{i}{nq} - \frac{i^2}{2n^2 q^2} - \cdots$$
+$$\ln\!\left(1 + \frac{i+1}{np}\right) \approx \frac{i+1}{np} - \frac{(i+1)^2}{2n^2 p^2} - \cdots$$
+
+<p>相减，忽略 $O(i^2/n^2)$ 项：</p>
+$$\ln\!\left[\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)}\right] \approx -\frac{i}{nq} - \frac{i+1}{np} + \cdots = -\frac{i}{npq} - \frac{1}{np} + \cdots$$
+
+<p>其中利用了 $\frac{1}{nq} + \frac{1}{np} = \frac{p+q}{npq} = \frac{1}{npq}$。高阶修正项为 $O(i^2/n^2)$。</p>
+
+<div class="remark">
+  <strong>关键观察：</strong>对数增量近似地<strong>线性依赖于 $i$</strong>，系数为 $-1/(npq)$。这意味着 PMF 的对数近似为 $i$ 的二次函数 &mdash; 即 Gaussian 形状。
+</div>
+
+<h4>Step 3：伸缩求和 (Telescoping Sum)</h4>
+
+<p>将从 $pn$ 到 $pn + j$ 的变化表示为 $j$ 个单位增量的和：</p>
+$$\ln\!\left[\frac{p_{S_n}(pn + j)}{p_{S_n}(pn)}\right] = \sum_{i=0}^{j-1} \ln\!\left[\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)}\right]$$
+
+<p>代入近似式：</p>
+$$\approx \sum_{i=0}^{j-1}\left(-\frac{i}{npq} - \frac{1}{np} + \cdots\right) = -\frac{1}{npq}\sum_{i=0}^{j-1} i - \frac{j}{np} + \cdots$$
+
+$$= -\frac{j(j-1)}{2npq} - \frac{j}{np} + \cdots \approx -\frac{j^2}{2npq}$$
+
+<p>其中利用了 $\sum_{i=0}^{j-1} i = j(j-1)/2 \approx j^2/2$，并忽略了与 $j^2$ 相比的线性项（线性项的量级等同于单位增量，远小于主项）。</p>
+
+<h4>Step 4：得出 Gaussian 形式</h4>
+
+<p>由伸缩和结果：</p>
+$$\ln\!\left[\frac{p_{S_n}(pn + j)}{p_{S_n}(pn)}\right] \approx -\frac{j^2}{2npq}$$
+
+<p>取指数：</p>
+$$p_{S_n}(pn + j) \approx p_{S_n}(pn) \cdot \exp\!\left(-\frac{j^2}{2npq}\right)$$
+
+<p>此公式对 $j$ 正负均成立，是一个以 $pn$ 为中心的量子化 Gaussian 分布，具有未知的归一化常数 $p_{S_n}(pn)$。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; Bernoulli 和的中心极限定理（离散 PMF 形式）</div>
+  <p>选取归一化常数使得 PMF 求和为 1（利用 Gaussian 积分 $\int_{-\infty}^\infty e^{-t^2/2}\,dt = \sqrt{2\pi}$），得到：</p>
+  $$p_{S_n}(pn + j) \approx \frac{1}{\sqrt{2\pi npq}} \exp\!\left(-\frac{j^2}{2npq}\right)$$
+  <p>等价地，标准化随机变量 $Z_n = \dfrac{S_n - np}{\sqrt{npq}}$ 的分布近似于标准正态分布：</p>
+  $$\lim_{n\to\infty} \Pr\!\left\{\frac{S_n - np}{\sqrt{npq}} \le y\right\} = \int_{-\infty}^y \frac{1}{\sqrt{2\pi}} e^{-x^2/2}\,dx = \Phi(y)$$
+  <p>即 $S_n$ 近似服从<strong>均值 $np$、方差 $npq$</strong> 的正态分布 $\mathcal{N}(np,\, npq)$。</p>
+</div>
+
+<div class="remark">
+  <strong>推导回顾：</strong>整个证明只依赖于：(1) 比率公式 $(n-k)p/((k+1)q)$；(2) 在峰值附近 Taylor 展开 $\ln(1+x)$；(3) 伸缩求和。无需 Stirling 公式或特征函数。教材 1.5.3 节给出了基于特征函数的另一种证明。
+</div>
+
+<h3>本讲小结</h3>
+
+<table class="summary">
+  <tr><th style="width:28%">主题</th><th>要点</th></tr>
+  <tr><td><strong>期望</strong></td><td>离散：$E[X]=\sum a_i p_X(a_i)$；连续：$E[X]=\int xf_X(x)\,dx$；非负通用：$E[X]=\int_0^\infty F_X^c(x)\,dx$</td></tr>
+  <tr><td><strong>标准差</strong></td><td>$\sigma_X = \sqrt{E[(X-\bar X)^2]}$，衡量随机变量的"典型偏离程度"</td></tr>
+  <tr><td><strong>指示随机变量</strong></td><td>$I_A(\omega)=\mathbf{1}(\omega\in A)$；$E[I_A]=\Pr\{A\}$；事件定理可转化为 rv 定理</td></tr>
+  <tr><td><strong>联合分布与独立性</strong></td><td>$X_1,\ldots,X_n$ 独立 $\iff$ $F_{\mathbf{X}}=\prod F_{X_m}$；条件 PMF 等于边际 PMF</td></tr>
+  <tr><td><strong>IID 与样本均值</strong></td><td>$\sigma^2_{S_n/n}=\sigma^2/n$，分布宽度按 $1/\sqrt{n}$ 缩小，大数定律的定量基础</td></tr>
+  <tr><td><strong>Bernoulli 过程</strong></td><td>IID 二值过程；$S_n\sim\text{Binomial}(n,p)$；比率 $(n-k)p/((k+1)q)$ 确定峰值在 $k\approx pn$</td></tr>
+  <tr><td><strong>CLT 推导</strong></td><td>对数比率线性 $\to$ 伸缩和为二次 $\to$ $p_{S_n}(pn+j)\approx\frac{1}{\sqrt{2\pi npq}}e^{-j^2/(2npq)}$</td></tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 6.262, Spring 2011 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>

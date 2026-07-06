@@ -11,6 +11,7 @@
 | 课程 | 来源 | 状态 | 进度 |
 |------|------|------|------|
 | [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 | 10 / 23 |
+| [随机过程](./stochastic-processes/) | MIT 6.262 | 进行中 | 3 / 25 |
 | [偏微分方程](./pde/) | 待定 | 计划中 | — |
 
 ## 泛函分析 — MIT 18.102
@@ -39,6 +40,25 @@
 - Hilbert 空间、标准正交基、Fourier 级数
 - 紧算子、自伴算子、谱定理
 
+## 随机过程 — MIT 6.262
+
+授课：Prof. Robert Gallager
+
+| # | 主题 | 笔记 |
+|---|------|------|
+| 1 | Introduction and Probability Review | [随机过程_L1](./stochastic-processes/随机过程_L1.pdf) |
+| 2 | Expectations, Independence, Bernoulli Process | [随机过程_L2](./stochastic-processes/随机过程_L2.pdf) |
+| 3 | Law of Large Numbers, Convergence | [随机过程_L3](./stochastic-processes/随机过程_L3.pdf) |
+| ... | ... | ... |
+
+### 涵盖内容
+
+- 概率论回顾、公理体系
+- 期望、独立性、IID 随机变量
+- Bernoulli 过程、大数定律、中心极限定理
+- Poisson 过程、Markov 链、更新过程
+- 随机游走、鞅论
+
 ## 笔记制作方式
 
 每讲笔记基于以下材料整理：
@@ -56,6 +76,11 @@
 - **MIT 18.102 Introduction to Functional Analysis, Spring 2021**
   授课：Dr. Casey Rodriguez
   来源：[MIT OpenCourseWare](https://ocw.mit.edu/courses/18-102-introduction-to-functional-analysis-spring-2021/)
+  许可证：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+- **MIT 6.262 Discrete Stochastic Processes, Spring 2011**
+  授课：Prof. Robert Gallager
+  来源：[MIT OpenCourseWare](https://ocw.mit.edu/courses/6-262-discrete-stochastic-processes-spring-2011/)
   许可证：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 本仓库为独立整理的学习笔记，非 MIT 官方出版物，MIT 不为本仓库背书。
