@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MIT 6.262 第五讲 - Poisson 过程的合并与分裂</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>MIT 6.262 离散随机过程</h1>
+  <h2>第五讲：Poisson 过程的合并与分裂</h2>
+  <p class="meta">Lecturer: Prof. Robert Gallager (<a href="https://www.youtube.com/watch?v=ct0QGoi3n4Q" style="color:#2c5f8a;">YouTube</a>)</p>
+</div>
+
+<h3>1. Poisson 过程回顾</h3>
+
+<p>在开始讨论合并与分裂之前，我们先回顾 Poisson 过程的核心性质，它们将在本讲中反复使用。</p>
+
+<p>速率为 $\lambda$ 的 Poisson 过程 $\{N(t);\, t > 0\}$ 具有以下等价刻画：</p>
+<ul>
+  <li><strong>到达间隔刻画：</strong>到达间隔 $X_1, X_2, \ldots$ 是 IID $\text{Exp}(\lambda)$ 随机变量。</li>
+  <li><strong>增量刻画：</strong>过程具有平稳独立增量，且 $N(t) \sim \text{Poisson}(\lambda t)$。</li>
+  <li><strong>小增量刻画：</strong>$\Pr\{\widetilde{N}(t, t+\delta) = 1\} = \lambda\delta + o(\delta)$，$\Pr\{\widetilde{N}(t, t+\delta) \geq 2\} = o(\delta)$。</li>
+</ul>
+
+<p><strong>关键性质：</strong>对任意时间划分 $0 < t_1 < t_2 < \cdots < t_k$，各区间上的增量 $\widetilde{N}(t_{i-1}, t_i) = N(t_i) - N(t_{i-1})$ 是互相独立的 Poisson 随机变量，参数分别为 $\lambda(t_i - t_{i-1})$。</p>
+
+<div class="remark">
+  <strong>独立 Poisson 随机变量的可加性：</strong>若 $Y_1 \sim \text{Poisson}(\mu_1)$，$Y_2 \sim \text{Poisson}(\mu_2)$ 独立，则 $Y_1 + Y_2 \sim \text{Poisson}(\mu_1 + \mu_2)$。这可由 MGF 直接验证：$E[e^{r(Y_1+Y_2)}] = e^{\mu_1(e^r-1)} \cdot e^{\mu_2(e^r-1)} = e^{(\mu_1+\mu_2)(e^r-1)}$。此性质是合并定理的代数基础。
+</div>
+
+<h3>2. 独立 Poisson 过程的合并 (Combining/Superposition)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 独立 Poisson 过程</div>
+  <p>两个 Poisson 过程 $\{N_1(t);\, t > 0\}$（速率 $\lambda_1$）和 $\{N_2(t);\, t > 0\}$（速率 $\lambda_2$）称为<strong>独立的</strong>，如果对任意时刻集 $t_1, \ldots, t_n$，随机向量 $(N_1(t_1), \ldots, N_1(t_n))$ 与 $(N_2(t_1), \ldots, N_2(t_n))$ 独立。</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; Poisson 过程的合并 (Superposition Theorem)</div>
+  <p>设 $\{N_1(t);\, t > 0\}$ 和 $\{N_2(t);\, t > 0\}$ 是速率分别为 $\lambda_1$ 和 $\lambda_2$ 的<strong>独立</strong> Poisson 过程。定义合并过程：</p>
+  $$N(t) = N_1(t) + N_2(t)$$
+  <p>则 $\{N(t);\, t > 0\}$ 是速率为 $\lambda = \lambda_1 + \lambda_2$ 的 Poisson 过程。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明方法一（小增量法）</div>
+  <p>在任意小增量 $(t, t+\delta]$ 内，$\widetilde{N}(t, t+\delta) = \widetilde{N}_1(t, t+\delta) + \widetilde{N}_2(t, t+\delta)$。</p>
+  <p><strong>恰好一次到达的概率：</strong></p>
+  $$\Pr\{\widetilde{N}(t, t+\delta) = 1\} = \Pr\{\widetilde{N}_1 = 1\}\Pr\{\widetilde{N}_2 = 0\} + \Pr\{\widetilde{N}_1 = 0\}\Pr\{\widetilde{N}_2 = 1\}$$
+  $$= [\lambda_1\delta + o(\delta)][1 - \lambda_2\delta + o(\delta)] + [1 - \lambda_1\delta + o(\delta)][\lambda_2\delta + o(\delta)]$$
+  $$= (\lambda_1 + \lambda_2)\delta + o(\delta)$$
+  <p><strong>零次到达的概率：</strong></p>
+  $$\Pr\{\widetilde{N}(t, t+\delta) = 0\} = [1 - \lambda_1\delta + o(\delta)][1 - \lambda_2\delta + o(\delta)] = 1 - (\lambda_1+\lambda_2)\delta + o(\delta)$$
+  <p><strong>两次及以上到达的概率：</strong>由补概率，$\Pr\{\widetilde{N} \geq 2\} = o(\delta)$。</p>
+  <p>合并过程继承了平稳独立增量（由两个过程的独立性和各自的平稳独立增量保证），且满足小增量条件（参数 $\lambda_1 + \lambda_2$）。由等价定义 II，$\{N(t)\}$ 是速率 $\lambda_1 + \lambda_2$ 的 Poisson 过程。$\square$</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明方法二（直接用 Poisson 可加性）</div>
+  <p>对任意不相交区间 $(t_{i-1}, t_i]$，$\widetilde{N}_1(t_{i-1}, t_i) \sim \text{Pois}(\lambda_1(t_i - t_{i-1}))$ 与 $\widetilde{N}_2(t_{i-1}, t_i) \sim \text{Pois}(\lambda_2(t_i - t_{i-1}))$ 独立。由 Poisson 可加性：</p>
+  $$\widetilde{N}(t_{i-1}, t_i) = \widetilde{N}_1(t_{i-1}, t_i) + \widetilde{N}_2(t_{i-1}, t_i) \sim \text{Pois}((\lambda_1+\lambda_2)(t_i - t_{i-1}))$$
+  <p>且不同区间上的增量仍独立（因为 $N_1, N_2$ 各自独立增量且彼此独立）。$\square$</p>
+</div>
+
+<h4>推广到多个过程</h4>
+
+<p>更一般地，若 $\{N_1(t)\}, \{N_2(t)\}, \ldots, \{N_k(t)\}$ 是<strong>互相独立</strong>的 Poisson 过程，速率分别为 $\lambda_1, \ldots, \lambda_k$，则合并过程 $N(t) = \sum_{i=1}^k N_i(t)$ 是速率为 $\lambda = \sum_{i=1}^k \lambda_i$ 的 Poisson 过程。</p>
+
+<div class="remark">
+  <strong>大量小过程的近似：</strong>即使各个子过程不是 Poisson 的，只要它们大量存在、互相独立、且每个过程的贡献很小，合并后的过程仍然近似 Poisson。这类似于 CLT 的精神——独立性在叠加中"洗掉"了各子过程内部的依赖结构。这解释了为什么 Poisson 过程在实际中如此普遍。
+</div>
+
+<h3>3. Poisson 过程的分裂/稀释 (Splitting/Thinning)</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; Poisson 过程的分裂 (Splitting/Thinning Theorem)</div>
+  <p>设 $\{N(t);\, t > 0\}$ 是速率为 $\lambda$ 的 Poisson 过程。每次到达独立地以概率 $p$ 被分配到"类型 1"，以概率 $1-p$ 分配到"类型 2"（分配决策由一个与 $N(t)$ 独立的 Bernoulli 过程控制）。定义：</p>
+  <ul>
+    <li>$N_1(t)$ = 时间 $(0, t]$ 内类型 1 的到达数</li>
+    <li>$N_2(t)$ = 时间 $(0, t]$ 内类型 2 的到达数</li>
+  </ul>
+  <p>则：</p>
+  <ol>
+    <li>$\{N_1(t);\, t > 0\}$ 是速率为 $\lambda p$ 的 Poisson 过程。</li>
+    <li>$\{N_2(t);\, t > 0\}$ 是速率为 $\lambda(1-p)$ 的 Poisson 过程。</li>
+    <li>$\{N_1(t)\}$ 和 $\{N_2(t)\}$ 是<strong>独立的</strong>。</li>
+  </ol>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（小增量法）</div>
+  <p><strong>步骤 1：各子过程是 Poisson。</strong></p>
+  <p>在小增量 $(t, t+\delta]$ 内，$\widetilde{N}_1(t, t+\delta)$ 的分布为：</p>
+  $$\Pr\{\widetilde{N}_1 = 1\} = \Pr\{\widetilde{N} = 1\} \cdot p + o(\delta) = \lambda p \delta + o(\delta)$$
+  $$\Pr\{\widetilde{N}_1 = 0\} = \Pr\{\widetilde{N} = 0\} + \Pr\{\widetilde{N} = 1\}(1-p) + o(\delta) = 1 - \lambda p \delta + o(\delta)$$
+  $$\Pr\{\widetilde{N}_1 \geq 2\} = o(\delta)$$
+  <p>$N_1$ 继承了原过程的平稳独立增量性质（因为分配决策在每个增量上独立进行）。由等价定义 II，$N_1$ 是速率 $\lambda p$ 的 Poisson 过程。类似地 $N_2$ 是速率 $\lambda(1-p)$ 的 Poisson 过程。</p>
+  <p><strong>步骤 2：$N_1$ 和 $N_2$ 独立。</strong></p>
+  <p>对任意区间 $(t, t+\delta]$，给定 $\widetilde{N}(t, t+\delta) = n$，$\widetilde{N}_1$ 和 $\widetilde{N}_2 = n - \widetilde{N}_1$ 的联合分布为 Binomial 分裂。由 Poisson 分裂引理（见下），$\widetilde{N}_1$ 和 $\widetilde{N}_2$ 无条件独立。对不同区间的独立性由原过程的独立增量保证。$\square$</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">引理 &mdash; Poisson 分裂引理</div>
+  <p>设 $N \sim \text{Poisson}(\mu)$。给定 $N = n$，每个事件独立地以概率 $p$ 归入类型 1。设 $N_1$ = 类型 1 的个数，$N_2 = N - N_1$。则 $N_1 \sim \text{Poisson}(\mu p)$，$N_2 \sim \text{Poisson}(\mu(1-p))$，且 $N_1$ 与 $N_2$ <strong>独立</strong>。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（Poisson 分裂引理）</div>
+  <p>计算联合 PMF：</p>
+  $$\Pr\{N_1 = j,\, N_2 = k\} = \Pr\{N_1 = j,\, N_2 = k \mid N = j+k\} \cdot \Pr\{N = j+k\}$$
+  $$= \binom{j+k}{j} p^j (1-p)^k \cdot \frac{\mu^{j+k} e^{-\mu}}{(j+k)!}$$
+  $$= \frac{p^j (1-p)^k}{j!\, k!} \cdot \mu^{j+k} e^{-\mu}$$
+  $$= \frac{(\mu p)^j e^{-\mu p}}{j!} \cdot \frac{(\mu(1-p))^k e^{-\mu(1-p)}}{k!}$$
+  <p>最后一步利用了 $e^{-\mu} = e^{-\mu p} \cdot e^{-\mu(1-p)}$。联合 PMF 分解为两个独立 Poisson 的乘积。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>直觉：</strong>分裂后的两个过程独立这一事实乍看反直觉——毕竟 $N_1(t) + N_2(t) = N(t)$，知道一个似乎应该限制另一个。但 Poisson 分布的特殊结构使得条件化后恰好"消除"了这种约束。这是 Poisson 分布的独特代数性质。
+</div>
+
+<h4>推广到多路分裂</h4>
+
+<p>更一般地，每次到达可以独立地分配到 $k$ 类之一，概率分别为 $p_1, \ldots, p_k$（$\sum p_i = 1$）。则各类形成的子过程 $\{N_i(t)\}$ 是<strong>互相独立</strong>的 Poisson 过程，速率分别为 $\lambda p_1, \ldots, \lambda p_k$。</p>
+
+<h3>4. 条件到达密度与顺序统计量</h3>
+
+<p>Poisson 过程的另一个深刻性质是：<strong>给定区间内的到达总数后，各到达时刻的条件分布是均匀的</strong>。这与顺序统计量（order statistics）之间存在精确对应。</p>
+
+<h4>给定 $N(t) = 1$ 时的条件分布</h4>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 单次到达的条件均匀性</div>
+  <p>给定 $N(t) = 1$（即 $(0, t]$ 内恰好一次到达），到达时刻 $S_1$ 的条件密度为：</p>
+  $$f_{S_1 | N(t)}(s_1 \mid 1) = \frac{1}{t}, \quad 0 < s_1 < t$$
+  <p>即 $S_1 \mid N(t)=1$ 在 $(0, t]$ 上<strong>均匀分布</strong>。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>利用独立增量。事件 "$S_1 \in (s_1, s_1+\delta]$ 且 $N(t) = 1$" 等价于"$(0, s_1]$ 无到达，$(s_1, s_1+\delta]$ 恰一次到达，$(s_1+\delta, t]$ 无到达"：</p>
+  $$f_{S_1|N(t)}(s_1 \mid 1) = \lim_{\delta \to 0} \frac{\Pr\{N(s_1) = 0\} \cdot \Pr\{\widetilde{N}(s_1, s_1+\delta) = 1\} \cdot \Pr\{\widetilde{N}(s_1+\delta, t) = 0\}}{\delta \cdot p_{N(t)}(1)}$$
+  $$= \frac{e^{-\lambda s_1} \cdot \lambda\delta \cdot e^{-\lambda(t - s_1 - \delta)}}{\delta \cdot \lambda t e^{-\lambda t}} = \frac{e^{-\lambda s_1} \cdot \lambda \cdot e^{-\lambda(t-s_1)}}{{\lambda t e^{-\lambda t}}} = \frac{\lambda e^{-\lambda t}}{\lambda t e^{-\lambda t}} = \frac{1}{t} \qquad\square$$
+</div>
+
+<h4>给定 $N(t) = n$ 时的联合条件分布</h4>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 条件联合密度（核心定理）</div>
+  <p>给定 $N(t) = n$，到达时刻向量 $(S_1, \ldots, S_n)$ 的条件联合密度为：</p>
+  $$f_{\vec{S}^{(n)} | N(t)}(\vec{s}^{(n)} \mid n) = \frac{n!}{t^n}, \quad 0 < s_1 < s_2 < \cdots < s_n < t$$
+  <p>这是在有序区域 $\{0 < s_1 < \cdots < s_n < t\}$ 上的<strong>均匀分布</strong>。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>将 $(0, t]$ 在 $s_1, \ldots, s_n$ 处划分为 $n+1$ 个子区间。利用独立增量：</p>
+  $$f_{\vec{S}^{(n)}|N(t)}(\vec{s}^{(n)}|n) = \lim_{\delta \to 0} \frac{\prod_{i=1}^n [e^{-\lambda(s_i - s_{i-1}-\delta)} \cdot \lambda\delta] \cdot e^{-\lambda(t-s_n-\delta)}}{\delta^n \cdot p_{N(t)}(n)}$$
+  <p>其中 $s_0 = 0$。指数项合并：</p>
+  $$\prod_{i=1}^n e^{-\lambda(s_i - s_{i-1} - \delta)} \cdot e^{-\lambda(t-s_n-\delta)} = e^{-\lambda(t - n\delta)} \to e^{-\lambda t}$$
+  <p>因此：</p>
+  $$f_{\vec{S}^{(n)}|N(t)}(\vec{s}^{(n)}|n) = \frac{(\lambda\delta)^n \cdot e^{-\lambda t}}{\delta^n \cdot \frac{(\lambda t)^n e^{-\lambda t}}{n!}} = \frac{\lambda^n \cdot e^{-\lambda t}}{\frac{(\lambda t)^n e^{-\lambda t}}{n!}} = \frac{n!}{t^n} \qquad\square$$
+</div>
+
+<div class="remark">
+  <strong>关键观察：</strong>条件密度 $n!/t^n$ 不依赖于 $\lambda$！给定到达总数后，速率参数的信息完全被"消耗"在确定 $n$ 的过程中；到达时刻的空间分布则完全由均匀性决定。这使得许多条件计算变得极其简洁。
+</div>
+
+<h4>顺序统计量的对应</h4>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 顺序统计量等价 (Order Statistics Equivalence)</div>
+  <p>设 $U_1, \ldots, U_n$ 是 $n$ 个独立的 $\text{Uniform}(0, t]$ 随机变量，$S_1 \leq S_2 \leq \cdots \leq S_n$ 是它们的<strong>顺序统计量</strong>（order statistics），即 $S_k$ 是第 $k$ 小的值。则：</p>
+  <p>$(S_1, \ldots, S_n)$ 的联合密度恰好等于 Poisson 过程中给定 $N(t) = n$ 时到达时刻的条件联合密度。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>$\vec{U}^n = (U_1, \ldots, U_n)$ 的联合密度在 $(0, t]^n$（体积 $t^n$）上均匀，为 $1/t^n$。</p>
+  <p>$n$ 维空间 $(0, t]^n$ 可按坐标排列方式划分为 $n!$ 个等体积区域（对应 $n!$ 种排列）。由对称性，每个区域的体积为 $t^n / n!$。</p>
+  <p>顺序统计量 $(S_1, \ldots, S_n)$ 的支撑集恰好是其中一个区域 $\{0 < s_1 < \cdots < s_n < t\}$，体积为 $t^n/n!$。在该区域上的密度为 $n!/t^n$（对原密度 $1/t^n$ 乘以 Jacobian $n!$，即从 $n!$ 个排列映射到同一组顺序统计量）。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>实用意义：</strong>这个等价意味着我们可以用顺序统计量的已知结果来回答 Poisson 过程的条件问题，反之亦然。例如：<br>
+  - 要模拟给定 $N(t) = n$ 的 Poisson 过程，只需生成 $n$ 个 $\text{Uniform}(0, t)$ 随机数然后排序。<br>
+  - 顺序统计量的边缘分布、矩等标准结果可以直接搬用。
+</div>
+
+<h4>边缘条件分布的推导</h4>
+
+<p>利用顺序统计量等价，可以快速得到各种边缘分布：</p>
+
+<p><strong>$S_1 \mid N(t) = n$ 的分布：</strong>$S_1 = \min(U_1, \ldots, U_n)$，其互补 CDF 为：</p>
+$$\Pr\{S_1 > s_1 \mid N(t) = n\} = \Pr\{\min_i U_i > s_1\} = \prod_{i=1}^n \Pr\{U_i > s_1\} = \left(1 - \frac{s_1}{t}\right)^n$$
+
+<p>密度为：</p>
+$$f_{S_1|N(t)}(s_1 \mid n) = \frac{n}{t}\left(1 - \frac{s_1}{t}\right)^{n-1}, \quad 0 < s_1 < t$$
+
+<p>条件期望：</p>
+$$E[S_1 \mid N(t) = n] = \frac{t}{n+1}$$
+
+<div class="remark">
+  <strong>对称性：</strong>由于 $n$ 个均匀随机变量将 $(0, t]$ 划分为 $n+1$ 段，由对称性，每段的期望长度为 $t/(n+1)$。因此 $E[S_k \mid N(t) = n] = kt/(n+1)$，对 $k = 1, \ldots, n$ 均成立。
+</div>
+
+<h4>条件下到达间隔的分布</h4>
+
+<p>给定 $N(t) = n$，定义 $X_k = S_k - S_{k-1}$（$k = 1, \ldots, n$）以及剩余时间 $X_{n+1}^* = t - S_n$。由从 $(s_1, \ldots, s_n)$ 到 $(x_1, \ldots, x_n)$ 的线性变换（Jacobian = 1）：</p>
+
+$$f_{X_1, \ldots, X_n, X_{n+1}^* \mid N(t)}(x_1, \ldots, x_n, x_{n+1}^* \mid n) = \frac{n!}{t^n}$$
+<p>约束为 $x_i > 0$（$i = 1, \ldots, n+1$），$\sum_{i=1}^{n+1} x_i = t$。这是在 $n$ 维单纯形上的均匀分布（Dirichlet 分布的特例）。</p>
+
+<p>$X_1$ 的边缘条件密度（对 $N(t) = 2$ 的情形）：</p>
+$$f_{X_1|N(t)}(x_1 \mid 2) = \frac{2}{t}\left(1 - \frac{x_1}{t}\right), \quad 0 < x_1 < t$$
+
+<p>一般情形：</p>
+$$f_{X_1|N(t)}(x_1 \mid n) = \frac{n}{t}\left(1 - \frac{x_1}{t}\right)^{n-1}, \quad 0 < x_1 < t$$
+
+<p>由对称性，$X_{n+1}^* = t - S_n$ 具有相同的条件分布：</p>
+$$f_{X_{n+1}^*|N(t)}(x \mid n) = \frac{n}{t}\left(1 - \frac{x}{t}\right)^{n-1}, \quad E[X_{n+1}^* \mid N(t) = n] = \frac{t}{n+1}$$
+
+<h4>检验悖论 (Inspection Paradox) 的初步讨论</h4>
+
+<p>考虑无条件的期望 $E[X_{n+1}^*]$：</p>
+$$E[X_{N(t)+1}^*] = \sum_{n=0}^{\infty} \frac{t}{n+1} \cdot \frac{(\lambda t)^n e^{-\lambda t}}{n!} = \sum_{n=0}^{\infty} \frac{(\lambda t)^{n+1} e^{-\lambda t}}{\lambda(n+1)!} = \frac{1 - e^{-\lambda t}}{\lambda}$$
+
+<p>当 $t$ 很大时，$E[X_{N(t)+1}^*] \approx 1/\lambda$。而 $X_{N(t)+1}$（包含时刻 $t$ 的完整到达间隔）的期望为：</p>
+$$E[X_{N(t)+1}] = E[X_{N(t)+1}^*] + E[t - S_{N(t)}] \approx \frac{2}{\lambda} - e^{-\lambda t}/\lambda$$
+
+<div class="remark">
+  <strong>检验悖论：</strong>包含随机选取时刻 $t$ 的到达间隔的期望长度约为 $2/\lambda$，是普通到达间隔期望 $1/\lambda$ 的<strong>两倍</strong>。直觉解释：如果你在一个随机时刻"跳入"过程，你更可能落在一个较长的到达间隔内（长区间占据更多时间），从而导致采样偏差。这一现象将在更新理论中深入讨论。
+</div>
+
+<h3>5. 非齐次 Poisson 过程 (Non-homogeneous Poisson Processes)</h3>
+
+<p>在许多实际场景中（如光通信中光子流的调制、一天中不同时段的电话到达），到达率随时间变化。这引出了<strong>非齐次</strong>（non-homogeneous）Poisson 过程。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 非齐次 Poisson 过程</div>
+  <p>一个计数过程 $\{N(t);\, t > 0\}$ 是<strong>非齐次 Poisson 过程</strong>，如果它满足：</p>
+  <ol>
+    <li><strong>独立增量：</strong>不相交区间上的增量相互独立。</li>
+    <li><strong>时变小增量条件：</strong>对所有 $t > 0$，</li>
+  </ol>
+  $$\Pr\{\widetilde{N}(t, t+\delta) = n\} = \begin{cases} 1 - \lambda(t)\delta + o(\delta) & n = 0 \\ \lambda(t)\delta + o(\delta) & n = 1 \\ o(\delta) & n \geq 2 \end{cases}$$
+  <p>其中 $\lambda(t) \geq 0$ 是<strong>速率函数</strong>（rate function / intensity function）。</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 非齐次 Poisson 过程的增量分布</div>
+  <p>对非齐次 Poisson 过程，区间 $(t, \tau]$ 上的到达数服从 Poisson 分布：</p>
+  $$\Pr\{\widetilde{N}(t, \tau) = n\} = \frac{[\widetilde{m}(t, \tau)]^n \exp[-\widetilde{m}(t, \tau)]}{n!}$$
+  <p>其中<strong>累积强度</strong>（mean function）为：</p>
+  $$\widetilde{m}(t, \tau) = \int_t^{\tau} \lambda(u)\, du$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明思路</div>
+  <p>将 $(t, \tau]$ 划分为 $m$ 个小段，每段长 $\delta = (\tau-t)/m$。第 $j$ 段上到达概率约为 $\lambda(t+j\delta)\delta$。当 $m \to \infty$ 时，这是 $m$ 次独立 Bernoulli 试验（成功概率之和趋向于 $\int_t^\tau \lambda(u)\,du$），由 Poisson 极限定理得结论。$\square$</p>
+</div>
+
+<div class="remark">
+  <strong>与齐次情形的区别：</strong><br>
+  - 非齐次 Poisson 过程有独立增量但<strong>不再有平稳增量</strong>（增量分布取决于区间位置而非仅其长度）。<br>
+  - 到达间隔不再是 IID 的，也不再是指数分布。<br>
+  - 合并和分裂的性质仍然成立：两个独立的非齐次 Poisson 过程合并后仍是非齐次 Poisson（速率相加）；分裂也保持非齐次 Poisson 结构（速率按比例分配）。
+</div>
+
+<h3>6. 应用举例</h3>
+
+<h4>例 1：后到先服务 (LCFS) 队列中的完成概率</h4>
+
+<p><strong>模型：</strong>顾客按速率 $\lambda$ 的 Poisson 过程到达。服务时间为独立的 $\text{Exp}(\mu)$。采用后到先服务策略：新到达的顾客立刻开始服务，当前被服务的顾客被中断（preempted）。</p>
+
+<p><strong>问题：</strong>一个新到达的顾客能在被中断前完成服务的概率是多少？</p>
+
+<p><strong>解答：</strong>将服务完成也视为一个独立的 Poisson 过程（速率 $\mu$）。"下一个事件"是到达还是服务完成？由于到达过程（速率 $\lambda$）和服务过程（速率 $\mu$）是独立的 Poisson 过程，合并后速率为 $\lambda + \mu$，且下一个事件是服务完成的概率为：</p>
+$$\Pr\{\text{服务完成先于下一次到达}\} = \frac{\mu}{\lambda + \mu}$$
+
+<h4>例 2：被中断后最终完成的概率</h4>
+
+<p><strong>问题：</strong>给定你被中断了一次，你最终（在没有更多中断的情况下）完成服务的概率是多少？</p>
+
+<p><strong>解答：</strong>需要中断你的那位顾客先完成（概率 $\mu/(\lambda+\mu)$），然后你也需要在下一次到达前完成（概率 $\mu/(\lambda+\mu)$）。因此：</p>
+$$\Pr\{\text{被中断一次后完成}\} = \left(\frac{\mu}{\lambda + \mu}\right)^2$$
+
+<p>更一般地，被中断 $k$ 次后最终完成的概率为 $(\mu/(\lambda+\mu))^{k+1}$。</p>
+
+<h4>例 3：分裂的应用 &mdash; 网络路由</h4>
+
+<p><strong>模型：</strong>数据包按速率 $\lambda$ 的 Poisson 过程到达路由器。路由器将每个包独立地以概率 $p_i$ 转发到第 $i$ 条链路（$i = 1, \ldots, k$，$\sum p_i = 1$）。</p>
+
+<p><strong>结论：</strong>第 $i$ 条链路上的数据包到达过程是速率为 $\lambda p_i$ 的 Poisson 过程，且各链路的到达过程互相独立。这大大简化了网络性能分析。</p>
+
+<h4>例 4：条件均匀性的应用</h4>
+
+<p><strong>问题：</strong>一天中 $(0, T]$ 时间内有 $N(T) = 100$ 辆车通过检查站。估计第一辆车到达的期望时刻。</p>
+
+<p><strong>解答：</strong>由条件均匀性，$E[S_1 \mid N(T) = 100] = T/101$。更一般地，第 $k$ 辆车的期望到达时刻为 $kT/101$——100 辆车将 $(0, T]$ 均匀划分为 101 段。</p>
+
+<h3>7. 合并与分裂的对偶性总结</h3>
+
+<p>合并和分裂互为"逆运算"：</p>
+
+<table class="summary">
+  <tr><th style="width:18%">操作</th><th style="width:40%">输入</th><th>输出</th></tr>
+  <tr>
+    <td><strong>合并</strong></td>
+    <td>独立 Poisson 过程，速率 $\lambda_1, \ldots, \lambda_k$</td>
+    <td>Poisson 过程，速率 $\sum \lambda_i$</td>
+  </tr>
+  <tr>
+    <td><strong>分裂</strong></td>
+    <td>Poisson 过程速率 $\lambda$，分配概率 $p_1, \ldots, p_k$</td>
+    <td>独立 Poisson 过程，速率 $\lambda p_1, \ldots, \lambda p_k$</td>
+  </tr>
+</table>
+
+<p>若先将速率 $\lambda$ 的过程按 $(p_1, p_2)$ 分裂，再合并，回到原速率 $\lambda p_1 + \lambda p_2 = \lambda$。反之，合并后再分裂回去，每个子过程的速率也恢复原值。但注意：分裂再合并得到的过程与原过程<strong>分布相同</strong>（都是同速率 Poisson），但<strong>不是同一组随机变量</strong>（到达时刻不同）。</p>
+
+<h3>本讲小结</h3>
+
+<table class="summary">
+  <tr><th style="width:28%">概念/结果</th><th style="width:38%">内容</th><th>要点</th></tr>
+  <tr>
+    <td><strong>合并定理</strong></td>
+    <td>$N_1(\lambda_1) + N_2(\lambda_2) \to N(\lambda_1+\lambda_2)$</td>
+    <td>独立 Poisson 合并仍 Poisson；速率相加</td>
+  </tr>
+  <tr>
+    <td><strong>分裂定理</strong></td>
+    <td>$N(\lambda) \xrightarrow{p} N_1(\lambda p),\; N_2(\lambda(1-p))$</td>
+    <td>子过程独立且仍 Poisson；速率按比例</td>
+  </tr>
+  <tr>
+    <td><strong>Poisson 分裂引理</strong></td>
+    <td>Pois$(\mu)$ 按 $p$ 分裂 $\to$ 独立 Pois$(\mu p)$, Pois$(\mu(1-p))$</td>
+    <td>独立性是 Poisson 的代数特性</td>
+  </tr>
+  <tr>
+    <td><strong>条件均匀性</strong></td>
+    <td>$f_{\vec{S}^n|N(t)}= n!/t^n$（有序区域上均匀）</td>
+    <td>不依赖 $\lambda$；等价于顺序统计量</td>
+  </tr>
+  <tr>
+    <td><strong>顺序统计量等价</strong></td>
+    <td>$n$ 个 Unif$(0,t)$ 的顺序统计量 $\overset{d}{=}$ 条件到达时刻</td>
+    <td>可用于模拟和分布推导</td>
+  </tr>
+  <tr>
+    <td><strong>非齐次 Poisson</strong></td>
+    <td>速率 $\lambda(t)$ 随时间变化；$\widetilde{N}(t,\tau) \sim$ Pois$(\int_t^\tau \lambda(u)du)$</td>
+    <td>独立增量但无平稳增量</td>
+  </tr>
+  <tr>
+    <td><strong>检验悖论</strong></td>
+    <td>包含 $t$ 的区间期望长度 $\approx 2/\lambda$</td>
+    <td>长度偏差采样；更新理论解释</td>
+  </tr>
+</table>
+
+<div class="footer-note">
+  <p>资料来源：MIT OpenCourseWare 6.262, Spring 2011 | 基于课程讲义与视频字幕整理</p>
+</div>
+
+</div>
+</body>
+</html>

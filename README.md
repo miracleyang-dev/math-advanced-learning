@@ -11,7 +11,7 @@
 | 课程 | 来源 | 状态 | 进度 |
 |------|------|------|------|
 | [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 | 10 / 23 |
-| [随机过程](./stochastic-processes/) | MIT 6.262 | 进行中 | 3 / 25 |
+| [随机过程](./stochastic-processes/) | MIT 6.262 | 进行中 | 6 / 25 |
 | [偏微分方程](./pde/) | 待定 | 计划中 | — |
 
 ## 泛函分析 — MIT 18.102
@@ -49,6 +49,9 @@
 | 1 | Introduction and Probability Review | [随机过程_L1](./stochastic-processes/随机过程_L1.pdf) |
 | 2 | Expectations, Independence, Bernoulli Process | [随机过程_L2](./stochastic-processes/随机过程_L2.pdf) |
 | 3 | Law of Large Numbers, Convergence | [随机过程_L3](./stochastic-processes/随机过程_L3.pdf) |
+| 4 | Poisson (The Perfect Arrival Process) | [随机过程_L4](./stochastic-processes/随机过程_L4.pdf) |
+| 5 | Poisson Combining and Splitting | [随机过程_L5](./stochastic-processes/随机过程_L5.pdf) |
+| 6 | From Poisson to Markov | [随机过程_L6](./stochastic-processes/随机过程_L6.pdf) |
 | ... | ... | ... |
 
 ### 涵盖内容
