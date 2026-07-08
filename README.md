@@ -6,13 +6,17 @@
 
 ---
 
-## 课程目录
+## 学习路径 (MIT 课程体系)
 
-| 课程 | 来源 | 状态 | 进度 |
+严格遵循 MIT 数学系进阶路径，按下列顺序推进：
+
+| 顺序 | 课程 | 来源 | 状态 |
 |------|------|------|------|
-| [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 | 10 / 23 |
-| [随机过程](./stochastic-processes/) | MIT 6.262 | 进行中 | 6 / 25 |
-| [偏微分方程](./pde/) | 待定 | 计划中 | — |
+| 1 | [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 |
+| 2 | [离散概率与随机过程](./stochastic-processes/) | MIT 18.619J | 进行中 |
+| 3 | 信息论 | MIT 18.424 | 计划中（后续会学） |
+| 4 | 离散数学 | MIT 18.404 | 计划中（后续会学） |
+| 5 | 组合分析 | MIT 18.211 | 计划中（后续会学） |
 
 ## 泛函分析 — MIT 18.102
 
@@ -40,27 +44,33 @@
 - Hilbert 空间、标准正交基、Fourier 级数
 - 紧算子、自伴算子、谱定理
 
-## 随机过程 — MIT 6.262
+## 离散概率与随机过程 — MIT 18.619J
 
-授课：Prof. Robert Gallager
+授课：Prof. Elchanan Mossel
 
 | # | 主题 | 笔记 |
 |---|------|------|
-| 1 | Introduction and Probability Review | [随机过程_L1](./stochastic-processes/随机过程_L1.pdf) |
-| 2 | Expectations, Independence, Bernoulli Process | [随机过程_L2](./stochastic-processes/随机过程_L2.pdf) |
-| 3 | Law of Large Numbers, Convergence | [随机过程_L3](./stochastic-processes/随机过程_L3.pdf) |
-| 4 | Poisson (The Perfect Arrival Process) | [随机过程_L4](./stochastic-processes/随机过程_L4.pdf) |
-| 5 | Poisson Combining and Splitting | [随机过程_L5](./stochastic-processes/随机过程_L5.pdf) |
-| 6 | From Poisson to Markov | [随机过程_L6](./stochastic-processes/随机过程_L6.pdf) |
+| 1 | 概率空间回顾与集中不等式 (Markov / Chebyshev / Chernoff / Hoeffding / McDiarmid) | [随机过程_L1](./stochastic-processes/随机过程_L1.pdf) |
+| 2 | 条件期望与鞅 (Doob 鞅、可选停止、Azuma-Hoeffding、鞅收敛) | [随机过程_L2](./stochastic-processes/随机过程_L2.pdf) |
+| 3 | 马尔可夫链与混合时间 (平稳分布、耦合、谱间隙、Cutoff) | [随机过程_L3](./stochastic-processes/随机过程_L3.pdf) |
 | ... | ... | ... |
 
 ### 涵盖内容
 
-- 概率论回顾、公理体系
-- 期望、独立性、IID 随机变量
-- Bernoulli 过程、大数定律、中心极限定理
-- Poisson 过程、Markov 链、更新过程
-- 随机游走、鞅论
+- 集中不等式：Markov / Chebyshev / Chernoff / Hoeffding / McDiarmid
+- 条件期望、滤过、Doob 鞅、可选停止定理
+- Azuma-Hoeffding 与鞅集中方法
+- 有限状态马尔可夫链、平稳分布、可逆性
+- 混合时间、耦合方法、谱间隙、Cutoff 现象
+- Glauber 动力学、MCMC 与统计物理应用
+
+## 后续课程 (计划中)
+
+以下课程将在完成前两门后依序推进，笔记与练习将补充到相应目录：
+
+- **MIT 18.424 信息论 (Seminar in Information Theory)** — 熵、互信息、信源信道编码、Shannon 定理
+- **MIT 18.404 离散数学 (Theory of Computation)** — 自动机、可计算性、复杂度类
+- **MIT 18.211 组合分析 (Combinatorial Analysis)** — 生成函数、Polya 计数、极值组合、随机方法
 
 ## 笔记制作方式
 
@@ -81,9 +91,9 @@
   来源：[MIT OpenCourseWare](https://ocw.mit.edu/courses/18-102-introduction-to-functional-analysis-spring-2021/)
   许可证：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-- **MIT 6.262 Discrete Stochastic Processes, Spring 2011**
-  授课：Prof. Robert Gallager
-  来源：[MIT OpenCourseWare](https://ocw.mit.edu/courses/6-262-discrete-stochastic-processes-spring-2011/)
+- **MIT 18.619J Discrete Probability and Stochastic Processes**
+  授课：Prof. Elchanan Mossel
+  来源：[MIT OpenCourseWare](https://ocw.mit.edu/)
   许可证：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 本仓库为独立整理的学习笔记，非 MIT 官方出版物，MIT 不为本仓库背书。

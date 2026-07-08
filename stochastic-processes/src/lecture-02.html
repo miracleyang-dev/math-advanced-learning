@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>MIT 6.262 第二讲 - 期望、独立性与 Bernoulli 过程</title>
+<title>MIT 18.619J 第二讲 - 条件期望与鞅</title>
 <script>
 window.MathJax = {
   tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
@@ -45,251 +45,167 @@ table.summary tr:last-child td { border-bottom: none; }
 <div class="container">
 
 <div class="title-block">
-  <h1>MIT 6.262 离散随机过程</h1>
-  <h2>第二讲：期望、独立性与 Bernoulli 过程</h2>
-  <p class="meta">Lecturer: Prof. Robert Gallager (<a href="https://www.youtube.com/watch?v=d4xfax4_Iww" style="color:#2c5f8a;">YouTube</a>)</p>
+  <h1>MIT 18.619J 离散概率与随机过程</h1>
+  <h2>第二讲：条件期望与鞅</h2>
+  <p class="meta">Lecturer: Prof. Elchanan Mossel</p>
 </div>
 
-<h3>1. 期望 (Expectation)</h3>
-
-<p>随机变量 $X$ 的分布函数通常包含比实际需要更多的细节。<strong>期望</strong> $\bar{X} = E[X]$ 是对随机变量最简洁的单一数值概括，它提供了"平均值"的精确数学含义。</p>
+<h3>1. 从初等条件概率到条件期望</h3>
+<p>初等概率将 <strong>条件概率</strong> 定义为 $\mathbb{P}(A\mid B)=\mathbb{P}(A\cap B)/\mathbb{P}(B)$，要求 $\mathbb{P}(B)>0$。但一旦 $B=\{Y=y\}$ 而 $Y$ 是连续型或复合结构，$\mathbb{P}(B)=0$，此定义失效。测度论用<strong>Radon-Nikodym 定理</strong>给出统一的条件期望框架。</p>
 
 <div class="def-box">
-  <div class="box-title">定义 &mdash; 期望 (Expectation)</div>
-  <p><strong>离散情形：</strong>若 $X$ 是离散随机变量，取值为 $a_1, a_2, \ldots$，则</p>
-  $$E[X] = \sum_i a_i \, p_X(a_i)$$
-  <p><strong>连续情形：</strong>若 $X$ 具有概率密度函数 $f_X(x)$，则</p>
-  $$E[X] = \int_{-\infty}^{\infty} x \, f_X(x) \, dx$$
-  <p>上述两种定义要求级数或积分绝对收敛，否则期望不存在。</p>
+  <div class="box-title">定义 &mdash; 关于 $\sigma$-代数的条件期望</div>
+  <p>设 $X\in L^1(\Omega,\mathcal{F},\mathbb{P})$，$\mathcal{G}\subseteq\mathcal{F}$ 为子 $\sigma$-代数。<strong>条件期望</strong> $\mathbb{E}[X\mid \mathcal{G}]$ 是唯一（a.s.）满足下列条件的随机变量 $Z$：</p>
+  <ol>
+    <li>$Z$ 是 $\mathcal{G}$-可测的；</li>
+    <li>$\displaystyle\int_G Z\,d\mathbb{P} = \int_G X\,d\mathbb{P}$，对每个 $G\in\mathcal{G}$。</li>
+  </ol>
 </div>
 
-<div class="def-box">
-  <div class="box-title">定义 &mdash; 互补 CDF 表示（非负随机变量）</div>
-  <p>对于<strong>任意非负</strong>随机变量 $X \ge 0$（不要求离散或连续），期望等于互补分布函数下的面积：</p>
-  $$E[X] = \int_0^{\infty} F_X^c(x) \, dx, \qquad F_X^c(x) = \Pr\{X > x\} = 1 - F_X(x)$$
-  <p><strong>几何解释：</strong>考虑离散情形，$X$ 取正值 $a_1 < a_2 < a_3 < \cdots$。互补 CDF $F_X^c(x)$ 是一个递减阶梯函数。将 $\int_0^\infty F_X^c(x)\,dx$ 理解为阶梯下方的面积，可以按水平切片重排：在高度 $a_i$ 处的水平条对应宽度为 $(a_i - a_{i-1})$、高度为 $\Pr\{X \ge a_i\}$ 的矩形。将所有水平条累加恰好等于 $\sum_i a_i \, p_X(a_i) = E[X]$。对连续情形，同样的论证可通过对 Riemann 和取极限推广。</p>
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 条件期望的基本性质</div>
+  <ul>
+    <li><strong>线性性：</strong>$\mathbb{E}[aX+bY\mid\mathcal{G}]=a\mathbb{E}[X\mid\mathcal{G}]+b\mathbb{E}[Y\mid\mathcal{G}]$；</li>
+    <li><strong>单调性：</strong>$X\ge Y\Rightarrow \mathbb{E}[X\mid\mathcal{G}]\ge\mathbb{E}[Y\mid\mathcal{G}]$ a.s.；</li>
+    <li><strong>塔性质 (Tower)：</strong>$\mathcal{H}\subseteq\mathcal{G}\Rightarrow \mathbb{E}\bigl[\mathbb{E}[X\mid\mathcal{G}]\bigm|\mathcal{H}\bigr]=\mathbb{E}[X\mid\mathcal{H}]$；</li>
+    <li><strong>提取已知信息：</strong>$Y$ 为 $\mathcal{G}$-可测且 $XY\in L^1$，则 $\mathbb{E}[XY\mid\mathcal{G}]=Y\,\mathbb{E}[X\mid\mathcal{G}]$；</li>
+    <li><strong>独立性：</strong>$X$ 独立于 $\mathcal{G}$，则 $\mathbb{E}[X\mid\mathcal{G}]=\mathbb{E}X$；</li>
+    <li><strong>Jensen：</strong>$\varphi$ 凸则 $\varphi(\mathbb{E}[X\mid\mathcal{G}])\le\mathbb{E}[\varphi(X)\mid\mathcal{G}]$。</li>
+  </ul>
 </div>
-
-<h4>一般随机变量的互补 CDF 表示</h4>
-
-<p>对于可正可负的一般随机变量 $X$，将其分解为正部与负部后可得：</p>
-$$E[X] = -\int_{-\infty}^{0} F_X(x) \, dx + \int_0^{\infty} F_X^c(x) \, dx$$
-<p>其中第一项的几何含义是：对于 $x < 0$，$F_X(x) = \Pr\{X \le x\}$ 是 $X$ 落在负半轴某处的概率，对其在 $(-\infty, 0)$ 上积分给出负部的贡献（带负号）。这一公式比直接按密度积分在很多问题中更加方便。</p>
 
 <div class="remark">
-  <strong>实用提示：</strong>在许多排队论和可靠性理论问题中，随机变量天然非负（如服务时间、寿命），此时 $E[X] = \int_0^\infty F_X^c(x)\,dx$ 是最简洁的期望计算公式。它也是证明大量不等式（如 Markov 不等式）的起点。
+  <strong>几何直觉：</strong>在 $L^2$ 中，$\mathbb{E}[X\mid\mathcal{G}]$ 恰好是 $X$ 在闭子空间 $L^2(\mathcal{G})$ 上的<strong>正交投影</strong>。因此塔性质对应"投影套叠"，Jensen 对应"投影不增凸性"。这与 18.102 中的 Hilbert 空间投影完全一致。
+</div>
+
+<h3>2. 滤过与随机过程 (Filtration)</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 &mdash; 滤过</div>
+  <p>递增子 $\sigma$-代数族 $\{\mathcal{F}_n\}_{n\ge 0}$，即 $\mathcal{F}_n\subseteq\mathcal{F}_{n+1}\subseteq\mathcal{F}$，称为<strong>滤过 (filtration)</strong>。它编码了"时刻 $n$ 已知信息"的累积过程。</p>
 </div>
 
 <div class="def-box">
-  <div class="box-title">定义 &mdash; 标准差 (Standard Deviation)</div>
-  <p>随机变量 $X$ 的<strong>标准差</strong>定义为方差的平方根：</p>
-  $$\sigma_X = \sqrt{E\!\left[(X - \bar{X})^2\right]}$$
-  <p>其中 $\bar{X} = E[X]$。标准差与 $X$ 量纲相同，衡量 $X$ 相对于其均值的"典型偏离程度"。方差 $\sigma_X^2 = E[(X-\bar{X})^2]$ 常更便于计算。</p>
+  <div class="box-title">定义 &mdash; 适应过程 (Adapted)</div>
+  <p>过程 $\{X_n\}$ 关于 $\{\mathcal{F}_n\}$ <strong>适应</strong>，若每个 $X_n$ 都是 $\mathcal{F}_n$-可测。典型选择：$\mathcal{F}_n=\sigma(X_0,\dots,X_n)$，称为<strong>自然滤过</strong>。</p>
 </div>
 
-<h3>2. 指示随机变量 (Indicator Random Variables)</h3>
-
-<p>指示随机变量是连接<strong>事件</strong>与<strong>随机变量</strong>理论的桥梁。通过它，关于随机变量的一切定理都可以直接应用到事件上。</p>
+<h3>3. 鞅、上鞅、下鞅 (Martingale, Super-/Submartingale)</h3>
 
 <div class="def-box">
-  <div class="box-title">定义 &mdash; 指示随机变量 (Indicator RV)</div>
-  <p>对于概率模型中的事件 $A$，定义指示随机变量 $I_A$ 为：</p>
-  $$I_A(\omega) = \begin{cases} 1, & \omega \in A \\ 0, & \omega \notin A \end{cases}$$
-  <p>$I_A$ 是一个二值（binary）随机变量，其 PMF 为：</p>
-  $$p_{I_A}(1) = \Pr\{A\}, \qquad p_{I_A}(0) = 1 - \Pr\{A\}$$
+  <div class="box-title">定义 &mdash; 鞅</div>
+  <p>适应过程 $\{X_n\}$ 满足 $X_n\in L^1$，称为</p>
+  <ul>
+    <li><strong>鞅 (martingale)</strong>：$\mathbb{E}[X_{n+1}\mid\mathcal{F}_n]=X_n$；</li>
+    <li><strong>上鞅 (supermartingale)</strong>：$\mathbb{E}[X_{n+1}\mid\mathcal{F}_n]\le X_n$（"公平游戏对玩家不利"）；</li>
+    <li><strong>下鞅 (submartingale)</strong>：$\mathbb{E}[X_{n+1}\mid\mathcal{F}_n]\ge X_n$。</li>
+  </ul>
 </div>
 
-<h4>期望与标准差</h4>
-
-<p>直接由 PMF 计算：</p>
-$$E[I_A] = 1 \cdot \Pr\{A\} + 0 \cdot (1 - \Pr\{A\}) = \Pr\{A\}$$
-$$E[I_A^2] = \Pr\{A\}, \qquad \text{Var}(I_A) = \Pr\{A\}(1 - \Pr\{A\})$$
-$$\sigma_{I_A} = \sqrt{\Pr\{A\}\,(1 - \Pr\{A\})}$$
-
-<p>注意当 $\Pr\{A\} = 1/2$ 时标准差最大（$= 1/2$），当 $\Pr\{A\}$ 趋近 0 或 1 时标准差趋近 0 &mdash; 这符合直觉：越确定的事件，波动越小。</p>
-
-<div class="remark">
-  <strong>核心观察：</strong>关于随机变量的定理可以直接通过指示随机变量应用到事件上。例如，大数定律应用到 $I_A$ 就得到频率的稳定性；中心极限定理应用到 $I_A$ 就得到二项分布的正态近似。这一视角贯穿整个课程。
-</div>
-
-<h3>3. 多个随机变量与独立性</h3>
-
-<p>单个随机变量的分布函数 $F_X(x)$ 并不能完全刻画该随机变量与其他随机变量之间的关系。为此需要引入<strong>联合分布</strong>的概念。</p>
-
-<div class="def-box">
-  <div class="box-title">定义 &mdash; 联合分布函数 (Joint CDF)</div>
-  <p>两个随机变量 $X, Y$ 的联合分布函数为：</p>
-  $$F_{XY}(x, y) = \Pr\{X \le x,\; Y \le y\} = \Pr\!\big(\{\omega : X(\omega) \le x\} \cap \{\omega : Y(\omega) \le y\}\big)$$
-  <p>更一般地，$n$ 个随机变量 $X_1, \ldots, X_n$ 的联合 CDF 为：</p>
-  $$F_{\mathbf{X}}(x_1, \ldots, x_n) = \Pr\{X_1 \le x_1, \ldots, X_n \le x_n\}$$
-</div>
-
-<div class="def-box">
-  <div class="box-title">定义 &mdash; 独立性 (Independence)</div>
-  <p>随机变量 $X_1, \ldots, X_n$ <strong>相互独立</strong>当且仅当对所有 $x_1, \ldots, x_n \in \mathbb{R}$：</p>
-  $$F_{\mathbf{X}}(x_1, \ldots, x_n) = \prod_{m=1}^n F_{X_m}(x_m)$$
-  <p>即联合 CDF 等于各边际 CDF 的乘积。这一乘积形式同样适用于联合 PMF 和联合 PDF。</p>
-</div>
-
-<h4>条件 PMF 与独立性的等价刻画</h4>
-
-<p>对于离散随机变量，条件 PMF 定义为：</p>
-$$p_{X|Y}(x|y) = \frac{p_{XY}(x, y)}{p_Y(y)}, \qquad \text{（当 } p_Y(y) > 0 \text{）}$$
-
-<p>利用条件 PMF，独立性有一个更直觉的等价表述：</p>
-$$X \text{ 与 } Y \text{ 独立} \iff p_{X|Y}(x|y) = p_X(x), \quad \forall\, x, y$$
-
-<p>即"知道 $Y$ 的值不改变 $X$ 的分布"。对密度函数类似：$f_{X|Y}(x|y) = f_X(x)$。</p>
-
-<div class="remark">
-  <strong>细节注意：</strong>若 $X_1, \ldots, X_n$ 相互独立，则它们的任意子集也相互独立。这对独立事件并不总是成立（两两独立不蕴含相互独立），但对独立随机变量是自动成立的，因为边际化联合 CDF 的乘积仍保持乘积结构。
-</div>
-
-<h3>4. IID 随机变量与扩展模型</h3>
-
-<div class="def-box">
-  <div class="box-title">定义 &mdash; IID (Independent and Identically Distributed)</div>
-  <p>随机变量 $X_1, X_2, \ldots, X_n$ 是<strong>独立同分布 (IID)</strong> 的，如果对所有 $x_1, \ldots, x_n$：</p>
-  $$F_{\mathbf{X}}(x_1, \ldots, x_n) = \prod_{k=1}^n F_X(x_k)$$
-  <p>即它们相互独立，且每个 $X_k$ 都具有相同的边际分布 $F_X$。该乘积形式同样适用于 PMF 和 PDF。</p>
-</div>
-
-<h4>扩展模型的构造</h4>
-
-<p>给定一个概率模型（样本空间 $\mathbb{R}$，随机变量 $X$），我们总可以构造一个<strong>扩展模型</strong>：以 $\mathbb{R}^n$ 为样本空间，其上定义 IID 随机变量 $X_1, X_2, \ldots, X_n$。进一步令 $n \to \infty$，得到 IID 随机过程 $X_1, X_2, \ldots$。这对应于现实中"重复独立实验"的数学抽象。</p>
-
-<h4>样本均值与大数定律</h4>
-
-<p>定义部分和 $S_n = X_1 + X_2 + \cdots + X_n$，样本均值为 $S_n / n$。</p>
-
-<p><strong>大数定律的直觉：</strong>$S_n/n$ 随着 $n$ 增大"本质上变为确定性的"（essentially becomes deterministic），趋近于 $\bar{X} = E[X]$。</p>
-
-<p>定量分析方差的行为：</p>
+<h4>基本例子</h4>
 <ul>
-  <li>$\sigma^2_{S_n} = n\sigma^2$：部分和的方差线性增长，分布的"宽度" $\sigma_{S_n} = \sigma\sqrt{n}$ 按 $\sqrt{n}$ 增长。</li>
-  <li>$\sigma^2_{S_n/n} = \sigma^2 / n$：样本均值的方差按 $1/n$ 缩小，分布的宽度按 $1/\sqrt{n}$ 缩小。</li>
+  <li><strong>随机游走：</strong>$S_n=\sum_{i=1}^n \xi_i$，$\xi_i$ 独立同分布、$\mathbb{E}\xi=0$。则 $S_n$ 是鞅。</li>
+  <li><strong>指数鞅：</strong>$\xi_i$ i.i.d.，$M_n=\prod_{i=1}^n e^{\lambda\xi_i}/\mathbb{E}[e^{\lambda\xi_i}]$ 为鞅（对任意 $\lambda$ 使 MGF 有限）。</li>
+  <li><strong>Doob 鞅：</strong>固定 $Z\in L^1$ 与滤过 $\{\mathcal{F}_n\}$，令 $M_n=\mathbb{E}[Z\mid\mathcal{F}_n]$，则 $M_n$ 为鞅（由塔性质）。</li>
 </ul>
 
-<p>因此样本均值的分布越来越集中于 $\bar{X}$ 附近。当 $X$ 是事件 $A$ 的指示变量 $I_A$ 时，$S_n/n$ 即为事件 $A$ 的<strong>相对频率</strong>，大数定律就是"频率趋近概率"的严格表述。</p>
-
 <div class="remark">
-  <strong>模型的两类困难：</strong>(1) 现实中的重复实验不够"相似且独立"，不能用 IID 扩展模型来描述；(2) IID 扩展本身可以，但基本模型选取不当。理解模型局限性是应用概率论时的核心判断力。
+  <strong>Doob 鞅是核心工具：</strong>它把"最终随机量 $Z=f(X_1,\dots,X_n)$"分解为一列增量的和 $Z-\mathbb{E}Z=\sum_i D_i$，其中 $D_i=M_i-M_{i-1}$ 具有<strong>零均值 + 关于 $\mathcal{F}_{i-1}$ 有界差分</strong>结构。
 </div>
 
-<h3>5. Bernoulli 过程</h3>
+<h3>4. 可停时与可选停止定理 (Stopping Times & Optional Stopping)</h3>
 
 <div class="def-box">
-  <div class="box-title">定义 &mdash; Bernoulli 过程</div>
-  <p>Bernoulli 过程是一个 IID 二值随机变量序列 $Y_1, Y_2, Y_3, \ldots$，其中每个 $Y_k$ 的 PMF 为：</p>
-  $$p_Y(1) = p > 0, \qquad p_Y(0) = 1 - p = q > 0$$
-  <p>$Y_k = 1$ 通常称为"成功"（success），$Y_k = 0$ 称为"失败"（failure）。参数 $p$ 称为成功概率。</p>
+  <div class="box-title">定义 &mdash; 可停时 (Stopping Time)</div>
+  <p>随机变量 $\tau:\Omega\to\{0,1,2,\dots\}\cup\{\infty\}$ 为<strong>关于 $\{\mathcal{F}_n\}$ 的可停时</strong>，若 $\{\tau\le n\}\in\mathcal{F}_n$ 对每个 $n$ 成立。</p>
 </div>
-
-<h4>$S_n$ 的二项分布</h4>
-
-<p>令 $S_n = Y_1 + Y_2 + \cdots + Y_n$ 为前 $n$ 次试验中的成功总数。则 $S_n$ 服从参数 $(n, p)$ 的二项分布：</p>
-$$p_{S_n}(k) = \binom{n}{k} p^k q^{n-k}, \qquad k = 0, 1, \ldots, n$$
-
-<p><strong>推导：</strong>任何具有 $k$ 个 1 和 $n-k$ 个 0 的特定 $n$-tuple 的概率为 $p^k q^{n-k}$（由 IID 性）。这样的 $n$-tuple 共有 $\binom{n}{k}$ 个（选择 $k$ 个位置放 1），因此 $p_{S_n}(k) = \binom{n}{k} p^k q^{n-k}$。</p>
 
 <div class="thm-box">
-  <div class="box-title">定理 &mdash; 二项分布的比率分析</div>
-  <p>相邻概率值的比为：</p>
-  $$\frac{p_{S_n}(k+1)}{p_{S_n}(k)} = \frac{(n-k)\,p}{(k+1)\,q}$$
-  <p>该比率关于 $k$ <strong>严格递减</strong>。具体地：</p>
-  <ul>
-    <li>当 $k \ge pn$ 时，比率 $< 1$，即 $p_{S_n}(k)$ 递减</li>
-    <li>当 $k + 1 \le pn$ 时，比率 $> 1$，即 $p_{S_n}(k)$ 递增</li>
-    <li>当 $k < pn < k+1$ 时，比率 $\approx 1$，即 $p_{S_n}(k)$ 取峰值</li>
-  </ul>
-  <p>因此 PMF 的<strong>峰值（mode）位于 $k \approx pn$</strong> 附近，恰等于期望 $E[S_n] = np$。</p>
+  <div class="box-title">定理 &mdash; Doob 可选停止定理</div>
+  <p>设 $\{M_n\}$ 为鞅，$\tau$ 为可停时。若下列任一条件成立，则 $\mathbb{E}[M_\tau]=\mathbb{E}[M_0]$：</p>
+  <ol>
+    <li>$\tau$ 几乎必然有界，即存在常数 $N$ 使 $\tau\le N$ a.s.；</li>
+    <li>$\{M_{n\wedge\tau}\}$ 一致可积（uniformly integrable）；</li>
+    <li>$\mathbb{E}\tau<\infty$ 且 $\{M_n-M_{n-1}\}$ 一致有界。</li>
+  </ol>
 </div>
 
-<p><strong>推导：</strong></p>
-$$\frac{p_{S_n}(k+1)}{p_{S_n}(k)} = \frac{\binom{n}{k+1} p^{k+1} q^{n-k-1}}{\binom{n}{k} p^k q^{n-k}} = \frac{n!/(k+1)!(n-k-1)!}{n!/k!(n-k)!} \cdot \frac{p}{q} = \frac{n-k}{k+1} \cdot \frac{p}{q}$$
-
-<p>令比率等于 1：$(n-k)p = (k+1)q$，解得 $k = pn - q$，即模在 $\lfloor pn \rfloor$ 或 $\lceil pn \rceil - 1$ 处取到。</p>
-
-<h3>6. Bernoulli 过程的中心极限定理推导</h3>
-
-<p>本节利用比率公式，通过对数近似直接推导 Bernoulli 和 $S_n$ 的 PMF 在峰值附近的 Gaussian 形状。这是中心极限定理的一个优美的初等证明。</p>
-
-<h4>Step 1：在 $k = pn$ 附近取对数</h4>
-
-<p>为简化代数，假设 $pn$ 为整数。设 $k = pn + i$（$i$ 相对较小），代入比率公式：</p>
-$$\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)} = \frac{n - pn - i}{pn + i + 1} \cdot \frac{p}{q} = \frac{nq - i}{pn + i + 1} \cdot \frac{p}{q}$$
-
-<p>改写为更便于取对数的形式：</p>
-$$\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)} = \frac{1 - \dfrac{i}{nq}}{1 + \dfrac{i+1}{np}}$$
-
-<p>取对数：</p>
-$$\ln\!\left[\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)}\right] = \ln\!\left(1 - \frac{i}{nq}\right) - \ln\!\left(1 + \frac{i+1}{np}\right)$$
-
-<h4>Step 2：Taylor 展开</h4>
-
-<p>当 $|i| \ll n$ 时，利用 $\ln(1+x) \approx x - x^2/2 + \cdots$：</p>
-$$\ln\!\left(1 - \frac{i}{nq}\right) \approx -\frac{i}{nq} - \frac{i^2}{2n^2 q^2} - \cdots$$
-$$\ln\!\left(1 + \frac{i+1}{np}\right) \approx \frac{i+1}{np} - \frac{(i+1)^2}{2n^2 p^2} - \cdots$$
-
-<p>相减，忽略 $O(i^2/n^2)$ 项：</p>
-$$\ln\!\left[\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)}\right] \approx -\frac{i}{nq} - \frac{i+1}{np} + \cdots = -\frac{i}{npq} - \frac{1}{np} + \cdots$$
-
-<p>其中利用了 $\frac{1}{nq} + \frac{1}{np} = \frac{p+q}{npq} = \frac{1}{npq}$。高阶修正项为 $O(i^2/n^2)$。</p>
-
-<div class="remark">
-  <strong>关键观察：</strong>对数增量近似地<strong>线性依赖于 $i$</strong>，系数为 $-1/(npq)$。这意味着 PMF 的对数近似为 $i$ 的二次函数 &mdash; 即 Gaussian 形状。
+<div class="proof-box">
+  <div class="box-title">证明（情形 1）</div>
+  <p>由鞅的定义与塔性质，对每个 $n$，$\mathbb{E}[M_{n\wedge\tau}]=\mathbb{E}[M_0]$。在情形 1 下，$M_{N\wedge\tau}=M_\tau$，故直接得结论。一般情形需借助控制收敛 / UI。$\square$</p>
 </div>
 
-<h4>Step 3：伸缩求和 (Telescoping Sum)</h4>
+<h4>典型应用：Gambler's Ruin</h4>
+<p>对称简单随机游走 $S_n=\sum \xi_i$，$\xi_i=\pm 1$ 各 $1/2$。设 $\tau=\inf\{n:S_n\in\{-a,b\}\}$，$a,b\in\mathbb{N}_+$。可证 $\mathbb{E}\tau=ab<\infty$。由可选停止定理，$\mathbb{E}[S_\tau]=0$，得</p>
+$$\mathbb{P}(S_\tau=b)=\frac{a}{a+b}, \qquad \mathbb{P}(S_\tau=-a)=\frac{b}{a+b}.$$
 
-<p>将从 $pn$ 到 $pn + j$ 的变化表示为 $j$ 个单位增量的和：</p>
-$$\ln\!\left[\frac{p_{S_n}(pn + j)}{p_{S_n}(pn)}\right] = \sum_{i=0}^{j-1} \ln\!\left[\frac{p_{S_n}(pn + i + 1)}{p_{S_n}(pn + i)}\right]$$
-
-<p>代入近似式：</p>
-$$\approx \sum_{i=0}^{j-1}\left(-\frac{i}{npq} - \frac{1}{np} + \cdots\right) = -\frac{1}{npq}\sum_{i=0}^{j-1} i - \frac{j}{np} + \cdots$$
-
-$$= -\frac{j(j-1)}{2npq} - \frac{j}{np} + \cdots \approx -\frac{j^2}{2npq}$$
-
-<p>其中利用了 $\sum_{i=0}^{j-1} i = j(j-1)/2 \approx j^2/2$，并忽略了与 $j^2$ 相比的线性项（线性项的量级等同于单位增量，远小于主项）。</p>
-
-<h4>Step 4：得出 Gaussian 形式</h4>
-
-<p>由伸缩和结果：</p>
-$$\ln\!\left[\frac{p_{S_n}(pn + j)}{p_{S_n}(pn)}\right] \approx -\frac{j^2}{2npq}$$
-
-<p>取指数：</p>
-$$p_{S_n}(pn + j) \approx p_{S_n}(pn) \cdot \exp\!\left(-\frac{j^2}{2npq}\right)$$
-
-<p>此公式对 $j$ 正负均成立，是一个以 $pn$ 为中心的量子化 Gaussian 分布，具有未知的归一化常数 $p_{S_n}(pn)$。</p>
+<h3>5. Doob 极大不等式 (Maximal Inequality)</h3>
 
 <div class="thm-box">
-  <div class="box-title">定理 &mdash; Bernoulli 和的中心极限定理（离散 PMF 形式）</div>
-  <p>选取归一化常数使得 PMF 求和为 1（利用 Gaussian 积分 $\int_{-\infty}^\infty e^{-t^2/2}\,dt = \sqrt{2\pi}$），得到：</p>
-  $$p_{S_n}(pn + j) \approx \frac{1}{\sqrt{2\pi npq}} \exp\!\left(-\frac{j^2}{2npq}\right)$$
-  <p>等价地，标准化随机变量 $Z_n = \dfrac{S_n - np}{\sqrt{npq}}$ 的分布近似于标准正态分布：</p>
-  $$\lim_{n\to\infty} \Pr\!\left\{\frac{S_n - np}{\sqrt{npq}} \le y\right\} = \int_{-\infty}^y \frac{1}{\sqrt{2\pi}} e^{-x^2/2}\,dx = \Phi(y)$$
-  <p>即 $S_n$ 近似服从<strong>均值 $np$、方差 $npq$</strong> 的正态分布 $\mathcal{N}(np,\, npq)$。</p>
+  <div class="box-title">定理 &mdash; Doob 极大不等式</div>
+  <p>$\{M_n\}$ 为非负下鞅（例如 $|X_n|$ 当 $X_n$ 为鞅），则对 $\lambda>0$：</p>
+  $$\lambda\,\mathbb{P}\bigl(\max_{k\le n}M_k \ge \lambda\bigr) \le \mathbb{E}\bigl[M_n\,\mathbf{1}_{\{\max_k M_k\ge\lambda\}}\bigr]\le \mathbb{E}[M_n].$$
+  <p>并有 <strong>$L^p$ 极大不等式</strong>（$p>1$）：</p>
+  $$\bigl\|\max_{k\le n}M_k\bigr\|_p \le \frac{p}{p-1}\|M_n\|_p.$$
 </div>
 
 <div class="remark">
-  <strong>推导回顾：</strong>整个证明只依赖于：(1) 比率公式 $(n-k)p/((k+1)q)$；(2) 在峰值附近 Taylor 展开 $\ln(1+x)$；(3) 伸缩求和。无需 Stirling 公式或特征函数。教材 1.5.3 节给出了基于特征函数的另一种证明。
+  Doob 极大不等式将"全轨迹的最大值"控制为"末端"的期望，是<strong>鞅收敛定理</strong>与<strong>随机过程极值分析</strong>的核心。它可视为 Markov 不等式在鞅结构下的强化。
 </div>
+
+<h3>6. Azuma-Hoeffding 不等式</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; Azuma-Hoeffding 不等式</div>
+  <p>$\{M_n\}$ 为鞅（或上鞅），差分 $D_i=M_i-M_{i-1}$ 满足 $|D_i|\le c_i$ a.s.。则对 $t>0$：</p>
+  $$\mathbb{P}(M_n - M_0 \ge t)\le \exp\!\Bigl(-\frac{t^2}{2\sum_{i=1}^n c_i^2}\Bigr).$$
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明思路</div>
+  <p>对 $e^{\lambda(M_n-M_0)}$ 逐步展开：</p>
+  $$\mathbb{E}[e^{\lambda(M_n-M_0)}] = \mathbb{E}\Bigl[e^{\lambda(M_{n-1}-M_0)}\underbrace{\mathbb{E}[e^{\lambda D_n}\mid\mathcal{F}_{n-1}]}_{\le \exp(\lambda^2 c_n^2/2)}\Bigr].$$
+  <p>内层估计使用 Hoeffding 引理（$D_n\in[-c_n,c_n]$，条件均值为零）。归纳得 $\mathbb{E}[e^{\lambda(M_n-M_0)}]\le\exp\!\bigl(\tfrac{\lambda^2}{2}\sum c_i^2\bigr)$；再用 Chernoff。$\square$</p>
+</div>
+
+<h4>McDiarmid 的鞅证明</h4>
+<p>令 $Z=f(X_1,\dots,X_n)$，构造 Doob 鞅 $M_k=\mathbb{E}[Z\mid X_1,\dots,X_k]$。有界差分条件 $c_i$ 意味着 $|M_k-M_{k-1}|\le c_k$ a.s.（可通过耦合两个仅在第 $k$ 坐标不同的样本证明）。对 $M_n=Z$ 应用 Azuma 即得 McDiarmid。</p>
+
+<h3>7. 鞅收敛定理 (Doob's Martingale Convergence)</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 &mdash; 上/下鞅收敛</div>
+  <p>若 $\{M_n\}$ 为上鞅且 $\sup_n \mathbb{E}[M_n^-]<\infty$（例如非负上鞅），则存在 $M_\infty\in L^1$ 使得 $M_n\to M_\infty$ a.s.</p>
+  <p>若进一步 $\{M_n\}$ 一致可积，则收敛在 $L^1$ 中成立，且 $M_n=\mathbb{E}[M_\infty\mid\mathcal{F}_n]$。</p>
+</div>
+
+<p><strong>证明骨架：</strong>Doob 的"跨越不等式 (upcrossing inequality)"表明 $M_n$ 在任意区间 $[a,b]$ 上下跨越的次数有界；因此几乎所有轨迹的 $\limsup$ 与 $\liminf$ 相等，极限存在。</p>
+
+<div class="remark">
+  <strong>与泛函分析的联系：</strong>Doob 鞅 $M_n=\mathbb{E}[Z\mid\mathcal{F}_n]$ 在 $L^p$（$p\ge 1$）中总收敛到 $\mathbb{E}[Z\mid\mathcal{F}_\infty]$，其中 $\mathcal{F}_\infty=\sigma(\bigcup_n\mathcal{F}_n)$。这是 $L^p$ 上的<strong>投影序列收敛</strong>——直接对应 Hilbert 空间的强算子收敛结果。
+</div>
+
+<h3>8. 案例：随机图色数的集中</h3>
+
+<p>Erdős-Rényi $G(n,1/2)$，$X=\chi(G)$ 为色数。逐点暴露<strong>顶点</strong>邻域构造 Doob 鞅 $M_k=\mathbb{E}[X\mid \text{前 }k\text{ 个顶点的所有边}]$。翻转一个顶点的邻域至多改变色数 $\pm 1$，因此 $c_k=1$。由 Azuma：</p>
+$$\mathbb{P}(|\chi(G)-\mathbb{E}\chi(G)|\ge t)\le 2e^{-t^2/(2n)}.$$
+<p>取 $t=C\sqrt{n\log n}$ 得色数<strong>集中于 $O(\sqrt{n\log n})$ 宽度</strong>——即使 $\mathbb{E}\chi$ 的精确值未知！这类不需知均值的集中，称为 <strong>Shamir-Spencer 定理</strong>。</p>
 
 <h3>本讲小结</h3>
-
 <table class="summary">
-  <tr><th style="width:28%">主题</th><th>要点</th></tr>
-  <tr><td><strong>期望</strong></td><td>离散：$E[X]=\sum a_i p_X(a_i)$；连续：$E[X]=\int xf_X(x)\,dx$；非负通用：$E[X]=\int_0^\infty F_X^c(x)\,dx$</td></tr>
-  <tr><td><strong>标准差</strong></td><td>$\sigma_X = \sqrt{E[(X-\bar X)^2]}$，衡量随机变量的"典型偏离程度"</td></tr>
-  <tr><td><strong>指示随机变量</strong></td><td>$I_A(\omega)=\mathbf{1}(\omega\in A)$；$E[I_A]=\Pr\{A\}$；事件定理可转化为 rv 定理</td></tr>
-  <tr><td><strong>联合分布与独立性</strong></td><td>$X_1,\ldots,X_n$ 独立 $\iff$ $F_{\mathbf{X}}=\prod F_{X_m}$；条件 PMF 等于边际 PMF</td></tr>
-  <tr><td><strong>IID 与样本均值</strong></td><td>$\sigma^2_{S_n/n}=\sigma^2/n$，分布宽度按 $1/\sqrt{n}$ 缩小，大数定律的定量基础</td></tr>
-  <tr><td><strong>Bernoulli 过程</strong></td><td>IID 二值过程；$S_n\sim\text{Binomial}(n,p)$；比率 $(n-k)p/((k+1)q)$ 确定峰值在 $k\approx pn$</td></tr>
-  <tr><td><strong>CLT 推导</strong></td><td>对数比率线性 $\to$ 伸缩和为二次 $\to$ $p_{S_n}(pn+j)\approx\frac{1}{\sqrt{2\pi npq}}e^{-j^2/(2npq)}$</td></tr>
+  <tr><th style="width:30%">概念</th><th>要点</th></tr>
+  <tr><td><strong>条件期望</strong></td><td>$L^1$ 上关于子 $\sigma$-代数的 Radon-Nikodym 导数；$L^2$ 情形为正交投影</td></tr>
+  <tr><td><strong>滤过 / 适应</strong></td><td>信息累积结构，$\mathcal{F}_n$ 递增；过程 $X_n$ 在 $\mathcal{F}_n$ 可测</td></tr>
+  <tr><td><strong>鞅</strong></td><td>$\mathbb{E}[X_{n+1}\mid\mathcal{F}_n]=X_n$；随机游走、指数鞅、Doob 鞅为典型</td></tr>
+  <tr><td><strong>可选停止定理</strong></td><td>有界 / UI / 有界差分条件下 $\mathbb{E}M_\tau=\mathbb{E}M_0$</td></tr>
+  <tr><td><strong>Doob 极大不等式</strong></td><td>$\lambda\mathbb{P}(\max M_k\ge\lambda)\le\mathbb{E}M_n$；$L^p$ 版 $p/(p-1)$ 常数</td></tr>
+  <tr><td><strong>Azuma-Hoeffding</strong></td><td>有界差分鞅的亚高斯尾部 $\exp(-t^2/(2\sum c_i^2))$</td></tr>
+  <tr><td><strong>McDiarmid</strong></td><td>Doob 鞅 + Azuma 的直接推论</td></tr>
+  <tr><td><strong>鞅收敛定理</strong></td><td>$\sup\mathbb{E}M_n^-<\infty$ 蕴含 a.s. 极限；UI 蕴含 $L^1$ 极限</td></tr>
 </table>
 
 <div class="footer-note">
-  <p>资料来源：MIT OpenCourseWare 6.262, Spring 2011 | 基于课程讲义与视频字幕整理</p>
+  <p>资料来源：MIT OpenCourseWare 18.619J Discrete Probability and Stochastic Processes | 基于课程讲义整理</p>
 </div>
 
 </div>
