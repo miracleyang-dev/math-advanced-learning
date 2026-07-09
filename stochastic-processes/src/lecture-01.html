@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>MIT 18.619J 第一讲 - 概率空间回顾与集中不等式</title>
+<title>随机过程 第一讲 - 概率的测度论重述</title>
 <script>
 window.MathJax = {
   tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
@@ -34,10 +34,13 @@ strong { color: #1a3a5c; }
 .proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
 .math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
 .remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+.todo { background: #ffe0e0; color: #c0392b; padding: 0 4px; border-radius: 3px; font-weight: 700; }
 table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
 table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
 table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
 table.summary tr:last-child td { border-bottom: none; }
+.exercise { margin: 8px 0; padding-left: 12px; border-left: 2px solid #d0dce8; }
+.exercise .diff { color: #e67e22; font-weight: 700; margin-right: 6px; }
 .footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
 </style>
 </head>
@@ -45,173 +48,298 @@ table.summary tr:last-child td { border-bottom: none; }
 <div class="container">
 
 <div class="title-block">
-  <h1>MIT 18.619J 离散概率与随机过程</h1>
-  <h2>第一讲：概率空间回顾与集中不等式</h2>
-  <p class="meta">Lecturer: Prof. Elchanan Mossel</p>
+  <h1>随机过程 (Stochastic Processes)</h1>
+  <h2>第一讲：概率的测度论重述</h2>
+  <p class="meta">主教材：Durrett, <em>Probability: Theory and Examples</em>, 5e, §1.1–1.3, §1.6 &middot; 辅助：Le Gall Appendix A</p>
 </div>
 
-<h3>1. 课程简介 (Introduction)</h3>
-<p><strong>离散概率与随机过程 (Discrete Probability and Stochastic Processes)</strong> 是研究离散状态空间上随机现象的核心课程。与经典概率论回顾不同，本课程从<strong>严格测度论视角</strong>出发，聚焦于<strong>集中不等式 (concentration inequalities)</strong>、<strong>鞅 (martingales)</strong>、<strong>马尔可夫链 (Markov chains)</strong> 三大主题，为组合概率、随机算法、统计学习理论奠定分析工具。</p>
+<!-- OUTLINE
+1. 动机：为什么需要测度论重述
+2. 概率空间与 σ-代数
+3. 随机变量作为可测函数
+4. 分布：推前测度与分布函数
+5. 期望：积分的四步构造
+6. 收敛定理与期望的线性性
+7. Radon-Nikodym 与"密度"的严格含义
+8. § 直觉与研究桥接
+9. § 常见误区
+10. § 习题
+-->
+
+<h3>1. 动机</h3>
+
+<p>本科概率论把随机变量当作"取值不定的量"，把期望写成 $\sum p_i x_i$ 或 $\int x\,f(x)\,\mathrm dx$。这套语言在处理以下三类问题时失效：</p>
+<ol>
+  <li>随机变量在<strong>不可数无穷</strong>索引下的极限（如 $\lim_{n\to\infty}\frac{1}{n}\sum_{k=1}^n X_k$ 的存在性、Brownian 运动的连续轨道）</li>
+  <li><strong>不同概率测度之间的变换</strong>（如 Girsanov 定理、重要性采样、diffusion 模型的反向 SDE）</li>
+  <li><strong>分布无密度、也无质量点</strong>的情形（如 Cantor 分布、退化 Gaussian、singular measure）</li>
+</ol>
+
+<p>测度论把"随机"这件事整理为三样对象：<strong>样本空间 $\Omega$、事件族 $\mathcal F$、概率测度 $\mathbb P$</strong>。所有后续机器都在这套底层设施上运转。本讲的目标是把本科概率的核心概念——事件、随机变量、分布、期望——重述为测度论对象，为后续鞅、Brownian、Itô 积分做好接口。</p>
 
 <div class="remark">
-  <strong>先修知识：</strong>基础概率论 (18.600 / 6.041)、实分析或测度论基础。课程侧重<strong>证明技巧</strong>与<strong>渐进分析</strong>——不仅要知道随机量以多大概率偏离均值，还要理解偏离尾部的<strong>指数速率</strong>。
+  <strong>前置：</strong>Rudin <em>Real and Complex Analysis</em> Ch.1–2，或任一本科实分析教材关于 σ-代数、Lebesgue 积分的章节。本讲不重新证明 Lebesgue 积分的构造，但会显式指出何处使用它。
 </div>
 
-<p>本讲目标：（i）以测度论语言重新组织概率公理；（ii）介绍三类基本集中不等式 Markov / Chebyshev / Chernoff，并给出典型应用。</p>
-
-<h3>2. 概率空间 (Probability Space)</h3>
+<h3>2. 概率空间与 σ-代数</h3>
 
 <div class="def-box">
-  <div class="box-title">定义 &mdash; 概率空间 (Kolmogorov)</div>
-  <p>三元组 $(\Omega, \mathcal{F}, \mathbb{P})$ 称为<strong>概率空间</strong>，若：</p>
+  <div class="box-title">定义 2.1 — σ-代数 (σ-algebra)</div>
+  <p>设 $\Omega$ 为非空集合。$\Omega$ 的子集族 $\mathcal F \subseteq 2^\Omega$ 称为一个 <strong>σ-代数</strong>，若满足：</p>
+  <ol>
+    <li>$\Omega \in \mathcal F$；</li>
+    <li>$A \in \mathcal F \Rightarrow A^c \in \mathcal F$（对补运算封闭）；</li>
+    <li>$\{A_n\}_{n\ge 1} \subseteq \mathcal F \Rightarrow \bigcup_{n\ge 1} A_n \in \mathcal F$（对<strong>可数</strong>并封闭）。</li>
+  </ol>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 2.2 — 概率空间 (probability space)</div>
+  <p><strong>概率空间</strong>是三元组 $(\Omega,\mathcal F,\mathbb P)$，其中：</p>
   <ul>
-    <li>$\Omega$ 是<strong>样本空间</strong>（非空集合）；</li>
-    <li>$\mathcal{F} \subseteq 2^\Omega$ 是<strong>$\sigma$-代数</strong>：$\Omega\in\mathcal{F}$，对补集封闭，对可数并封闭；</li>
-    <li>$\mathbb{P}:\mathcal{F}\to[0,1]$ 是<strong>概率测度</strong>：$\mathbb{P}(\Omega)=1$，且对可数不相交事件族 $\{A_n\}$ 有 $\mathbb{P}(\bigcup_n A_n)=\sum_n \mathbb{P}(A_n)$。</li>
+    <li>$\Omega$ 是样本空间（sample space）；</li>
+    <li>$\mathcal F$ 是 $\Omega$ 上的 σ-代数，其元素称为<strong>事件 (event)</strong>；</li>
+    <li>$\mathbb P:\mathcal F\to[0,1]$ 满足 $\mathbb P(\Omega)=1$ 与 <strong>可数可加性</strong>：对两两不相交的 $\{A_n\}\subseteq\mathcal F$，$$\mathbb P\!\left(\bigsqcup_{n\ge 1} A_n\right) = \sum_{n\ge 1}\mathbb P(A_n).$$</li>
   </ul>
 </div>
 
-<div class="def-box">
-  <div class="box-title">定义 &mdash; 随机变量 (Random Variable)</div>
-  <p>可测映射 $X:(\Omega,\mathcal{F})\to(\mathbb{R},\mathcal{B}(\mathbb{R}))$，即对每个 Borel 集 $B$，$X^{-1}(B)\in\mathcal{F}$。其<strong>分布</strong>为 $\mu_X(B)=\mathbb{P}(X\in B)$。</p>
-</div>
+<h4>例 2.3（离散）</h4>
+<p>$\Omega=\{1,2,\dots,6\}$，$\mathcal F = 2^\Omega$，$\mathbb P(\{k\})=1/6$。可数可加性此时退化为有限可加性。</p>
 
-<p><strong>期望</strong> 定义为 Lebesgue 积分 $\mathbb{E}[X]=\int_\Omega X\,d\mathbb{P}$；在离散情形退化为 $\sum_x x\,\mathbb{P}(X=x)$。</p>
+<h4>例 2.4（连续，Lebesgue）</h4>
+<p>$\Omega=[0,1]$，$\mathcal F=\mathcal B([0,1])$（Borel σ-代数），$\mathbb P=$ Lebesgue 测度限制到 $[0,1]$。事件"落在 $[a,b]\subseteq[0,1]$"的概率是 $b-a$。</p>
 
-<div class="remark">
-  <strong>与 18.102 的联系：</strong>概率测度是有限测度的特例，因此 Lebesgue 测度理论、$L^p$ 空间、控制收敛定理直接可用。方差 $\mathrm{Var}(X)=\mathbb{E}[(X-\mathbb{E}X)^2]$ 是 $L^2$ 范数的平方。
-</div>
-
-<h3>3. Markov 不等式 (Markov's Inequality)</h3>
+<h4>反例 2.5 —— 为何不能取 $\mathcal F=2^\Omega$</h4>
+<p>在 $\Omega=[0,1]$ 上，用选择公理可构造不可测的 Vitali 集 $V$：若强行给它一个概率值，会与"$\mathbb P$ 平移不变且可数可加"矛盾（<em>Rudin, Real and Complex Analysis</em>, Thm 2.22）。<strong>结论：σ-代数不能太大，事件必须"可以被测度"</strong>——这就是为什么要把 $\mathcal F$ 单独作为结构的一部分。</p>
 
 <div class="thm-box">
-  <div class="box-title">定理 &mdash; Markov 不等式</div>
-  <p>设 $X\ge 0$ 为非负随机变量，$a>0$，则</p>
-  $$\mathbb{P}(X \ge a) \;\le\; \frac{\mathbb{E}[X]}{a}.$$
+  <div class="box-title">命题 2.6 — 概率测度的基本性质</div>
+  <p>对任意 $A,B,A_n\in\mathcal F$：</p>
+  <ol>
+    <li>$\mathbb P(\varnothing)=0$；</li>
+    <li>单调性：$A\subseteq B \Rightarrow \mathbb P(A)\le \mathbb P(B)$；</li>
+    <li>次可加性：$\mathbb P\!\left(\bigcup_n A_n\right)\le \sum_n \mathbb P(A_n)$；</li>
+    <li>下连续：$A_n\uparrow A \Rightarrow \mathbb P(A_n)\uparrow \mathbb P(A)$；</li>
+    <li>上连续：$A_n\downarrow A \Rightarrow \mathbb P(A_n)\downarrow \mathbb P(A)$。</li>
+  </ol>
 </div>
 
 <div class="proof-box">
   <div class="box-title">证明</div>
-  <p>由 $X\ge a\,\mathbf{1}_{\{X\ge a\}}$（当 $X<a$ 时右侧为 0，其余处 $X\ge a$），两边取期望：</p>
-  $$\mathbb{E}[X] \ge a\,\mathbb{E}[\mathbf{1}_{\{X\ge a\}}] = a\,\mathbb{P}(X\ge a). \quad\square$$
+  <p>(1) 令 $A_n=\varnothing$ 应用可数可加性得 $\mathbb P(\varnothing)=\sum \mathbb P(\varnothing)$，仅当 $\mathbb P(\varnothing)=0$ 时成立。</p>
+  <p>(2) $B = A \sqcup (B\setminus A)$，由可数可加性（退化为二元）$\mathbb P(B)=\mathbb P(A)+\mathbb P(B\setminus A)\ge \mathbb P(A)$。</p>
+  <p>(3) 令 $B_1=A_1$，$B_n = A_n\setminus\bigcup_{k<n}A_k$，则 $\{B_n\}$ 两两不交、$\bigcup B_n=\bigcup A_n$、$B_n\subseteq A_n$。用可数可加性和 (2)：$\mathbb P(\bigcup A_n)=\sum \mathbb P(B_n)\le \sum \mathbb P(A_n)$。</p>
+  <p>(4) $A_n\uparrow A$ 意味着 $A=A_1\sqcup\bigsqcup_{n\ge 2}(A_n\setminus A_{n-1})$。可数可加性给 $\mathbb P(A)=\mathbb P(A_1)+\sum_{n\ge 2}\mathbb P(A_n\setminus A_{n-1})$。前 $N$ 项之和为 $\mathbb P(A_N)$，取极限即得 $\mathbb P(A_N)\uparrow \mathbb P(A)$。</p>
+  <p>(5) 对补集应用 (4)：$A_n^c \uparrow A^c$，且 $\mathbb P(\cdot)=1-\mathbb P((\cdot)^c)$。$\blacksquare$</p>
 </div>
 
 <div class="remark">
-  Markov 不等式仅需一阶矩，虽然极为粗糙，却是所有更细致集中不等式的基础模板：<strong>对某个非负函数应用 Markov</strong>。
+  <strong>直觉：</strong>可数可加性 = 有限可加性 + 下连续。这一等价（<em>Durrett</em> Thm 1.1.1）说明"连续性"和"可数极限"在概率论中是同一件事的两副面孔——它也是所有极限定理（大数律、中心极限、鞅收敛）能成立的根本理由。
 </div>
 
-<h3>4. Chebyshev 不等式 (Chebyshev's Inequality)</h3>
-
-<div class="thm-box">
-  <div class="box-title">定理 &mdash; Chebyshev 不等式</div>
-  <p>设 $X\in L^2$，$t>0$，则</p>
-  $$\mathbb{P}\bigl(|X-\mathbb{E}X| \ge t\bigr) \;\le\; \frac{\mathrm{Var}(X)}{t^2}.$$
-</div>
-
-<div class="proof-box">
-  <div class="box-title">证明</div>
-  <p>对非负变量 $Y=(X-\mathbb{E}X)^2$ 应用 Markov 不等式（阈值 $t^2$）：</p>
-  $$\mathbb{P}(|X-\mathbb{E}X|\ge t) = \mathbb{P}(Y\ge t^2) \le \frac{\mathbb{E}[Y]}{t^2} = \frac{\mathrm{Var}(X)}{t^2}. \quad\square$$
-</div>
-
-<h4>典型应用：弱大数定律</h4>
-<p>设 $X_1,\dots,X_n$ 独立同分布，$\mathbb{E}X_i=\mu$，$\mathrm{Var}(X_i)=\sigma^2$。令 $\bar X_n=\frac{1}{n}\sum X_i$。则</p>
-$$\mathbb{P}(|\bar X_n - \mu|\ge \varepsilon) \le \frac{\sigma^2}{n\varepsilon^2} \xrightarrow{n\to\infty} 0.$$
-<p>这是<strong>弱大数定律</strong>的一行证明，收敛速率为 $O(1/n)$。</p>
-
-<h3>5. 矩生成函数与 Chernoff 方法 (MGF & Chernoff Method)</h3>
+<h3>3. 随机变量作为可测函数</h3>
 
 <div class="def-box">
-  <div class="box-title">定义 &mdash; 矩生成函数 (MGF)</div>
-  <p>随机变量 $X$ 的矩生成函数定义为</p>
-  $$M_X(\lambda) = \mathbb{E}[e^{\lambda X}], \quad \lambda\in\mathbb{R}.$$
-  <p>若 $M_X(\lambda)<\infty$ 在原点邻域成立，则 $X$ 具有<strong>全部矩</strong>，且 $\log M_X$ 光滑凸。</p>
+  <div class="box-title">定义 3.1 — 可测函数 / 随机变量</div>
+  <p>设 $(\Omega,\mathcal F)$ 与 $(S,\mathcal S)$ 为两个可测空间。映射 $X:\Omega\to S$ 称为 <strong>$\mathcal F/\mathcal S$-可测</strong>，若对所有 $B\in\mathcal S$ 有 $X^{-1}(B)\in\mathcal F$。当 $(S,\mathcal S)=(\mathbb R,\mathcal B(\mathbb R))$ 时，$X$ 称为一个（实值）<strong>随机变量 (random variable)</strong>。</p>
+</div>
+
+<div class="remark">
+  <strong>要点：</strong>随机变量不是"随机的变量"，而是一个确定的函数 $X:\Omega\to\mathbb R$；"随机"来自 $\omega\in\Omega$ 由 $\mathbb P$ 抽取。这一视角上的转换是理解鞅和 Brownian 的前提。
 </div>
 
 <div class="thm-box">
-  <div class="box-title">定理 &mdash; Chernoff 界 (Chernoff Bound)</div>
-  <p>对任意 $\lambda>0$ 与 $a\in\mathbb{R}$：</p>
-  $$\mathbb{P}(X\ge a) \le e^{-\lambda a}\,\mathbb{E}[e^{\lambda X}].$$
-  <p>取最优 $\lambda$ 得</p>
-  $$\mathbb{P}(X\ge a) \le \exp\!\Bigl(-\sup_{\lambda>0}\bigl(\lambda a - \log M_X(\lambda)\bigr)\Bigr) = e^{-I(a)},$$
-  <p>其中 $I(a)=\sup_\lambda(\lambda a-\log M_X(\lambda))$ 为 $\log M_X$ 的 <strong>Legendre-Fenchel 变换</strong>。</p>
+  <div class="box-title">命题 3.2 — 可测性的等价刻画</div>
+  <p>$X:\Omega\to\mathbb R$ 是随机变量当且仅当对每个 $a\in\mathbb R$：$\{X\le a\}=\{\omega: X(\omega)\le a\}\in\mathcal F$。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（骨架）</div>
+  <p>$(\Rightarrow)$：$(-\infty,a]\in\mathcal B(\mathbb R)$。</p>
+  <p>$(\Leftarrow)$：令 $\mathcal C=\{B\in\mathcal B(\mathbb R): X^{-1}(B)\in\mathcal F\}$。验证 $\mathcal C$ 是 σ-代数（用 $X^{-1}$ 保持并、交、补的事实），且包含 $\{(-\infty,a]:a\in\mathbb R\}$。因 $\mathcal B(\mathbb R)$ 由该族生成（<em>Rudin</em> Thm 1.12），$\mathcal C\supseteq\mathcal B(\mathbb R)$。$\blacksquare$</p>
+</div>
+
+<h4>例 3.3 —— 指示函数</h4>
+<p>对 $A\in\mathcal F$，$\mathbf 1_A(\omega)=1$（若 $\omega\in A$）否则 $0$，是最简单的随机变量。这类函数将成为第 5 节积分构造的起点。</p>
+
+<h4>例 3.4 —— 简单函数</h4>
+<p>$X=\sum_{i=1}^n c_i\,\mathbf 1_{A_i}$，其中 $A_i\in\mathcal F$、$c_i\in\mathbb R$。任何非负随机变量都能被一列递增的简单函数逐点逼近（<em>Durrett</em> Thm 1.5.5）——这是 Lebesgue 积分构造的关键。</p>
+
+<h3>4. 分布：推前测度</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 4.1 — 分布 (distribution) / 推前测度 (pushforward)</div>
+  <p>设 $X:\Omega\to\mathbb R$ 是随机变量。$X$ 的<strong>分布</strong>是 $(\mathbb R,\mathcal B(\mathbb R))$ 上的概率测度 $\mu_X$，定义为$$\mu_X(B) := \mathbb P(X\in B) = \mathbb P(X^{-1}(B)),\quad B\in\mathcal B(\mathbb R).$$</p>
+</div>
+
+<div class="def-box">
+  <div class="box-title">定义 4.2 — 分布函数 (CDF)</div>
+  <p>$X$ 的<strong>分布函数</strong> $F_X:\mathbb R\to[0,1]$ 为 $F_X(a):=\mu_X((-\infty,a])=\mathbb P(X\le a)$。</p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">定理 4.3 — 分布函数的刻画</div>
+  <p>$F:\mathbb R\to[0,1]$ 是某个随机变量的分布函数，当且仅当：</p>
+  <ol>
+    <li>单调不减；</li>
+    <li>右连续：$F(a+):=\lim_{x\downarrow a}F(x)=F(a)$；</li>
+    <li>$\lim_{a\to-\infty}F(a)=0$，$\lim_{a\to+\infty}F(a)=1$。</li>
+  </ol>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（骨架）</div>
+  <p>必要性用命题 2.6 的下 / 上连续。充分性用 <strong>Carathéodory 扩张定理</strong>：$F$ 唯一决定 $(a,b]$ 上的预测度 $F(b)-F(a)$，扩张到 $\mathcal B(\mathbb R)$ 上得到 $\mu$；再取 $\Omega=\mathbb R,\mathcal F=\mathcal B(\mathbb R),\mathbb P=\mu$，$X(\omega)=\omega$ 即可。$\blacksquare$（详见 <em>Durrett</em> Thm 1.2.2。）</p>
+</div>
+
+<div class="remark">
+  <strong>要点：</strong>研究随机变量 $X$ 的分布只依赖 $\mu_X$，与"$\Omega$ 是什么"无关。生成模型中我们几乎从不关心底层 $\Omega$，只关心生成的分布 $\mu_X$——这就是为什么"生成一个样本"的严格含义是"抽 $\omega\sim\mathbb P$，输出 $X(\omega)\in\mathbb R^d$"。
+</div>
+
+<h3>5. 期望：积分的四步构造</h3>
+
+<p>下面复述 Lebesgue 积分在概率语境下的四步构造。我们只写陈述，证明留给实分析教材。</p>
+
+<div class="def-box">
+  <div class="box-title">定义 5.1 — 期望的四步构造</div>
+  <ol>
+    <li><strong>指示函数</strong>：$\mathbb E[\mathbf 1_A]:=\mathbb P(A)$。</li>
+    <li><strong>非负简单函数</strong>：$X=\sum_{i=1}^n c_i\mathbf 1_{A_i}$（$c_i\ge 0$，$A_i$ 两两不交），$\mathbb E[X]:=\sum_{i=1}^n c_i\mathbb P(A_i)$。</li>
+    <li><strong>非负随机变量</strong>：$\mathbb E[X]:=\sup\{\mathbb E[Y]: Y\text{ 简单},\,0\le Y\le X\}$。</li>
+    <li><strong>一般</strong>：$X=X^+-X^-$（$X^\pm\ge 0$），若 $\mathbb E[X^+]$ 与 $\mathbb E[X^-]$ 不同时为 $+\infty$，则 $\mathbb E[X]:=\mathbb E[X^+]-\mathbb E[X^-]$。当 $\mathbb E[|X|]<\infty$ 时称 $X$ <strong>可积 (integrable)</strong>，记 $X\in L^1(\mathbb P)$。</li>
+  </ol>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">定理 5.2 — 期望的基本性质</div>
+  <p>对可积随机变量 $X,Y$ 与常数 $a,b\in\mathbb R$：</p>
+  <ol>
+    <li><strong>线性性</strong>：$\mathbb E[aX+bY]=a\mathbb E[X]+b\mathbb E[Y]$。</li>
+    <li><strong>单调性</strong>：$X\le Y$ a.s. $\Rightarrow \mathbb E[X]\le\mathbb E[Y]$。</li>
+    <li><strong>三角不等式</strong>：$|\mathbb E[X]|\le\mathbb E[|X|]$。</li>
+    <li><strong>Jensen 不等式</strong>：若 $\varphi:\mathbb R\to\mathbb R$ 凸且 $\varphi(X)\in L^1$，则 $\varphi(\mathbb E[X])\le\mathbb E[\varphi(X)]$。</li>
+  </ol>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明（骨架）</div>
+  <p>(1)(2)(3) 依次对简单函数、非负、一般三个层次证明——每一步用 sup 的性质与前一层的结论。</p>
+  <p>(4) 由凸函数在任一点 $c$ 处存在支撑仿射：$\varphi(x)\ge \varphi(c)+\lambda(x-c)$。取 $c=\mathbb E[X]$，对 $x=X(\omega)$ 逐点成立，两边取期望并用线性性即可。$\blacksquare$</p>
+</div>
+
+<h4>例 5.3 —— 变量替换公式</h4>
+<div class="thm-box">
+  <div class="box-title">命题 5.4 — Law of the Unconscious Statistician (LOTUS)</div>
+  <p>设 $g:\mathbb R\to\mathbb R$ Borel 可测，$X$ 为随机变量，$\mu_X$ 为 $X$ 的分布。若 $g(X)\in L^1(\mathbb P)$，则$$\mathbb E[g(X)] = \int_{\mathbb R} g(x)\,\mathrm d\mu_X(x).$$</p>
+</div>
+<p>该公式把"在 $\Omega$ 上求积分"转化为"在 $\mathbb R$ 上求积分"，是 ML 中 $\mathbb E_{x\sim p}[\ell(x,\theta)]$ 的严格含义。证明遵循四步构造对 $g$ 归纳（Durrett Thm 1.6.9）。</p>
+
+<h3>6. 收敛定理</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 6.1 — 三大收敛定理（陈述汇总）</div>
+  <ul>
+    <li><strong>单调收敛 (MCT)</strong>：若 $0\le X_n\uparrow X$ a.s.，则 $\mathbb E[X_n]\uparrow\mathbb E[X]$。</li>
+    <li><strong>Fatou 引理</strong>：若 $X_n\ge 0$，则 $\mathbb E[\liminf_n X_n]\le \liminf_n \mathbb E[X_n]$。</li>
+    <li><strong>控制收敛 (DCT)</strong>：若 $X_n\to X$ a.s. 且存在 $Y\in L^1$ 使 $|X_n|\le Y$ a.s.，则 $\mathbb E[X_n]\to\mathbb E[X]$。</li>
+  </ul>
 </div>
 
 <div class="proof-box">
   <div class="box-title">证明</div>
-  <p>对 $Y=e^{\lambda X}$（$\lambda>0$）应用 Markov 不等式：</p>
-  $$\mathbb{P}(X\ge a) = \mathbb{P}(e^{\lambda X}\ge e^{\lambda a}) \le \frac{\mathbb{E}[e^{\lambda X}]}{e^{\lambda a}}.$$
-  <p>对 $\lambda>0$ 取下确界即得指数形式尾部界。$\square$</p>
+  <p>三条定理的证明与实分析中 Lebesgue 积分完全一致（<em>Rudin</em> Thm 1.26, 1.28, 1.34；概率语境下的转述见 <em>Durrett</em> §1.5）。此处不再重复。</p>
 </div>
 
 <div class="remark">
-  Chernoff 方法优于 Chebyshev 的关键：对独立求和 $S_n=\sum X_i$，MGF <strong>可乘</strong> $M_{S_n}(\lambda)=\prod M_{X_i}(\lambda)$。因此 $\log M$ 关于 $n$ 线性，尾部呈 $e^{-cn}$ 的<strong>指数衰减</strong>，而非 Chebyshev 的 $1/n$ 多项式衰减。
+  <strong>研究应用：</strong>DCT 是"期望与极限交换"的通行证。ML 中我们频繁写下 $\lim_n \mathbb E[\ell(X,\theta_n)]=\mathbb E[\ell(X,\theta_\infty)]$，其严谨性依赖于找到合适的 $Y$。反例：$X_n=n\cdot\mathbf 1_{[0,1/n]}$ 逐点收敛到 $0$，但 $\mathbb E[X_n]=1\not\to 0$——DCT 失败因为找不到统一的 $Y$。这类反例会在强化学习的方差爆炸、diffusion 训练目标的收敛性讨论中反复出现。
 </div>
 
-<h3>6. Hoeffding 不等式 (Hoeffding's Inequality)</h3>
+<h3>7. Radon–Nikodym 与"密度"的严格含义</h3>
 
-<div class="thm-box">
-  <div class="box-title">引理 &mdash; Hoeffding 引理</div>
-  <p>若 $X$ 满足 $\mathbb{E}[X]=0$ 且 $X\in[a,b]$ a.s.，则对任意 $\lambda\in\mathbb{R}$：</p>
-  $$\mathbb{E}[e^{\lambda X}] \le \exp\!\Bigl(\tfrac{\lambda^2(b-a)^2}{8}\Bigr).$$
+<div class="def-box">
+  <div class="box-title">定义 7.1 — 绝对连续 (absolute continuity)</div>
+  <p>设 $\mu,\nu$ 是 $(\Omega,\mathcal F)$ 上的 σ-有限测度。称 $\nu \ll \mu$（$\nu$ <strong>关于 $\mu$ 绝对连续</strong>），若对每个 $A\in\mathcal F$：$\mu(A)=0 \Rightarrow \nu(A)=0$。</p>
 </div>
 
 <div class="thm-box">
-  <div class="box-title">定理 &mdash; Hoeffding 不等式</div>
-  <p>设 $X_1,\dots,X_n$ 独立，$X_i\in[a_i,b_i]$ a.s.，$S=\sum_{i=1}^n X_i$。则对 $t>0$：</p>
-  $$\mathbb{P}\bigl(S-\mathbb{E}S \ge t\bigr) \le \exp\!\Bigl(-\frac{2t^2}{\sum_{i=1}^n (b_i-a_i)^2}\Bigr).$$
+  <div class="box-title">定理 7.2 — Radon–Nikodym</div>
+  <p>若 $\nu \ll \mu$ 且两者均 σ-有限，则存在几乎处处唯一的非负可测函数 $f=\dfrac{\mathrm d\nu}{\mathrm d\mu}$（称为 <strong>Radon–Nikodym 导数 / 密度</strong>）满足$$\nu(A)=\int_A f\,\mathrm d\mu,\quad \forall A\in\mathcal F.$$</p>
 </div>
 
 <div class="proof-box">
-  <div class="box-title">证明思路</div>
-  <p>不失一般性设 $\mathbb{E}X_i=0$。对中心化的 $S$ 应用 Chernoff：</p>
-  $$\mathbb{P}(S\ge t)\le e^{-\lambda t}\prod_{i=1}^n \mathbb{E}[e^{\lambda X_i}] \le e^{-\lambda t}\exp\!\Bigl(\tfrac{\lambda^2}{8}\sum(b_i-a_i)^2\Bigr).$$
-  <p>关于 $\lambda>0$ 极小化，取 $\lambda^*=\frac{4t}{\sum(b_i-a_i)^2}$，即得结论。$\square$</p>
-</div>
-
-<h4>典型应用：均匀大数定律速率</h4>
-<p>设 $X_i\in[0,1]$ 独立同分布，$\mathbb{E}X_i=\mu$。则</p>
-$$\mathbb{P}\bigl(|\bar X_n - \mu|\ge \varepsilon\bigr) \le 2e^{-2n\varepsilon^2}.$$
-<p>相较 Chebyshev 的 $1/(n\varepsilon^2)$，Hoeffding 给出<strong>指数速率</strong>——这是统计学习理论中 PAC 界的基础。</p>
-
-<h3>7. 有界差分不等式 (McDiarmid / Bounded Differences)</h3>
-
-<div class="thm-box">
-  <div class="box-title">定理 &mdash; McDiarmid 不等式</div>
-  <p>设 $X_1,\dots,X_n$ 独立，$f:\prod\mathcal{X}_i\to\mathbb{R}$ 满足<strong>有界差分</strong>条件：改变第 $i$ 个坐标至多使 $f$ 变化 $c_i$。则</p>
-  $$\mathbb{P}\bigl(f(X)-\mathbb{E}f(X)\ge t\bigr) \le \exp\!\Bigl(-\frac{2t^2}{\sum c_i^2}\Bigr).$$
+  <div class="box-title">证明</div>
+  <p>经典证明用 Hilbert 空间投影法（von Neumann）：在 $L^2(\mu+\nu)$ 上考虑泛函 $T\varphi=\int\varphi\,\mathrm d\nu$，由 Riesz 表示定理得核 $g$，再证 $f=g/(1-g)$。完整过程见 <em>Rudin</em> Thm 6.10。$\blacksquare$</p>
 </div>
 
 <div class="remark">
-  McDiarmid 将 Hoeffding 从"独立求和"推广到"独立坐标的 Lipschitz 函数"，是<strong>随机化算法分析</strong>与<strong>组合概率</strong>（如随机图中最大团、旅行商问题）的核心工具。证明将在下一讲通过 Doob 鞅分解给出。
+  <strong>为什么这条定理如此关键：</strong>本科概率里的"概率密度函数 $p(x)$"其实是 $\mu_X$ 关于 Lebesgue 测度 $\lambda$ 的 Radon–Nikodym 导数 $\mathrm d\mu_X/\mathrm d\lambda$。因此"$X$ 有密度 $p$" $\iff\mu_X\ll\lambda$。Cantor 分布满足 $\mu_X([0,1])=1$ 但 $\mu_X\perp\lambda$——它<strong>没有</strong>密度。生成模型（尤其是 GAN、normalizing flow、diffusion）频繁遇到"退化分布"（数据流形是 $\mathbb R^d$ 中的低维子集），此时目标分布与 Lebesgue 测度并不绝对连续；这正是<em>去噪 (denoising)</em> 与 $\sigma\to 0$ 极限背后的数学动机。
 </div>
 
-<h3>8. 案例：随机图中的三角形计数</h3>
+<h3>8. 小结</h3>
 
-<p>考虑 Erdős-Rényi 随机图 $G(n,p)$：每对顶点独立以概率 $p$ 相连。令 $T$ 为图中三角形数目，$\mathbb{E}T=\binom{n}{3}p^3$。</p>
-
-<ul>
-  <li><strong>Chebyshev 视角</strong>：$\mathrm{Var}(T)$ 需展开三角形对之间的相交结构，得到 $\mathbb{P}(|T-\mathbb{E}T|\ge \varepsilon\mathbb{E}T)=O(1/n)$。</li>
-  <li><strong>McDiarmid 视角</strong>：每条边翻转最多改变 $n-2$ 个三角形，因此 $c_e=n-2$。对 $\binom{n}{2}$ 条边应用，得</li>
-</ul>
-$$\mathbb{P}\bigl(|T-\mathbb{E}T|\ge t\bigr) \le 2\exp\!\Bigl(-\tfrac{2t^2}{\binom{n}{2}(n-2)^2}\Bigr).$$
-<p>在密集图 $p=\Theta(1)$ 情形，$\mathbb{E}T=\Theta(n^3)$，取 $t=\varepsilon\mathbb{E}T$ 得到指数衰减，明显强于 Chebyshev。</p>
-
-<h3>本讲小结</h3>
 <table class="summary">
-  <tr><th style="width:30%">工具</th><th>假设 / 结论</th></tr>
-  <tr><td><strong>Markov 不等式</strong></td><td>$X\ge 0$ &nbsp;$\Rightarrow$&nbsp; $\mathbb{P}(X\ge a)\le \mathbb{E}X/a$</td></tr>
-  <tr><td><strong>Chebyshev 不等式</strong></td><td>$X\in L^2$ &nbsp;$\Rightarrow$&nbsp; $\mathbb{P}(|X-\mathbb{E}X|\ge t)\le \mathrm{Var}(X)/t^2$</td></tr>
-  <tr><td><strong>Chernoff 方法</strong></td><td>指数化 + Markov，得到 Legendre 变换形式的指数尾部界</td></tr>
-  <tr><td><strong>Hoeffding 引理</strong></td><td>有界零均值变量的 MGF 亚高斯上界 $\exp(\lambda^2(b-a)^2/8)$</td></tr>
-  <tr><td><strong>Hoeffding 不等式</strong></td><td>独立有界求和：$\mathbb{P}(S-\mathbb{E}S\ge t)\le\exp\!\bigl(-\tfrac{2t^2}{\sum(b_i-a_i)^2}\bigr)$</td></tr>
-  <tr><td><strong>McDiarmid</strong></td><td>坐标 Lipschitz 函数在独立输入下的有界差分集中</td></tr>
+  <tr><th>本科概率概念</th><th>测度论重述</th><th>后续用途</th></tr>
+  <tr><td>事件</td><td>$A\in\mathcal F$（σ-代数元素）</td><td>滤过 $\{\mathcal F_t\}$（L3 鞅）</td></tr>
+  <tr><td>随机变量</td><td>可测函数 $X:\Omega\to\mathbb R$</td><td>随机过程 $\{X_t\}$ 是随机变量族</td></tr>
+  <tr><td>分布</td><td>推前测度 $\mu_X=\mathbb P\circ X^{-1}$</td><td>SDE 解的边缘分布、生成分布</td></tr>
+  <tr><td>密度</td><td>Radon–Nikodym 导数 $\mathrm d\mu_X/\mathrm d\lambda$</td><td>Girsanov（L14）、score function（L17）</td></tr>
+  <tr><td>期望</td><td>Lebesgue 积分 $\int X\,\mathrm d\mathbb P$</td><td>损失函数 $\mathbb E_{x\sim p}[\ell(x)]$</td></tr>
 </table>
 
+<h3>§ 直觉与研究桥接</h3>
+
+<p><strong>与 score matching / diffusion 的接口。</strong>Diffusion 模型的训练目标形如 $\mathbb E_{t,x_0,\epsilon}[\|\epsilon_\theta(x_t,t)-\epsilon\|^2]$，其中 $x_t$ 是条件分布 $q(x_t\mid x_0)$ 下的样本。"取期望"这件事的严格含义需要一个乘积概率空间 $(\Omega,\mathcal F,\mathbb P)$：$t$ 从 $[0,T]$ 上的 Lebesgue 抽，$x_0$ 从数据分布抽，$\epsilon$ 从 $\mathcal N(0,I)$ 抽——三者独立（下一讲的独立性定义）。当这些独立性假设失效（例如 $t$ 与 $x_0$ 相关的自适应加权训练），要用 Radon–Nikodym 显式改写期望。</p>
+
+<p><strong>与 Girsanov / 重要性采样的接口。</strong>反向 SDE 的推导本质上是把前向 SDE 下的期望换到反向测度下的期望，其数学工具就是 Radon–Nikodym 导数（L14 Girsanov）。所以"密度比 $p_{\mathrm{data}}(x)/p_\theta(x)$"这类 ML 中随手写下的表达式，只有在 $p_\theta\ll p_{\mathrm{data}}$（或反之）时才严格成立——这也是 GAN 训练里"mode collapse"的一个数学侧写：$p_\theta$ 支撑集缩小到与 $p_{\mathrm{data}}$ 奇异，密度比爆炸。</p>
+
+<p>关键 paper 指向：Song &amp; Ermon 2019 (NCSN)；Song et al. ICLR 2021（SDE 视角）；Vincent 2011（denoising score matching 的原理）。这些都会在 L17–L18 精读。</p>
+
+<h3>§ 常见误区</h3>
+<ol>
+  <li><strong>把 $\Omega$ 和 $\mathbb R$ 搞混。</strong>随机变量的取值空间是 $\mathbb R$（或 $\mathbb R^d$），样本空间 $\Omega$ 通常抽象且我们从不显式构造它。研究中提及"数据分布 $p(x)$"时讨论的是 $\mathbb R^d$ 上的测度 $\mu_X$，不是 $\Omega$。</li>
+  <li><strong>把"a.s. 相等"与"处处相等"当作同一件事。</strong>$X=Y$ a.s. 意味着 $\mathbb P(X\neq Y)=0$，但可能存在（测度零的）$\omega$ 使 $X(\omega)\neq Y(\omega)$。所有期望等式在 a.s. 意义下考察——把等式写严谨的习惯要从本讲开始。</li>
+  <li><strong>误以为所有分布都有密度。</strong>Cantor 分布、点质量、混合分布可能没有 Lebesgue 密度。凡是训练目标涉及 $\log p(x)$ 的模型，都要问一句：$p$ 是相对哪个基测度的 Radon–Nikodym 导数？（在离散设定下基测度是计数测度，$\log p$ 是概率质量的对数；在连续设定下基测度是 Lebesgue。混淆两者是常见 bug。）</li>
+</ol>
+
+<h3>§ 习题</h3>
+
+<div class="exercise">
+  <span class="diff">(★)</span>
+  设 $\Omega=\mathbb N$，$\mathcal F=2^\Omega$，$\mathbb P(\{n\})=(1-p)^{n-1}p$（$p\in(0,1)$）。验证 $\mathbb P$ 是概率测度，并计算 $\mathbb E[X]$，其中 $X(n)=n$。
+  <br><em>出处：Durrett 5e §1.6 Ex.4 变体。</em>
+</div>
+
+<div class="exercise">
+  <span class="diff">(★★)</span>
+  设 $X:\Omega\to\mathbb R$ 满足 $\{X\le a\}\in\mathcal F$ 对每个有理 $a\in\mathbb Q$ 成立。证明 $X$ 是随机变量。（提示：$\mathbb R$ 的稠密性。）
+  <br><em>出处：Durrett 5e §1.3 Ex.1。</em>
+</div>
+
+<div class="exercise">
+  <span class="diff">(★★)</span>
+  证明 Jensen 不等式的<strong>相等条件</strong>：$\varphi(\mathbb E[X])=\mathbb E[\varphi(X)]$（$\varphi$ 严格凸、$X\in L^1$）当且仅当 $X$ 是 a.s. 常数。
+  <br><em>出处：自造，参考 Durrett 5e Thm 1.6.2 的证明思路。</em>
+</div>
+
+<div class="exercise">
+  <span class="diff">(★★★)</span>
+  <strong>ML 开放题：</strong>考虑 normalizing flow 模型：可逆变换 $f_\theta:\mathbb R^d\to\mathbb R^d$，基分布 $z\sim\mathcal N(0,I)$，$x=f_\theta(z)$。工程实现里的对数似然公式 $\log p_\theta(x)=\log p_z(f_\theta^{-1}(x))+\log|\det J_{f_\theta^{-1}}(x)|$ 何时成立？请从 Radon–Nikodym 导数与推前测度出发，写出这个公式的严格版本（提示：从 $\mu_X=\mu_Z\circ f_\theta^{-1}$ 出发，用变量替换定理）。并讨论：当 $d=2$、$f_\theta$ 把 $z\in\mathbb R^2$ 压到某条曲线上时，公式为什么不再成立？这与 diffusion 模型中"数据流形是低维"的常见假设有何联系？
+</div>
+
 <div class="footer-note">
-  <p>资料来源：MIT OpenCourseWare 18.619J Discrete Probability and Stochastic Processes | 基于课程讲义整理</p>
+  来源：Durrett R., <em>Probability: Theory and Examples</em>, 5e, §1.1–1.3, §1.6 &middot; Rudin W., <em>Real and Complex Analysis</em>, Ch.1 &middot; 本讲义为个人学习整理，与原作者及出版方无关。
 </div>
 
 </div>
 </body>
 </html>
+
+<!-- CHECKLIST
+- definitions: 8 (σ-代数, 概率空间, 可测函数/随机变量, 分布/推前测度, 分布函数, 期望四步, 绝对连续, LOTUS 隐含)
+- theorems: 7 (proved: 5 [Prop 2.6, Prop 3.2, Thm 4.3 骨架, Thm 5.2, Thm 7.2 骨架], sketch: 2 [Thm 6.1 汇总, Thm 4.3])
+- examples: 6 (Ex 2.3, 2.4, 2.5 反例, 3.3, 3.4, 5.3)
+- exercises: 4 (1 x ★, 2 x ★★, 1 x ★★★ ML 开放题)
+- [待核对] tags: 0
+- research bridge references: [Song&Ermon 2019 NCSN, Song et al. ICLR 2021 SDE, Vincent 2011 DSM]
+- estimated word count: ~5800 汉字
+-->

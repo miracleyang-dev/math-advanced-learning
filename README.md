@@ -2,101 +2,75 @@
 
 进阶数学课程学习笔记，中文撰写，保留数学术语原文。
 
+面向 **深度生成 / 推理模型** 研究的数学底子。以"学到东西、可以直接对接论文"为标准挑选教材与主讲，不锁定单一课程来源。
+
 > 本仓库采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可证，详见 [来源声明](#来源声明)。
 
 ---
 
-## 学习路径 (MIT 课程体系)
+## 学习路径
 
-严格遵循 MIT 数学系进阶路径，按下列顺序推进：
+三门主课并行推进，两条线在"生成模型 / 变分推断"处合流。
 
-| 顺序 | 课程 | 来源 | 状态 | 进度 |
-|------|------|------|------|------|
-| 1 | [泛函分析](./functional-analysis/) | MIT 18.102 | 进行中 | 10 / 23 |
-| 2 | [离散概率与随机过程](./stochastic-processes/) | MIT 18.619J | 进行中 | 3 / 25 |
-| 3 | 信息论 | MIT 18.424 | 计划中 | 0 / — |
-| 4 | 离散数学 | MIT 18.404 | 计划中 | 0 / — |
-| 5 | 组合分析 | MIT 18.211 | 计划中 | 0 / — |
+| 顺序 | 课程 | 主教材 / 主讲 | 状态 | 进度 |
+|------|------|---------------|------|------|
+| 1 | [泛函分析](./functional-analysis/) | MIT 18.102 (Rodriguez) + Rudin *Functional Analysis* | 重启 | 0 / 22 |
+| 2 | [随机过程](./stochastic-processes/) | Durrett *Probability: Theory and Examples* 5e + Le Gall + Särkkä | 进行中 | 0 / 20 |
+| 3 | [信息论](./information-theory/) | Cover & Thomas 2e + Polyanskiy & Wu *From Coding to Learning* + MIT 6.441 | 进行中 | 0 / 18 |
 
-## 泛函分析 — MIT 18.102
+每门课的详细章节地图见各自目录下的 `README.md`。
 
-授课：Dr. Casey Rodriguez
+## 讲义制作方式
 
-| # | 主题 | 笔记 |
-|---|------|------|
-| 1 | Basic Banach Space Theory | [泛函分析_L1](./functional-analysis/泛函分析_L1.pdf) |
-| 2 | Bounded Linear Operators | [泛函分析_L2](./functional-analysis/泛函分析_L2.pdf) |
-| 3 | Quotient Spaces, Baire Category Theorem | [泛函分析_L3](./functional-analysis/泛函分析_L3.pdf) |
-| 4 | Open Mapping Theorem, Closed Graph Theorem | [泛函分析_L4](./functional-analysis/泛函分析_L4.pdf) |
-| 5 | Zorn's Lemma, Hahn-Banach Theorem | [泛函分析_L5](./functional-analysis/泛函分析_L5.pdf) |
-| 6 | Double Dual, Outer Measure | [泛函分析_L6](./functional-analysis/泛函分析_L6.pdf) |
-| 7 | Sigma Algebras | [泛函分析_L7](./functional-analysis/泛函分析_L7.pdf) |
-| 8 | Lebesgue Measurable Subsets and Measure | [泛函分析_L8](./functional-analysis/泛函分析_L8.pdf) |
-| 9 | Lebesgue Measurable Functions | [泛函分析_L9](./functional-analysis/泛函分析_L9.pdf) |
-| 10 | Simple Functions | [泛函分析_L10](./functional-analysis/泛函分析_L10.pdf) |
-| ... | ... | ... |
+每讲一个自包含 HTML 文件（`<course>/src/lecture-XX.html`），MathJax 3 渲染公式，样式统一（`.def-box` / `.thm-box` / `.proof-box` / `.remark`）。用 `scripts/generate_pdf.py` 渲染为 PDF 提交到课程根目录。
 
-### 涵盖内容
+讲义由 AI 辅助生成，遵循 [`PROMPT.md`](./PROMPT.md) 中的规范；模板见 [`templates/lecture-template.html`](./templates/lecture-template.html)。
 
-- 赋范空间、完备性、Banach 空间
-- 泛函、Hahn-Banach 定理、对偶性
-- Lebesgue 测度、可测函数、L^p 空间
-- Hilbert 空间、标准正交基、Fourier 级数
-- 紧算子、自伴算子、谱定理
+## 目录结构
 
-## 离散概率与随机过程 — MIT 18.619J
+```
+math-advanced-learning/
+├── functional-analysis/
+│   ├── README.md               # 泛函分析章节地图 + 符号约定
+│   └── src/                    # lecture-XX.html
+├── stochastic-processes/
+│   ├── README.md
+│   └── src/
+├── information-theory/
+│   ├── README.md
+│   └── src/
+├── templates/
+│   └── lecture-template.html   # HTML 骨架
+├── scripts/
+│   └── generate_pdf.py         # HTML → PDF
+├── PROMPT.md                   # AI 生成讲义的 prompt 规范（三种输入源）
+└── README.md
+```
 
-授课：Prof. Elchanan Mossel
+## 生成 PDF
 
-| # | 主题 | 笔记 |
-|---|------|------|
-| 1 | 概率空间回顾与集中不等式 (Markov / Chebyshev / Chernoff / Hoeffding / McDiarmid) | [随机过程_L1](./stochastic-processes/随机过程_L1.pdf) |
-| 2 | 条件期望与鞅 (Doob 鞅、可选停止、Azuma-Hoeffding、鞅收敛) | [随机过程_L2](./stochastic-processes/随机过程_L2.pdf) |
-| 3 | 马尔可夫链与混合时间 (平稳分布、耦合、谱间隙、Cutoff) | [随机过程_L3](./stochastic-processes/随机过程_L3.pdf) |
-| ... | ... | ... |
+```bash
+pip install playwright
+python -m playwright install chromium
+python scripts/generate_pdf.py stochastic-processes/src/lecture-01.html \
+  -o stochastic-processes/随机过程_L1.pdf
+```
 
-### 涵盖内容
-
-- 集中不等式：Markov / Chebyshev / Chernoff / Hoeffding / McDiarmid
-- 条件期望、滤过、Doob 鞅、可选停止定理
-- Azuma-Hoeffding 与鞅集中方法
-- 有限状态马尔可夫链、平稳分布、可逆性
-- 混合时间、耦合方法、谱间隙、Cutoff 现象
-- Glauber 动力学、MCMC 与统计物理应用
-
-## 后续课程 (计划中)
-
-以下课程将在完成前两门后依序推进，笔记与练习将补充到相应目录：
-
-- **MIT 18.424 信息论 (Seminar in Information Theory)** — 熵、互信息、信源信道编码、Shannon 定理
-- **MIT 18.404 离散数学 (Theory of Computation)** — 自动机、可计算性、复杂度类
-- **MIT 18.211 组合分析 (Combinatorial Analysis)** — 生成函数、Polya 计数、极值组合、随机方法
-
-## 笔记制作方式
-
-每讲笔记基于以下材料整理：
-
-1. MIT OpenCourseWare 发布的**官方讲义**
-2. 课程录像的**视频字幕**
-3. **个人重组** — 以定义、定理、证明、小结的结构重新编排，中文撰写
-
-数学公式使用 MathJax 排版，渲染为 PDF。
+PDF 通过 Git LFS 存储（见 `.gitattributes`）。
 
 ## 来源声明
 
-本仓库包含基于以下材料的衍生作品：
+本仓库为个人学习整理，包含基于以下公开材料的衍生笔记：
 
-- **MIT 18.102 Introduction to Functional Analysis, Spring 2021**
-  授课：Dr. Casey Rodriguez
-  来源：[MIT OpenCourseWare](https://ocw.mit.edu/courses/18-102-introduction-to-functional-analysis-spring-2021/)
-  许可证：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+- **MIT 18.102 Introduction to Functional Analysis**（Dr. Casey Rodriguez）— [MIT OpenCourseWare](https://ocw.mit.edu/), CC BY-NC-SA 4.0
+- **MIT 6.441 Information Theory**（Prof. Yury Polyanskiy）— 课程主页公开讲义
+- Durrett R. *Probability: Theory and Examples*, 5e — 教学引用
+- Cover T., Thomas J. *Elements of Information Theory*, 2e — 教学引用
+- Le Gall J.-F. *Brownian Motion, Martingales, and Stochastic Calculus* — 教学引用
+- Särkkä S., Solin A. *Applied Stochastic Differential Equations* — 教学引用
+- Polyanskiy Y., Wu Y. *Information Theory: From Coding to Learning* — 作者公开草稿
 
-- **MIT 18.619J Discrete Probability and Stochastic Processes**
-  授课：Prof. Elchanan Mossel
-  来源：[MIT OpenCourseWare](https://ocw.mit.edu/)
-  许可证：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-
-本仓库为独立整理的学习笔记，非 MIT 官方出版物，MIT 不为本仓库背书。
+本仓库非任何机构官方出版物，作者与相应版权持有者不为本仓库背书。
 
 ## 许可证
 

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>【课程名】第 X 讲 - 【本讲标题】</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+/* Title */
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+/* Sections */
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+/* Definition / Theorem boxes */
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+/* Math display */
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+/* Note / remark */
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+/* Todo marker (must be zeroed before finalize) */
+.todo { background: #ffe0e0; color: #c0392b; padding: 0 4px; border-radius: 3px; font-weight: 700; }
+/* Summary table */
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+/* Exercise list */
+.exercise { margin: 8px 0; padding-left: 12px; border-left: 2px solid #d0dce8; }
+.exercise .diff { color: #e67e22; font-weight: 700; margin-right: 6px; }
+/* Footer */
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>【课程名，例如：随机过程 (Stochastic Processes)】</h1>
+  <h2>第 X 讲：【本讲标题】</h2>
+  <p class="meta">主教材：【教材名 §xx】 &middot; 参考：【辅助材料】</p>
+</div>
+
+<!-- OUTLINE
+1. 【一句话】
+2. 【一句话】
+...
+-->
+
+<h3>1. 动机</h3>
+<p>【为什么这个概念存在；与哪个 ML / 研究问题挂钩】</p>
+
+<div class="remark">
+  <strong>前置：</strong>本讲假设读者掌握 Lxx（【前置内容】）。若不熟悉，先复习。
+</div>
+
+<h3>2. 定义</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 2.1 — 【概念名 (English)】</div>
+  <p>【形式化定义】</p>
+</div>
+
+<h4>例</h4>
+<p>【常规例子】</p>
+
+<h4>反例 / 边界情形</h4>
+<p>【说明为何定义中每一条件都必要】</p>
+
+<h3>3. 主要结果</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 3.1 — 【定理名】</div>
+  <p>【定理陈述】</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>【每一步显式指出援引】</p>
+</div>
+
+<h3>4. 例子与计算</h3>
+<p>【至少一个连续、一个离散、一个 ML 相关】</p>
+
+<h3>5. 小结</h3>
+<table class="summary">
+  <tr><th>概念</th><th>关键性质</th><th>研究桥接</th></tr>
+  <tr><td>【】</td><td>【】</td><td>【】</td></tr>
+</table>
+
+<h3>§ 直觉与研究桥接</h3>
+<p>【本讲概念在深度生成 / 推理模型中的位置。具体到 paper。1–3 段。】</p>
+
+<h3>§ 常见误区</h3>
+<ol>
+  <li>【】</li>
+  <li>【】</li>
+  <li>【】</li>
+</ol>
+
+<h3>§ 习题</h3>
+<div class="exercise"><span class="diff">(★)</span>【题目】<br><em>出处：【教材 / 自造】</em></div>
+<div class="exercise"><span class="diff">(★★)</span>【题目】</div>
+<div class="exercise"><span class="diff">(★★★)</span>【ML 开放题】</div>
+
+<div class="footer-note">
+  来源：【材料出处】 &middot; 本讲义为个人学习整理，与原作者 / 机构无关。
+</div>
+
+</div>
+</body>
+</html>
+
+<!-- CHECKLIST
+- definitions:
+- theorems: (proved: , sketch: )
+- examples:
+- exercises:
+- [待核对] tags:
+- research bridge references: []
+- estimated word count:
+-->
