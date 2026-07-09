@@ -52,7 +52,7 @@ math-advanced-learning/
 ```bash
 pip install playwright
 python -m playwright install chromium
-python scripts/generate_pdf.py stochastic-processes/src/lecture-01.html \
+python scripts/generate_pdf.py stochastic-processes/src/lecture-01.html ^
   -o stochastic-processes/随机过程_L1.pdf
 ```
 
