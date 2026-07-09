@@ -15,29 +15,50 @@ import argparse
 import asyncio
 import sys
 from pathlib import Path
+from typing import Optional
 
 
-async def html_to_pdf(html_path: str, output_path: str | None = None):
-    from playwright.async_api import async_playwright
+async def html_to_pdf(html_path: str, output_path: Optional[str] = None):
+    try:
+        from playwright.async_api import Error as PlaywrightError
+        from playwright.async_api import async_playwright
+    except ImportError:
+        print(
+            "Error: Playwright is not installed.\n"
+            "Run in Windows cmd:\n"
+            "  py -m pip install playwright\n"
+            "  py -m playwright install chromium",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
-    html_path = Path(html_path).resolve()
-    if not html_path.exists():
-        print(f"Error: {html_path} not found", file=sys.stderr)
+    input_path = Path(html_path).resolve()
+    if not input_path.exists():
+        print(f"Error: {input_path} not found", file=sys.stderr)
         sys.exit(1)
 
     if output_path is None:
-        output_path = html_path.with_suffix(".pdf")
+        pdf_path = input_path.with_suffix(".pdf")
     else:
-        output_path = Path(output_path).resolve()
+        pdf_path = Path(output_path).resolve()
 
-    print(f"Input:  {html_path}")
-    print(f"Output: {output_path}")
+    print(f"Input:  {input_path}")
+    print(f"Output: {pdf_path}")
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch()
+        try:
+            browser = await p.chromium.launch()
+        except PlaywrightError:
+            print(
+                "Error: Playwright Chromium is not installed or cannot be launched.\n"
+                "Run in Windows cmd:\n"
+                "  py -m playwright install chromium",
+                file=sys.stderr,
+            )
+            sys.exit(1)
         page = await browser.new_page()
 
-        await page.goto(f"file://{html_path}", wait_until="networkidle")
+        await page.goto(input_path.as_uri(), wait_until="networkidle")
         await page.wait_for_timeout(5000)
 
         # Wait for MathJax rendering
@@ -53,14 +74,14 @@ async def html_to_pdf(html_path: str, output_path: str | None = None):
         await page.wait_for_timeout(2000)
 
         await page.pdf(
-            path=str(output_path),
+            path=str(pdf_path),
             format="A4",
             margin={"top": "20mm", "bottom": "22mm", "left": "22mm", "right": "22mm"},
             print_background=True,
         )
 
         await browser.close()
-        print(f"Done. ({output_path.stat().st_size / 1024:.0f} KB)")
+        print(f"Done. ({pdf_path.stat().st_size / 1024:.0f} KB)")
 
 
 def main():

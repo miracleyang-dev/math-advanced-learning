@@ -49,11 +49,13 @@ math-advanced-learning/
 
 ## 生成 PDF
 
-```bash
-pip install playwright
-python -m playwright install chromium
-python scripts/generate_pdf.py stochastic-processes/src/lecture-01.html ^
-  -o stochastic-processes/随机过程_L1.pdf
+Windows cmd：
+
+```cmd
+py -m pip install playwright
+py -m playwright install chromium
+py scripts\generate_pdf.py stochastic-processes\src\lecture-01.html ^
+  -o stochastic-processes\随机过程_L1.pdf
 ```
 
 PDF 通过 Git LFS 存储（见 `.gitattributes`）。
