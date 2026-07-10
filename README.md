@@ -12,11 +12,11 @@
 
 三门主课并行推进，两条线在"生成模型 / 变分推断"处合流。
 
-| 顺序 | 课程 | 主教材 / 主讲 | 状态 | 进度 |
-|------|------|---------------|------|------|
-| 1 | [泛函分析](./functional-analysis/) | MIT 18.102 (Rodriguez) + Rudin *Functional Analysis* | 重启 | 0 / 22 |
-| 2 | [随机过程](./stochastic-processes/) | Durrett *Probability: Theory and Examples* 5e + Le Gall + Särkkä | 进行中 | 0 / 20 |
-| 3 | [信息论](./information-theory/) | Cover & Thomas 2e + Polyanskiy & Wu *From Coding to Learning* + MIT 6.441 | 进行中 | 0 / 18 |
+| 顺序 | 课程 | 主教材 / 主讲 | 状态 | 讲义生成进度 | 阅读进度 |
+|------|------|---------------|------|----------|---------------|
+| 1 | [泛函分析](./functional-analysis/) | MIT 18.102 (Rodriguez) + Rudin *Functional Analysis* | 重启 | 5 / 22 | 0 / 22 |
+| 2 | [随机过程](./stochastic-processes/) | Durrett *Probability: Theory and Examples* 5e + Le Gall + Särkkä | 进行中 | 5 / 20 | 0 / 20 |
+| 3 | [信息论](./information-theory/) | Cover & Thomas 2e + Polyanskiy & Wu *From Coding to Learning* + MIT 6.441 | 进行中 | 0 / 18 | 0 / 18 |
 
 每门课的详细章节地图见各自目录下的 `README.md`。
 

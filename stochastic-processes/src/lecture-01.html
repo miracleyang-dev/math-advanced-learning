@@ -232,7 +232,14 @@ table.summary tr:last-child td { border-bottom: none; }
   <div class="box-title">命题 5.4 — Law of the Unconscious Statistician (LOTUS)</div>
   <p>设 $g:\mathbb R\to\mathbb R$ Borel 可测，$X$ 为随机变量，$\mu_X$ 为 $X$ 的分布。若 $g(X)\in L^1(\mathbb P)$，则$$\mathbb E[g(X)] = \int_{\mathbb R} g(x)\,\mathrm d\mu_X(x).$$</p>
 </div>
-<p>该公式把"在 $\Omega$ 上求积分"转化为"在 $\mathbb R$ 上求积分"，是 ML 中 $\mathbb E_{x\sim p}[\ell(x,\theta)]$ 的严格含义。证明遵循四步构造对 $g$ 归纳（Durrett Thm 1.6.9）。</p>
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>先对指示函数 $g=\mathbf 1_B$ 验证：由定义 4.1，$\mathbb E[\mathbf 1_B(X)]=\mathbb P(X\in B)=\mu_X(B)=\int \mathbf 1_B\,d\mu_X$。</p>
+  <p>再对非负简单函数 $g=\sum_i c_i\mathbf 1_{B_i}$，由期望四步构造中的线性性与上一段的指示函数情形，得到等式。</p>
+  <p>若 $g\ge0$ Borel 可测，取递增简单函数 $g_n\uparrow g$。由 L1 定义 5.1 的非负积分构造和单调收敛定理，左右两侧都是简单函数积分的递增极限，因此相等。</p>
+  <p>一般可积 $g$ 写为 $g^+-g^-$。因 $g(X)\in L^1$，两部分积分有限；分别对 $g^+$ 与 $g^-$ 应用非负情形并相减，得到结论。$\blacksquare$</p>
+</div>
+<p>该公式把"在 $\Omega$ 上求积分"转化为"在 $\mathbb R$ 上求积分"，是 ML 中 $\mathbb E_{x\sim p}[\ell(x,\theta)]$ 的严格含义。</p>
 
 <h3>6. 收敛定理</h3>
 
@@ -246,8 +253,10 @@ table.summary tr:last-child td { border-bottom: none; }
 </div>
 
 <div class="proof-box">
-  <div class="box-title">证明</div>
-  <p>三条定理的证明与实分析中 Lebesgue 积分完全一致（<em>Rudin</em> Thm 1.26, 1.28, 1.34；概率语境下的转述见 <em>Durrett</em> §1.5）。此处不再重复。</p>
+  <div class="box-title">证明（骨架）</div>
+  <p><strong>MCT：</strong>由定义 5.1，$\mathbb E[X]=\sup\{\mathbb E[Y]:0\le Y\le X,\,Y\text{ 简单}\}$。若 $0\le X_n\uparrow X$，则 $\mathbb E[X_n]$ 单调递增且不超过 $\mathbb E[X]$。反向取任意简单 $0\le Y\le X$ 与 $0<c<1$，集合 $A_n=\{X_n\ge cY\}$ 递增到 $\Omega$；由命题 2.6 下连续性与简单函数积分公式，$\liminf_n\mathbb E[X_n]\ge c\mathbb E[Y]$。对 $Y$ 取上确界，再令 $c\uparrow1$，得到 $\lim_n\mathbb E[X_n]=\mathbb E[X]$。</p>
+  <p><strong>Fatou：</strong>令 $Y_n=\inf_{k\ge n}X_k$，则 $Y_n\uparrow\liminf_k X_k$。由 MCT，$\mathbb E[\liminf X_k]=\lim_n\mathbb E[Y_n]$；又 $Y_n\le X_k$ 对所有 $k\ge n$，由期望单调性得 $\mathbb E[Y_n]\le\inf_{k\ge n}\mathbb E[X_k]$。令 $n\to\infty$ 即得 Fatou。</p>
+  <p><strong>DCT：</strong>由 $|X_n|\le Y\in L^1$ 与 a.s. 收敛，$|X|\le Y$ a.s.。对非负变量 $Y+X_n$ 与 $Y-X_n$ 应用 Fatou，并使用 $X_n\to X$，得到 $\mathbb E[Y+X]\le\liminf\mathbb E[Y+X_n]$ 与 $\mathbb E[Y-X]\le\liminf\mathbb E[Y-X_n]$。整理为 $\limsup\mathbb E[X_n]\le\mathbb E[X]\le\liminf\mathbb E[X_n]$，故期望收敛。对 $|X_n-X|$ 同理应用 DCT 的非负形式可得 $L^1$ 收敛。$\blacksquare$</p>
 </div>
 
 <div class="remark">
@@ -335,11 +344,11 @@ table.summary tr:last-child td { border-bottom: none; }
 </html>
 
 <!-- CHECKLIST
-- definitions: 8 (σ-代数, 概率空间, 可测函数/随机变量, 分布/推前测度, 分布函数, 期望四步, 绝对连续, LOTUS 隐含)
-- theorems: 7 (proved: 5 [Prop 2.6, Prop 3.2, Thm 4.3 骨架, Thm 5.2, Thm 7.2 骨架], sketch: 2 [Thm 6.1 汇总, Thm 4.3])
+- definitions: 7 (σ-代数, 概率空间, 可测函数/随机变量, 分布/推前测度, 分布函数, 期望四步, 绝对连续)
+- theorems: 7 (proved: 6 [Prop 2.6, Prop 3.2, Thm 5.2, Prop 5.4, Thm 6.1, Thm 7.2], sketch: 1 [Thm 4.3])
 - examples: 6 (Ex 2.3, 2.4, 2.5 反例, 3.3, 3.4, 5.3)
 - exercises: 4 (1 x ★, 2 x ★★, 1 x ★★★ ML 开放题)
 - [待核对] tags: 0
 - research bridge references: [Song&Ermon 2019 NCSN, Song et al. ICLR 2021 SDE, Vincent 2011 DSM]
-- estimated word count: ~5800 汉字
+- estimated word count: ~6500 汉字
 -->

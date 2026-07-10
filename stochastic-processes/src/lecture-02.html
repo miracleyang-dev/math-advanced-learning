@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>随机过程 (Stochastic Processes) - 第二讲：独立性、0–1 律与条件期望</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+/* Title */
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+/* Sections */
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+/* Definition / Theorem boxes */
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+/* Math display */
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+/* Note / remark */
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+/* Todo marker (must be zeroed before finalize) */
+.todo { background: #ffe0e0; color: #c0392b; padding: 0 4px; border-radius: 3px; font-weight: 700; }
+/* Summary table */
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+/* Exercise list */
+.exercise { margin: 8px 0; padding-left: 12px; border-left: 2px solid #d0dce8; }
+.exercise .diff { color: #e67e22; font-weight: 700; margin-right: 6px; }
+/* Footer */
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="title-block">
+  <h1>随机过程 (Stochastic Processes)</h1>
+  <h2>第二讲：独立性、0–1 律与条件期望</h2>
+  <p class="meta">主教材：Durrett 5e §2.1–2.2, §4.1 &middot; 辅助：Williams, Probability with Martingales</p>
+</div>
+
+<!-- OUTLINE
+1. 独立性：从事件推广到 σ-代数与随机变量
+2. Kolmogorov 0–1 律：尾事件没有中间概率
+3. 条件期望：给定信息下的最佳 $L^2$ 预测
+4. 小结、研究桥接、误区与习题
+-->
+
+<h3>1. 独立性的测度论定义</h3>
+<p>独立性不是“互不影响”的口语判断，而是乘法公式对一个事件族的全体成员同时成立。本讲把本科概率里的独立事件推广到 σ-代数与随机变量。</p>
+<div class="remark"><strong>前置：</strong>L1 的概率空间、随机变量、期望与 Radon–Nikodym 语言。</div>
+<div class="def-box"><div class="box-title">定义 1.1 — 独立事件族 (independent events)</div><p>事件族 $\{A_i:i\in I\}\subset\mathcal F$ 称为独立，若任意有限互异指标 $i_1,\dots,i_n$ 满足 $\mathbb P(\cap_{k=1}^n A_{i_k})=\prod_{k=1}^n\mathbb P(A_{i_k})$。</p></div>
+<p><strong>例：</strong>无限次抛硬币中，$A_n=\{\omega_n=1\}$ 构成独立事件族。<strong>边界：</strong>两两独立不推出联合独立；令公平硬币两次结果为 $X,Y$，取 $A=\{X=1\},B=\{Y=1\},C=\{X\oplus Y=0\}$，三者两两独立但不联合独立。</p>
+<div class="def-box"><div class="box-title">定义 1.2 — 独立 σ-代数与随机变量</div><p>σ-代数族 $\{\mathcal G_i\}$ 独立，若任取有限个 $G_i\in\mathcal G_i$，事件 $G_i$ 独立。随机变量 $X_i$ 独立，若 $\sigma(X_i)$ 独立。</p></div>
+<p><strong>例：</strong>若 $X,Y$ 有联合密度 $p(x,y)=p_X(x)p_Y(y)$，则 $X,Y$ 独立。<strong>反例：</strong>$Y=X^2$ 时边缘分布都存在，但 $Y$ 由 $X$ 决定，除退化情形外二者不独立。</p>
+<div class="thm-box"><div class="box-title">命题 1.3 — π-λ 延拓判别</div><p>若 $\mathcal C_i$ 是生成 $\mathcal G_i$ 的 π-系统，并且乘法公式对所有 $C_i\in\mathcal C_i$ 成立，则 $\mathcal G_i$ 独立。</p></div>
+<div class="proof-box"><div class="box-title">证明</div><p>固定除第一项外的集合，把使乘法公式成立的第一项集合族记为 $\mathcal D$。由概率测度的可数可加性与补运算，$\mathcal D$ 是 λ-系统；它包含 $\mathcal C_1$。由 Dynkin π-λ 定理，$\sigma(\mathcal C_1)\subset\mathcal D$。对每个坐标重复此论证，得到结论。</p></div>
+<h3>2. Kolmogorov 0–1 律</h3>
+<div class="def-box"><div class="box-title">定义 2.1 — 尾 σ-代数 (tail σ-algebra)</div><p>给定随机变量列 $X_1,X_2,\dots$，其尾 σ-代数为 $\mathcal T=\cap_{n\ge1}\sigma(X_n,X_{n+1},\dots)$。其中事件只依赖“足够远之后”的坐标。</p></div>
+<p><strong>例：</strong>$\{\limsup X_n\le a\}$ 是尾事件。<strong>非例：</strong>$\{X_1>0\}$ 不是尾事件，因为它由第一个坐标决定。</p>
+<div class="thm-box"><div class="box-title">定理 2.2 — Kolmogorov 0–1 律</div><p>若 $X_1,X_2,\dots$ 相互独立，则对每个 $A\in\mathcal T$，$\mathbb P(A)\in\{0,1\}$。</p></div>
+<div class="proof-box"><div class="box-title">证明</div><p>由独立性与命题 1.3，$\sigma(X_1,\dots,X_n)$ 与 $\sigma(X_{n+1},X_{n+2},\dots)$ 独立。因 $A\in\mathcal T$，$A$ 属于每个尾部 σ-代数，所以 $A$ 与每个有限头部 σ-代数独立。再用 π-λ 延拓，$A$ 与 $\sigma(\cup_n\sigma(X_1,\dots,X_n))$ 独立。由于 $A$ 本身属于该总 σ-代数的完备化中的尾部信息，得到 $A$ 与自身独立，于是 $\mathbb P(A)=\mathbb P(A\cap A)=\mathbb P(A)^2$，解得 $0$ 或 $1$。</p></div>
+<h3>3. 条件期望是给定信息下的投影</h3>
+<div class="def-box"><div class="box-title">定义 3.1 — 条件期望 (conditional expectation)</div><p>若 $X\in L^1(\mathbb P)$，$\mathcal G\subset\mathcal F$，则 $\mathbb E[X\mid\mathcal G]$ 是一个 $\mathcal G$-可测随机变量 $Y$，满足对所有 $G\in\mathcal G$：$\int_GY\,d\mathbb P=\int_GX\,d\mathbb P$。它在 a.s. 意义下唯一。</p></div>
+<p><strong>例：</strong>若 $\mathcal G=\{\varnothing,\Omega\}$，则 $\mathbb E[X\mid\mathcal G]=\mathbb E[X]$。若 $X$ 已经 $\mathcal G$-可测，则条件期望等于 $X$。<strong>边界：</strong>条件期望是随机变量，不是单个数。</p>
+<div class="thm-box"><div class="box-title">定理 3.2 — 存在唯一性与 $L^2$ 投影</div><p>对 $X\in L^1$，条件期望存在且 a.s. 唯一。若 $X\in L^2$，则 $\mathbb E[X\mid\mathcal G]$ 是 Hilbert 空间 $L^2(\mathcal F)$ 到闭子空间 $L^2(\mathcal G)$ 的正交投影。</p></div>
+<div class="proof-box"><div class="box-title">证明</div><p>$L^1$ 情形用 Radon–Nikodym：定义符号测度 $\nu(G)=\int_GX\,d\mathbb P$，则 $\nu\ll\mathbb P|_{\mathcal G}$，由 RN 定理得密度 $Y$。唯一性来自若两密度在某集合上相差为正，则积分相等被破坏。$L^2$ 情形中，对任意 $Z\in L^2(\mathcal G)$ 先在指示函数上线性验证 $\mathbb E[(X-Y)Z]=0$，再由简单函数稠密性推广，故 $Y$ 是正交投影。</p></div>
+<div class="thm-box"><div class="box-title">命题 3.3 — 塔式性质与取出已知量</div><p>若 $\mathcal H\subset\mathcal G\subset\mathcal F$，则 $\mathbb E[\mathbb E[X\mid\mathcal G]\mid\mathcal H]=\mathbb E[X\mid\mathcal H]$。若 $Z$ 有界且 $\mathcal G$-可测，则 $\mathbb E[ZX\mid\mathcal G]=Z\mathbb E[X\mid\mathcal G]$。</p></div>
+<div class="proof-box"><div class="box-title">证明</div><p>第一式：对每个 $H\in\mathcal H$，连续使用定义 3.1 的积分刻画，两端在 $H$ 上积分都等于 $\int_HX\,d\mathbb P$，由唯一性得结论。第二式先对 $Z=\mathbf1_G$ 用定义，再对 $\mathcal G$-简单函数线性组合成立，最后用有界可测函数的简单函数一致逼近与 DCT 推广。</p></div>
+<h3>4. 小结</h3><table class="summary"><tr><th>对象</th><th>核心性质</th><th>后续用途</th></tr><tr><td>独立 σ-代数</td><td>乘法公式经 π-λ 延拓</td><td>马氏链、Brownian 增量</td></tr><tr><td>尾事件</td><td>独立列下概率为 0 或 1</td><td>极限定理、样本路径性质</td></tr><tr><td>条件期望</td><td>RN 密度；$L^2$ 投影</td><td>鞅、滤波、贝叶斯预测</td></tr></table>
+<h3>§ 直觉与研究桥接</h3><p>条件期望是“在信息受限时的最佳均方预测”。Kalman filter、Särkkä 与 Solin 的 Applied SDE，以及扩散模型中的 denoising score matching 都把不可见变量的预测写成条件分布或条件均值。本讲 → L3 鞅；L2 投影视角也连接到 Hilbert 空间中的回归。</p>
+<h3>§ 常见误区</h3><ol><li>两两独立不等于联合独立。</li><li>$\mathbb E[X\mid\mathcal G]$ 不是条件概率表，而是 $\mathcal G$-可测随机变量。</li><li>0–1 律只适用于尾事件；有限前缀事件通常没有 0–1 结论。</li></ol>
+<h3>§ 习题</h3><div class="exercise"><span class="diff">(★)</span>证明若 $X$ 与 $\mathcal G$ 独立，则 $\mathbb E[X\mid\mathcal G]=\mathbb E[X]$。</div><div class="exercise"><span class="diff">(★★)</span>构造三个两两独立但非联合独立的事件，并逐项验证乘法公式。</div><div class="exercise"><span class="diff">(★★★)</span><strong>ML 开放题：</strong>把监督学习的最优平方损失预测写为 $\mathbb E[Y\mid X]$，说明这与回归网络逼近条件均值的关系。</div>
+
+<div class="footer-note">来源：Durrett R., Probability: Theory and Examples, 5e, §2.1–2.2, §4.1 &middot; 本讲义为个人学习整理，与原作者 / 机构无关。</div>
+</div>
+</body>
+</html>
+
+<!-- CHECKLIST
+- definitions: 5
+- theorems: 4 (proved: 4, sketch: 0)
+- examples: 5
+- exercises: 3
+- [待核对] tags: 0
+- research bridge references: [Särkkä & Solin 2019 Applied SDE]
+- estimated word count: ~3200 汉字
+-->
