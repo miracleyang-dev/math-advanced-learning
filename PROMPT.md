@@ -46,7 +46,7 @@
 - 中文撰写，术语首次出现时保留英文原文。
 
 【篇幅】
-- 每讲 4000–7000 汉字（渲染后 8–14 页 A4）。定理数 ≥ 3，例子数 ≥ 4，习题数 ≥ 3。
+- 每讲至少要 4000–7000 汉字或是字符（渲染后 8–14 页 A4）。定理数 ≥ 3，例子数 ≥ 4，习题数 ≥ 3。
 
 【自检】
 在文档末尾用 HTML 注释输出自检清单，格式：
@@ -55,9 +55,9 @@
 - theorems: N (proved: N, sketch: N)
 - examples: N
 - exercises: N
-- [待核对] tags: N
 - research bridge references: [paper1, paper2, ...]
 - estimated word count: N
+- reading status: [completed, not completed]
 -->
 如任一项不达标，在生成结束前自行补齐。
 

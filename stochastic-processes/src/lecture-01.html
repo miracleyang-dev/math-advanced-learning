@@ -70,7 +70,7 @@ table.summary tr:last-child td { border-bottom: none; }
 
 <p>本科概率论把随机变量当作"取值不定的量"，把期望写成 $\sum p_i x_i$ 或 $\int x\,f(x)\,\mathrm dx$。这套语言在处理以下三类问题时失效：</p>
 <ol>
-  <li>随机变量在<strong>不可数无穷</strong>索引下的极限（如 $\lim_{n\to\infty}\frac{1}{n}\sum_{k=1}^n X_k$ 的存在性、Brownian 运动的连续轨道）</li>
+  <li>随机变量族在<strong>无限索引</strong>下的极限（如 $\lim_{n\to\infty}\frac{1}{n}\sum_{k=1}^n X_k$ 的存在性、Brownian 运动的连续轨道）</li>
   <li><strong>不同概率测度之间的变换</strong>（如 Girsanov 定理、重要性采样、diffusion 模型的反向 SDE）</li>
   <li><strong>分布无密度、也无质量点</strong>的情形（如 Cantor 分布、退化 Gaussian、singular measure）</li>
 </ol>
@@ -119,22 +119,24 @@ table.summary tr:last-child td { border-bottom: none; }
     <li>$\mathbb P(\varnothing)=0$；</li>
     <li>单调性：$A\subseteq B \Rightarrow \mathbb P(A)\le \mathbb P(B)$；</li>
     <li>次可加性：$\mathbb P\!\left(\bigcup_n A_n\right)\le \sum_n \mathbb P(A_n)$；</li>
-    <li>下连续：$A_n\uparrow A \Rightarrow \mathbb P(A_n)\uparrow \mathbb P(A)$；</li>
-    <li>上连续：$A_n\downarrow A \Rightarrow \mathbb P(A_n)\downarrow \mathbb P(A)$。</li>
+    <li>下连续(从下连续)：$A_n\uparrow A \Rightarrow \mathbb P(A_n)\uparrow \mathbb P(A)$；</li>
+    <li>上连续(从上连续)：$A_n\downarrow A \Rightarrow \mathbb P(A_n)\downarrow \mathbb P(A)$。</li>
   </ol>
 </div>
 
 <div class="proof-box">
   <div class="box-title">证明</div>
-  <p>(1) 令 $A_n=\varnothing$ 应用可数可加性得 $\mathbb P(\varnothing)=\sum \mathbb P(\varnothing)$，仅当 $\mathbb P(\varnothing)=0$ 时成立。</p>
+  <p>(1) 因空集与自身不交，有限可加性给出 $\mathbb P(\varnothing)=2\mathbb P(\varnothing)$，故 $\mathbb P(\varnothing)=0$。</p>
   <p>(2) $B = A \sqcup (B\setminus A)$，由可数可加性（退化为二元）$\mathbb P(B)=\mathbb P(A)+\mathbb P(B\setminus A)\ge \mathbb P(A)$。</p>
-  <p>(3) 令 $B_1=A_1$，$B_n = A_n\setminus\bigcup_{k<n}A_k$，则 $\{B_n\}$ 两两不交、$\bigcup B_n=\bigcup A_n$、$B_n\subseteq A_n$。用可数可加性和 (2)：$\mathbb P(\bigcup A_n)=\sum \mathbb P(B_n)\le \sum \mathbb P(A_n)$。</p>
+  <p>(3) 令 $B_1=A_1$，$B_n = A_n\setminus\bigcup_{k&lt;n}A_k$，则 $\{B_n\}$ 两两不交、$\bigcup B_n=\bigcup A_n$、$B_n\subseteq A_n$。用可数可加性和 (2)：$\mathbb P(\bigcup A_n)=\sum \mathbb P(B_n)\le \sum \mathbb P(A_n)$。</p>
   <p>(4) $A_n\uparrow A$ 意味着 $A=A_1\sqcup\bigsqcup_{n\ge 2}(A_n\setminus A_{n-1})$。可数可加性给 $\mathbb P(A)=\mathbb P(A_1)+\sum_{n\ge 2}\mathbb P(A_n\setminus A_{n-1})$。前 $N$ 项之和为 $\mathbb P(A_N)$，取极限即得 $\mathbb P(A_N)\uparrow \mathbb P(A)$。</p>
   <p>(5) 对补集应用 (4)：$A_n^c \uparrow A^c$，且 $\mathbb P(\cdot)=1-\mathbb P((\cdot)^c)$。$\blacksquare$</p>
 </div>
 
 <div class="remark">
-  <strong>直觉：</strong>可数可加性 = 有限可加性 + 下连续。这一等价（<em>Durrett</em> Thm 1.1.1）说明"连续性"和"可数极限"在概率论中是同一件事的两副面孔——它也是所有极限定理（大数律、中心极限、鞅收敛）能成立的根本理由。
+  <strong>可数可加性的等价刻画：</strong>对同一 σ-代数上的满足 $\mathbb P(\Omega)=1$ 的非负集合函数，可数可加性等价于“有限可加性 + 下连续”，也等价于“有限可加性 + 在空集处上连续”。反向推出可数可加性时，只需上连续的特例：若 $R_n\downarrow\varnothing$，则 $\mathbb P(R_n)\downarrow0$。对任意两两不交的 $A_n$，令 $A=\bigsqcup_{n\ge1}A_n$ 及 $R_N=\bigsqcup_{n>N}A_n$，则 $R_N\downarrow\varnothing$，且由有限可加性
+  $$\mathbb P(A)=\sum_{n=1}^{N}\mathbb P(A_n)+\mathbb P(R_N).$$
+  令 $N\to\infty$，由 $\mathbb P(R_N)\to0$ 即得 $\mathbb P(A)=\sum_{n\ge1}\mathbb P(A_n)$。这说明“连续性”和“可数极限”在概率论中是同一结构的两种表述（<em>Durrett</em> Thm 1.1.1）。
 </div>
 
 <h3>3. 随机变量作为可测函数</h3>
@@ -169,7 +171,9 @@ table.summary tr:last-child td { border-bottom: none; }
 
 <div class="def-box">
   <div class="box-title">定义 4.1 — 分布 (distribution) / 推前测度 (pushforward)</div>
-  <p>设 $X:\Omega\to\mathbb R$ 是随机变量。$X$ 的<strong>分布</strong>是 $(\mathbb R,\mathcal B(\mathbb R))$ 上的概率测度 $\mu_X$，定义为$$\mu_X(B) := \mathbb P(X\in B) = \mathbb P(X^{-1}(B)),\quad B\in\mathcal B(\mathbb R).$$</p>
+  <p>一般地，若 $X:(\Omega,\mathcal F)\to(S,\mathcal S)$ 可测，测度 $\mathbb P$ 经 $X$ 的<strong>推前测度</strong>记为 $X_\#\mathbb P$，它是 $(S,\mathcal S)$ 上的测度，定义为
+  $$(X_\#\mathbb P)(B):=\mathbb P(X^{-1}(B)),\quad B\in\mathcal S.$$
+  它把取值空间中的集合 $B$ 拉回样本空间，再用 $\mathbb P$ 测量；也就是说，它记录“$X$ 的值落入 $B$”的概率。若 $X:\Omega\to\mathbb R$ 是随机变量，则 $X$ 的<strong>分布</strong>正是这个推前测度：$\mu_X:=X_\#\mathbb P=\mathbb P\circ X^{-1}$，即 $\mu_X(B)=\mathbb P(X\in B)$。</p>
 </div>
 
 <div class="def-box">
@@ -189,7 +193,7 @@ table.summary tr:last-child td { border-bottom: none; }
 
 <div class="proof-box">
   <div class="box-title">证明（骨架）</div>
-  <p>必要性用命题 2.6 的下 / 上连续。充分性用 <strong>Carathéodory 扩张定理</strong>：$F$ 唯一决定 $(a,b]$ 上的预测度 $F(b)-F(a)$，扩张到 $\mathcal B(\mathbb R)$ 上得到 $\mu$；再取 $\Omega=\mathbb R,\mathcal F=\mathcal B(\mathbb R),\mathbb P=\mu$，$X(\omega)=\omega$ 即可。$\blacksquare$（详见 <em>Durrett</em> Thm 1.2.2。）</p>
+  <p>必要性用命题 2.6 的下 / 上连续。充分性用 <strong>Carathéodory 扩张定理</strong>：先在半开区间上定义前测度 $\mu_0((a,b])=F(b)-F(a)$，再扩张到 $\mathcal B(\mathbb R)$ 上得到 $\mu$；取 $\Omega=\mathbb R,\mathcal F=\mathcal B(\mathbb R),\mathbb P=\mu$，$X(\omega)=\omega$ 即可。$\blacksquare$（详见 <em>Durrett</em> Thm 1.2.2。）</p>
 </div>
 
 <div class="remark">
@@ -224,7 +228,7 @@ table.summary tr:last-child td { border-bottom: none; }
 <div class="proof-box">
   <div class="box-title">证明（骨架）</div>
   <p>(1)(2)(3) 依次对简单函数、非负、一般三个层次证明——每一步用 sup 的性质与前一层的结论。</p>
-  <p>(4) 由凸函数在任一点 $c$ 处存在支撑仿射：$\varphi(x)\ge \varphi(c)+\lambda(x-c)$。取 $c=\mathbb E[X]$，对 $x=X(\omega)$ 逐点成立，两边取期望并用线性性即可。$\blacksquare$</p>
+  <p>(4) 由凸函数在任一点 $c$ 处存在支撑直线：存在某个常数 $\lambda\in\mathbb R$（即 $\varphi$ 在 $c$ 处的一个次梯度）使得对所有 $x\in\mathbb R$，$\varphi(x)\ge \varphi(c)+\lambda(x-c)$。取 $c=\mathbb E[X]$，再令 $x=X(\omega)$，两边取期望并用线性性，右端即为 $\varphi(\mathbb E[X])$。$\blacksquare$</p>
 </div>
 
 <h4>例 5.3 —— 变量替换公式</h4>
@@ -236,7 +240,7 @@ table.summary tr:last-child td { border-bottom: none; }
   <div class="box-title">证明</div>
   <p>先对指示函数 $g=\mathbf 1_B$ 验证：由定义 4.1，$\mathbb E[\mathbf 1_B(X)]=\mathbb P(X\in B)=\mu_X(B)=\int \mathbf 1_B\,d\mu_X$。</p>
   <p>再对非负简单函数 $g=\sum_i c_i\mathbf 1_{B_i}$，由期望四步构造中的线性性与上一段的指示函数情形，得到等式。</p>
-  <p>若 $g\ge0$ Borel 可测，取递增简单函数 $g_n\uparrow g$。由 L1 定义 5.1 的非负积分构造和单调收敛定理，左右两侧都是简单函数积分的递增极限，因此相等。</p>
+  <p>若 $g\ge0$ Borel 可测，取递增简单函数 $g_n\uparrow g$。由定义 5.1 的非负积分构造，以及下节马上证明的单调收敛定理，左右两侧都是简单函数积分的递增极限，因此相等。</p>
   <p>一般可积 $g$ 写为 $g^+-g^-$。因 $g(X)\in L^1$，两部分积分有限；分别对 $g^+$ 与 $g^-$ 应用非负情形并相减，得到结论。$\blacksquare$</p>
 </div>
 <p>该公式把"在 $\Omega$ 上求积分"转化为"在 $\mathbb R$ 上求积分"，是 ML 中 $\mathbb E_{x\sim p}[\ell(x,\theta)]$ 的严格含义。</p>
@@ -254,20 +258,21 @@ table.summary tr:last-child td { border-bottom: none; }
 
 <div class="proof-box">
   <div class="box-title">证明（骨架）</div>
-  <p><strong>MCT：</strong>由定义 5.1，$\mathbb E[X]=\sup\{\mathbb E[Y]:0\le Y\le X,\,Y\text{ 简单}\}$。若 $0\le X_n\uparrow X$，则 $\mathbb E[X_n]$ 单调递增且不超过 $\mathbb E[X]$。反向取任意简单 $0\le Y\le X$ 与 $0<c<1$，集合 $A_n=\{X_n\ge cY\}$ 递增到 $\Omega$；由命题 2.6 下连续性与简单函数积分公式，$\liminf_n\mathbb E[X_n]\ge c\mathbb E[Y]$。对 $Y$ 取上确界，再令 $c\uparrow1$，得到 $\lim_n\mathbb E[X_n]=\mathbb E[X]$。</p>
+  <p><strong>MCT：</strong>由定义 5.1，$\mathbb E[X]=\sup\{\mathbb E[Y]:0\le Y\le X,\,Y\text{ 简单}\}$。若 $0\le X_n\uparrow X$，则 $\mathbb E[X_n]$ 单调递增且不超过 $\mathbb E[X]$。反向取任意简单 $0\le Y\le X$ 与 $0&lt;c&lt;1$。在 $X_n\uparrow X$ 成立的概率为 $1$ 的集合上，每个 $\omega$ 最终都满足 $X_n(\omega)\ge cY(\omega)$，故对 $A_n=\{X_n\ge cY\}$ 有 $\mathbb P(A_n)\uparrow1$；由简单函数积分公式，$\liminf_n\mathbb E[X_n]\ge c\mathbb E[Y]$。对 $Y$ 取上确界，再令 $c\uparrow1$，得到 $\lim_n\mathbb E[X_n]=\mathbb E[X]$。</p>
   <p><strong>Fatou：</strong>令 $Y_n=\inf_{k\ge n}X_k$，则 $Y_n\uparrow\liminf_k X_k$。由 MCT，$\mathbb E[\liminf X_k]=\lim_n\mathbb E[Y_n]$；又 $Y_n\le X_k$ 对所有 $k\ge n$，由期望单调性得 $\mathbb E[Y_n]\le\inf_{k\ge n}\mathbb E[X_k]$。令 $n\to\infty$ 即得 Fatou。</p>
-  <p><strong>DCT：</strong>由 $|X_n|\le Y\in L^1$ 与 a.s. 收敛，$|X|\le Y$ a.s.。对非负变量 $Y+X_n$ 与 $Y-X_n$ 应用 Fatou，并使用 $X_n\to X$，得到 $\mathbb E[Y+X]\le\liminf\mathbb E[Y+X_n]$ 与 $\mathbb E[Y-X]\le\liminf\mathbb E[Y-X_n]$。整理为 $\limsup\mathbb E[X_n]\le\mathbb E[X]\le\liminf\mathbb E[X_n]$，故期望收敛。对 $|X_n-X|$ 同理应用 DCT 的非负形式可得 $L^1$ 收敛。$\blacksquare$</p>
+  <p><strong>DCT：</strong>由 $|X_n|\le Y\in L^1$ 与 a.s. 收敛，$|X|\le Y$ a.s.。对非负变量 $Y+X_n$ 与 $Y-X_n$ 应用 Fatou，并使用 $X_n\to X$，得到 $\mathbb E[Y+X]\le\liminf\mathbb E[Y+X_n]$ 与 $\mathbb E[Y-X]\le\liminf\mathbb E[Y-X_n]$。整理为 $\limsup\mathbb E[X_n]\le\mathbb E[X]\le\liminf\mathbb E[X_n]$，故期望收敛。$\blacksquare$</p>
 </div>
 
 <div class="remark">
-  <strong>研究应用：</strong>DCT 是"期望与极限交换"的通行证。ML 中我们频繁写下 $\lim_n \mathbb E[\ell(X,\theta_n)]=\mathbb E[\ell(X,\theta_\infty)]$，其严谨性依赖于找到合适的 $Y$。反例：$X_n=n\cdot\mathbf 1_{[0,1/n]}$ 逐点收敛到 $0$，但 $\mathbb E[X_n]=1\not\to 0$——DCT 失败因为找不到统一的 $Y$。这类反例会在强化学习的方差爆炸、diffusion 训练目标的收敛性讨论中反复出现。
+  <p><strong>DCT 的后续推论：</strong>在相同条件下还有 $\mathbb E[|X_n-X|]\to0$，即 $X_n\to X$ 于 $L^1$。</p>
+  <p><strong>研究应用：</strong>DCT 是"期望与极限交换"的通行证。ML 中我们频繁写下 $\lim_n \mathbb E[\ell(X,\theta_n)]=\mathbb E[\ell(X,\theta_\infty)]$，其严谨性依赖于找到合适的 $Y$。反例：$X_n=n\cdot\mathbf 1_{[0,1/n]}$ 逐点收敛到 $0$，但 $\mathbb E[X_n]=1\not\to 0$——DCT 失败因为找不到统一的 $Y$。这类反例会在强化学习的方差爆炸、diffusion 训练目标的收敛性讨论中反复出现。</p>
 </div>
 
 <h3>7. Radon–Nikodym 与"密度"的严格含义</h3>
 
 <div class="def-box">
   <div class="box-title">定义 7.1 — 绝对连续 (absolute continuity)</div>
-  <p>设 $\mu,\nu$ 是 $(\Omega,\mathcal F)$ 上的 σ-有限测度。称 $\nu \ll \mu$（$\nu$ <strong>关于 $\mu$ 绝对连续</strong>），若对每个 $A\in\mathcal F$：$\mu(A)=0 \Rightarrow \nu(A)=0$。</p>
+  <p>测度 $\mu$ 称为 <strong>σ-有限 (σ-finite)</strong>，若存在 $E_n\in\mathcal F$ 使 $\Omega=\bigcup_{n\ge1}E_n$，且每个 $\mu(E_n)&lt;\infty$；也就是整个空间能被可数个有限测度集合覆盖。设 $\mu,\nu$ 是 $(\Omega,\mathcal F)$ 上的 σ-有限测度。称 $\nu \ll \mu$（$\nu$ <strong>关于 $\mu$ 绝对连续</strong>），若对每个 $A\in\mathcal F$：$\mu(A)=0 \Rightarrow \nu(A)=0$。</p>
 </div>
 
 <div class="thm-box">
@@ -277,7 +282,7 @@ table.summary tr:last-child td { border-bottom: none; }
 
 <div class="proof-box">
   <div class="box-title">证明</div>
-  <p>经典证明用 Hilbert 空间投影法（von Neumann）：在 $L^2(\mu+\nu)$ 上考虑泛函 $T\varphi=\int\varphi\,\mathrm d\nu$，由 Riesz 表示定理得核 $g$，再证 $f=g/(1-g)$。完整过程见 <em>Rudin</em> Thm 6.10。$\blacksquare$</p>
+  <p>经典证明先处理有限测度：在 $L^2(\mu+\nu)$ 上用 Riesz 表示定理构造 $g$，再得到 $f=g/(1-g)$；σ-有限情形由可数个有限测度集合上的结果拼接而成。完整过程见 <em>Rudin</em> Thm 6.10。$\blacksquare$</p>
 </div>
 
 <div class="remark">
@@ -297,16 +302,16 @@ table.summary tr:last-child td { border-bottom: none; }
 
 <h3>§ 直觉与研究桥接</h3>
 
-<p><strong>与 score matching / diffusion 的接口。</strong>Diffusion 模型的训练目标形如 $\mathbb E_{t,x_0,\epsilon}[\|\epsilon_\theta(x_t,t)-\epsilon\|^2]$，其中 $x_t$ 是条件分布 $q(x_t\mid x_0)$ 下的样本。"取期望"这件事的严格含义需要一个乘积概率空间 $(\Omega,\mathcal F,\mathbb P)$：$t$ 从 $[0,T]$ 上的 Lebesgue 抽，$x_0$ 从数据分布抽，$\epsilon$ 从 $\mathcal N(0,I)$ 抽——三者独立（下一讲的独立性定义）。当这些独立性假设失效（例如 $t$ 与 $x_0$ 相关的自适应加权训练），要用 Radon–Nikodym 显式改写期望。</p>
+<p><strong>与 score matching / diffusion 的接口。</strong>Diffusion 模型的训练目标形如 $\mathbb E_{t,x_0,\epsilon}[\|\epsilon_\theta(x_t,t)-\epsilon\|^2]$，其中 $x_t$ 是条件分布 $q(x_t\mid x_0)$ 下的样本。"取期望"这件事的严格含义需要一个乘积概率空间 $(\Omega,\mathcal F,\mathbb P)$：$t$ 从 $[0,T]$ 上的均匀分布 $\mathrm dt/T$ 抽取，$x_0$ 从数据分布抽，$\epsilon$ 从 $\mathcal N(0,I)$ 抽——三者独立（下一讲的独立性定义）。当这些独立性假设失效（例如 $t$ 与 $x_0$ 相关的自适应加权训练），要用 Radon–Nikodym 显式改写期望。</p>
 
-<p><strong>与 Girsanov / 重要性采样的接口。</strong>反向 SDE 的推导本质上是把前向 SDE 下的期望换到反向测度下的期望，其数学工具就是 Radon–Nikodym 导数（L14 Girsanov）。所以"密度比 $p_{\mathrm{data}}(x)/p_\theta(x)$"这类 ML 中随手写下的表达式，只有在 $p_\theta\ll p_{\mathrm{data}}$（或反之）时才严格成立——这也是 GAN 训练里"mode collapse"的一个数学侧写：$p_\theta$ 支撑集缩小到与 $p_{\mathrm{data}}$ 奇异，密度比爆炸。</p>
+<p><strong>与 Girsanov / 重要性采样的接口。</strong>Girsanov 定理和重要性采样都在做同一类操作：用 Radon–Nikodym 导数把一个测度下的期望改写为另一个测度下的加权期望。要用模型分布 $P_\theta$ 采样来计算数据分布 $P_{\mathrm{data}}$ 下的期望，需要 $P_{\mathrm{data}}\ll P_\theta$，权重是 $\mathrm dP_{\mathrm{data}}/\mathrm dP_\theta$；反向改写则需要 $P_\theta\ll P_{\mathrm{data}}$，权重是 $\mathrm dP_\theta/\mathrm dP_{\mathrm{data}}$。若两者都有同一个基测度下的密度，这两个导数才可分别写成 $p_{\mathrm{data}}/p_\theta$ 与 $p_\theta/p_{\mathrm{data}}$。当 mode collapse 使 $P_\theta$ 的支撑集过小，前一种绝对连续性可能失效，重要性权重便不再处处有定义。</p>
 
 <p>关键 paper 指向：Song &amp; Ermon 2019 (NCSN)；Song et al. ICLR 2021（SDE 视角）；Vincent 2011（denoising score matching 的原理）。这些都会在 L17–L18 精读。</p>
 
 <h3>§ 常见误区</h3>
 <ol>
   <li><strong>把 $\Omega$ 和 $\mathbb R$ 搞混。</strong>随机变量的取值空间是 $\mathbb R$（或 $\mathbb R^d$），样本空间 $\Omega$ 通常抽象且我们从不显式构造它。研究中提及"数据分布 $p(x)$"时讨论的是 $\mathbb R^d$ 上的测度 $\mu_X$，不是 $\Omega$。</li>
-  <li><strong>把"a.s. 相等"与"处处相等"当作同一件事。</strong>$X=Y$ a.s. 意味着 $\mathbb P(X\neq Y)=0$，但可能存在（测度零的）$\omega$ 使 $X(\omega)\neq Y(\omega)$。所有期望等式在 a.s. 意义下考察——把等式写严谨的习惯要从本讲开始。</li>
+  <li><strong>把"a.s. 相等"与"处处相等"当作同一件事。</strong>$X=Y$ a.s. 意味着 $\mathbb P(X\neq Y)=0$，但可能存在（测度零的）$\omega$ 使 $X(\omega)\neq Y(\omega)$。若两个随机变量 a.s. 相等，则它们的期望在有定义时相等。</li>
   <li><strong>误以为所有分布都有密度。</strong>Cantor 分布、点质量、混合分布可能没有 Lebesgue 密度。凡是训练目标涉及 $\log p(x)$ 的模型，都要问一句：$p$ 是相对哪个基测度的 Radon–Nikodym 导数？（在离散设定下基测度是计数测度，$\log p$ 是概率质量的对数；在连续设定下基测度是 Lebesgue。混淆两者是常见 bug。）</li>
 </ol>
 
@@ -326,13 +331,13 @@ table.summary tr:last-child td { border-bottom: none; }
 
 <div class="exercise">
   <span class="diff">(★★)</span>
-  证明 Jensen 不等式的<strong>相等条件</strong>：$\varphi(\mathbb E[X])=\mathbb E[\varphi(X)]$（$\varphi$ 严格凸、$X\in L^1$）当且仅当 $X$ 是 a.s. 常数。
+  证明 Jensen 不等式的<strong>相等条件</strong>：$\varphi(\mathbb E[X])=\mathbb E[\varphi(X)]$（$\varphi$ 严格凸、$X\in L^1$ 且 $\varphi(X)\in L^1$）当且仅当 $X$ 是 a.s. 常数。
   <br><em>出处：自造，参考 Durrett 5e Thm 1.6.2 的证明思路。</em>
 </div>
 
 <div class="exercise">
   <span class="diff">(★★★)</span>
-  <strong>ML 开放题：</strong>考虑 normalizing flow 模型：可逆变换 $f_\theta:\mathbb R^d\to\mathbb R^d$，基分布 $z\sim\mathcal N(0,I)$，$x=f_\theta(z)$。工程实现里的对数似然公式 $\log p_\theta(x)=\log p_z(f_\theta^{-1}(x))+\log|\det J_{f_\theta^{-1}}(x)|$ 何时成立？请从 Radon–Nikodym 导数与推前测度出发，写出这个公式的严格版本（提示：从 $\mu_X=\mu_Z\circ f_\theta^{-1}$ 出发，用变量替换定理）。并讨论：当 $d=2$、$f_\theta$ 把 $z\in\mathbb R^2$ 压到某条曲线上时，公式为什么不再成立？这与 diffusion 模型中"数据流形是低维"的常见假设有何联系？
+  <strong>ML 开放题：</strong>考虑 normalizing flow 模型：可逆变换 $f_\theta:\mathbb R^d\to\mathbb R^d$，基分布 $z\sim\mathcal N(0,I)$，$x=f_\theta(z)$。工程中对数似然公式 $\log p_\theta(x)=\log p_z(f_\theta^{-1}(x))+\log|\det J_{f_\theta^{-1}}(x)|$ 在何时成立？请从 Radon–Nikodym 导数与推前测度出发，写出这个公式的严格版本（提示：从 $\mu_X=\mu_Z\circ f_\theta^{-1}$ 出发，用变量替换定理）。再讨论：若放弃可逆性，改用 $f_\theta:\mathbb R\to\mathbb R^2$ 将分布映到一条曲线上，公式为什么不再成立？这与 diffusion 模型中"数据流形是低维"的常见假设有何联系？
 </div>
 
 <div class="footer-note">
@@ -345,10 +350,10 @@ table.summary tr:last-child td { border-bottom: none; }
 
 <!-- CHECKLIST
 - definitions: 7 (σ-代数, 概率空间, 可测函数/随机变量, 分布/推前测度, 分布函数, 期望四步, 绝对连续)
-- theorems: 7 (proved: 6 [Prop 2.6, Prop 3.2, Thm 5.2, Prop 5.4, Thm 6.1, Thm 7.2], sketch: 1 [Thm 4.3])
+- theorems: 7 (proof sketches: Prop 2.6, Prop 3.2, Thm 4.3, Thm 5.2, Prop 5.4, Thm 6.1, Thm 7.2)
 - examples: 6 (Ex 2.3, 2.4, 2.5 反例, 3.3, 3.4, 5.3)
 - exercises: 4 (1 x ★, 2 x ★★, 1 x ★★★ ML 开放题)
-- [待核对] tags: 0
 - research bridge references: [Song&Ermon 2019 NCSN, Song et al. ICLR 2021 SDE, Vincent 2011 DSM]
-- estimated word count: ~6500 汉字
+- estimated text length: ~11,700 non-whitespace characters (~2,820 Han characters)
+- reading status: completed
 -->
