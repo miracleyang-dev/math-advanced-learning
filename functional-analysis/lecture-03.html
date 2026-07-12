@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>泛函分析 第三讲 - 商空间与 Baire 纲定理</title>
+<script>window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size:A4; margin:20mm 22mm; } * { box-sizing:border-box; } body { font-family:"Noto Serif CJK SC","Source Han Serif SC","Songti SC",serif; font-size:11pt; line-height:1.8; color:#2c2c2c; } .container { max-width:720px; margin:auto; padding:30px 20px; } .title-block { text-align:center; border-bottom:2px solid #1a3a5c; margin-bottom:28px; padding-bottom:20px; } .title-block h1 { color:#1a3a5c; font-size:20pt; margin:0; } .title-block h2 { color:#2c5f8a; font-size:14pt; font-weight:400; } .meta { color:#888; font-size:9.5pt; } h3 { color:#1a3a5c; border-bottom:1.5px solid #d0dce8; margin-top:28px; } h4 { color:#2c5f8a; } p { text-align:justify; } ol { margin-left:1.5em; } .def-box { background:#f7f9fc; border:1px solid #d0dce8; padding:14px 18px; margin:12px 0; } .thm-box { background:#eaf2fa; border-left:4px solid #2c5f8a; padding:14px 18px; margin:12px 0; } .proof-box { background:#fefef6; border-left:3px solid #bbb; padding:12px 16px; margin:10px 0; } .remark { background:#fff9f0; border-left:3px solid #e67e22; padding:10px 14px; margin:10px 0; } .box-title { font-weight:700; color:#1a3a5c; } .def-box .box-title { color:#c0392b; } table.summary { width:100%; border-collapse:collapse; } th { background:#1a3a5c; color:white; padding:8px; } td { background:#f7f9fc; padding:8px; border-bottom:1px solid #d0dce8; } .exercise { margin:8px 0; padding-left:12px; border-left:2px solid #d0dce8; } .diff { color:#e67e22; font-weight:700; } .footer-note { margin-top:32px; padding-top:12px; border-top:1px solid #ccc; text-align:center; font-size:8.5pt; color:#999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>泛函分析 (Functional Analysis)</h1>
+  <h2>第三讲：商空间、商范数与 Baire 纲定理</h2>
+  <p class="meta">MIT 18.102 &middot; Rudin, <em>Functional Analysis</em>, 2e, §2.2</p>
+</div>
+
+<!-- OUTLINE
+1. 为什么要把子空间压缩为零
+2. 商空间与商范数
+3. 商空间的完备性与诱导算子
+4. 稠密、无处稠密与 Baire 纲
+5. Baire 纲定理及应用预告
+6. 小结、研究桥接、误区与习题
+-->
+
+<h3>1. 商空间的动机</h3>
+
+<p>在许多问题中，只关心向量“模掉某个子空间”后的信息。例如函数只差一个常数时可视为同一对象；线性方程 $Tx=y$ 的两个解只差一个核空间元素。商空间把这种等价关系变成新的线性空间。</p>
+
+<div class="def-box"><div class="box-title">定义 1.1 — 商空间</div><p>设 $Y$ 是线性空间 $X$ 的子空间。定义 $x\sim x'$ 当且仅当 $x-x'\in Y$。等价类 $x+Y=\{x+y:y\in Y\}$ 称为陪集；全体陪集组成商空间 $X/Y$，按 $(x+Y)+(z+Y)=(x+z)+Y$ 和 $a(x+Y)=ax+Y$ 运算。</p></div>
+
+<p><strong>有限维例：</strong>$\mathbb R^2/\operatorname{span}(e_1)$ 只保留竖直方向信息，与 $\mathbb R$ 线性同构。<strong>函数例：</strong>$C([0,1])/\mathbb K\mathbf1$ 把相差常数的连续函数识别为同一元素。</p>
+
+<div class="def-box"><div class="box-title">定义 1.2 — 商映射</div><p>自然映射 $\pi:X\to X/Y$，$\pi(x)=x+Y$，称为商映射。它线性、满射，且 $\ker\pi=Y$。</p></div>
+
+<h3>2. 商范数</h3>
+
+<div class="def-box"><div class="box-title">定义 2.1 — 商范数</div><p>若 $X$ 为赋范空间且 $Y$ 为闭线性子空间，定义 $\|x+Y\|_{X/Y}=\inf_{y\in Y}\|x-y\|=\operatorname{dist}(x,Y)$。</p></div>
+
+<div class="remark"><strong>为什么要求 $Y$ 闭：</strong>若 $Y$ 不闭，取 $x\in\overline Y\setminus Y$，则非零陪集 $x+Y$ 的“范数”为 $0$，只能得到半范数。闭性保证距离为零时 $x\in Y$。</div>
+
+<div class="thm-box"><div class="box-title">命题 2.2 — 商范数确实是范数</div><p>当 $Y$ 闭时，上式与代表元选择无关，并满足范数三公理；自然商映射满足 $\|\pi(x)\|\le\|x\|$，故 $\|\pi\|\le1$。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>若 $x'=x+y_0$，则 $\inf_{y\in Y}\|x'-y\|=\inf_{y\in Y}\|x-(y-y_0)\|$，故定义良好。齐次性由变量替换得到。对任意 $y_1,y_2\in Y$，$\|(x+z)-(y_1+y_2)\|\le\|x-y_1\|+\|z-y_2\|$；分别取下确界得三角不等式。正定性使用 $Y$ 闭。</p></div>
+
+<p><strong>计算例：</strong>在 $C([0,1])/\mathbb K\mathbf1$ 中，$\|f+\mathbb K\mathbf1\|=\inf_c\|f-c\|_\infty=(\max f-\min f)/2$。最佳常数是函数值域中点 $(\max f+\min f)/2$。</p>
+
+<h3>3. 商空间的完备性与诱导算子</h3>
+
+<div class="thm-box"><div class="box-title">定理 3.1 — Banach 空间的闭子空间商仍为 Banach</div><p>若 $X$ 是 Banach，$Y\subset X$ 闭，则 $X/Y$ 在商范数下为 Banach。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>设 $(x_n+Y)$ 是 Cauchy 列。选取子列使 $\|(x_{n_{k+1}}-x_{n_k})+Y\|<2^{-k}$。按下确界定义，可取 $y_k\in Y$ 使 $\|x_{n_{k+1}}-x_{n_k}-y_k\|<2^{1-k}$。修改代表元 $z_1=x_{n_1}$、$z_{k+1}=z_k+(x_{n_{k+1}}-x_{n_k}-y_k)$，则 $z_k+Y=x_{n_k}+Y$ 且 $\sum_k\|z_{k+1}-z_k\|<\infty$。因此 $(z_k)$ 在 Banach 空间 $X$ 中收敛到某个 $z$，子列陪集收敛到 $z+Y$；原 Cauchy 列也收敛到同一极限。</p></div>
+
+<div class="thm-box"><div class="box-title">命题 3.2 — 算子经核空间因子化</div><p>若 $T:X\to Z$ 线性且 $Y\subset\ker T$，则存在唯一线性映射 $\widetilde T:X/Y\to Z$ 满足 $T=\widetilde T\pi$。若 $T$ 有界且 $Y$ 闭，则 $\widetilde T$ 有界且 $\|\widetilde T\|\le\|T\|$。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>定义 $\widetilde T(x+Y)=Tx$。若 $x-x'\in Y\subset\ker T$，则 $Tx=Tx'$，所以定义良好；唯一性来自 $\pi$ 满射。对任意 $y\in Y$，$\|Tx\|=\|T(x-y)\|\le\|T\|\|x-y\|$，对 $y$ 取下确界得 $\|\widetilde T(x+Y)\|\le\|T\|\|x+Y\|$。</p></div>
+
+<p>特别地，任意线性算子都可写成 $X\xrightarrow{\pi}X/\ker T\xrightarrow{\widetilde T}\operatorname{ran}T$。这把“不唯一解”的自由度全部收进核空间。</p>
+
+<h3>4. Baire 纲语言</h3>
+
+<div class="def-box"><div class="box-title">定义 4.1 — 无处稠密与第一纲集</div><p>拓扑空间中的集合 $A$ 称为无处稠密 (nowhere dense)，若 $\overline A$ 的内部为空。可数个无处稠密集的并称为第一纲集 (meagre set)。其补集称为余第一纲集 (residual set)。</p></div>
+
+<p><strong>例：</strong>$\mathbb R$ 中单点集无处稠密，故 $\mathbb Q$ 是第一纲集，但它同时在 $\mathbb R$ 中稠密。这说明“稠密”描述能否逼近每一点，“第一纲”描述集合是否由拓扑上薄的部分组成，两者不矛盾。</p>
+
+<div class="def-box"><div class="box-title">定义 4.2 — Baire 空间</div><p>若任意可数个稠密开集的交仍稠密，则称该拓扑空间为 Baire 空间。等价地，非空开集不能写成可数个无处稠密集之并。</p></div>
+
+<h3>5. Baire 纲定理</h3>
+
+<div class="thm-box"><div class="box-title">定理 5.1 — Baire 纲定理</div><p>每个完备度量空间都是 Baire 空间。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>设 $G_1,G_2,\dots$ 为稠密开集，要证其交与任意非空开集 $U$ 相交。先在 $U\cap G_1$ 中取闭球 $\overline B(x_1,r_1)$，令 $r_1<1$。递归地，在 $B(x_n,r_n)\cap G_{n+1}$ 中取闭球 $\overline B(x_{n+1},r_{n+1})$，使其包含于前一开球且 $r_{n+1}<2^{-n}$。球心列是 Cauchy 列，完备性给极限 $x$。嵌套闭球保证 $x\in U$ 且 $x\in G_n$ 对所有 $n$ 成立。</p></div>
+
+<div class="remark"><strong>为什么重要：</strong>Baire 定理把“对每个点总有某个界”升级为“在某个开球上存在统一的界”。L4 的一致有界原理、开映射定理和闭图像定理都依赖这一升级机制。</div>
+
+<h3>6. 小结</h3>
+
+<table class="summary"><tr><th>对象</th><th>作用</th><th>关键条件</th></tr><tr><td>$X/Y$</td><td>把子空间方向识别为零</td><td>商范数要求 $Y$ 闭</td></tr><tr><td>诱导算子</td><td>把核空间中的非唯一性剥离</td><td>$Y\subset\ker T$</td></tr><tr><td>Baire 定理</td><td>从逐点信息提取局部统一信息</td><td>完备度量空间</td></tr></table>
+
+<h3>§ 直觉与研究桥接</h3>
+
+<p>机器学习模型常具有参数对称性：不同参数表示同一函数。商空间提供“模掉不可辨识方向”的线性原型。Baire 定理则是泛函分析三大基本定理的共同发动机，本讲 → L4 开映射、闭图像与一致有界原理。优化中把解空间按零空间取商，也可把退化半范数变成真正范数。</p>
+
+<h3>§ 常见误区</h3>
+<ol><li>商空间元素是陪集，不是选定的唯一代表元。</li><li>子空间不闭时，距离公式只给半范数。</li><li>第一纲集可以稠密；“小”是纲意义而非测度意义。</li></ol>
+
+<h3>§ 习题</h3>
+<div class="exercise"><span class="diff">(★)</span>证明自然商映射 $\pi:X\to X/Y$ 的范数为 $1$，假设 $Y\ne X$。</div>
+<div class="exercise"><span class="diff">(★★)</span>证明 $\ell^\infty/c_0$ 是 Banach 空间，并解释为什么不能用坐标逐点方式选取自然代表元。</div>
+<div class="exercise"><span class="diff">(★★)</span>证明完备度量空间不可能是自身的第一纲子集。</div>
+<div class="exercise"><span class="diff">(★★★)</span><strong>ML 开放题：</strong>考虑线性模型中参数的零空间对称性，说明在商空间上定义距离如何避免把功能等价的参数视为不同解。</div>
+
+<div class="footer-note">来源：MIT 18.102；Rudin W., <em>Functional Analysis</em>, 2e, §2.2 &middot; 本讲义为个人学习整理，与原作者 / 机构无关。</div>
+</div>
+</body>
+</html>
+
+<!-- CHECKLIST
+- definitions: 5
+- theorems: 4 (proved: 4, sketch: 0)
+- examples: 7
+- exercises: 4
+- research bridge references: [quotient geometry, uniform boundedness principle]
+- estimated word count: ~5200 non-whitespace characters
+- reading status: not completed
+-->

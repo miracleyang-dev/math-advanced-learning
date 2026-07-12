@@ -8,7 +8,7 @@
 2. **课程参数块**（第 2 节）— 挑对应课程（泛函 / 随机过程 / 信息论）
 3. **输入源块**（第 3 节的变体 A / B / C 之一）— 按你手上的材料类型挑一个
 
-拼好后作为一整段 prompt 发给 AI（Claude / GPT / etc）。生成的 HTML 保存到 `<course>/src/lecture-XX.html`，然后用 `scripts/generate_pdf.py` 渲染成 PDF。
+拼好后作为一整段 prompt 发给 AI（Claude / GPT / etc）。生成的 HTML 保存到 `<course>/lecture-XX.html`；HTML 是唯一讲义产物，不使用 `src/` 中间目录，也不生成或保存对应 PDF。
 
 ---
 
@@ -18,7 +18,7 @@
 你是数学讲义整理助手。任务是把输入材料整理成一份自包含的 HTML 讲义，用于 GitHub 仓库 math-advanced-learning。请严格遵守以下规则。
 
 【输出格式】
-1. 输出一个完整的 HTML 文档（<!DOCTYPE html> 到 </html>），直接可用 scripts/generate_pdf.py 渲染成 PDF。不要额外解说；不要 Markdown 代码围栏。
+1. 输出一个完整的 HTML 文档（<!DOCTYPE html> 到 </html>）。不要额外解说；不要 Markdown 代码围栏。只生成和维护 HTML，不生成 PDF。
 2. 必须复用 templates/lecture-template.html 的骨架和 CSS，类名不得改动：
    - .title-block 内含 h1（课程名）、h2（本讲标题）、p.meta（来源链接）
    - .def-box     蓝框红标题，"定义 — XXX"
@@ -46,7 +46,7 @@
 - 中文撰写，术语首次出现时保留英文原文。
 
 【篇幅】
-- 每讲至少要 4000–7000 汉字或是字符（渲染后 8–14 页 A4）。定理数 ≥ 3，例子数 ≥ 4，习题数 ≥ 3。
+- 每讲至少要 4000–7000 汉字或字符。定理数 ≥ 3，例子数 ≥ 4，习题数 ≥ 3。
 
 【自检】
 在文档末尾用 HTML 注释输出自检清单，格式：
@@ -57,9 +57,9 @@
 - exercises: N
 - research bridge references: [paper1, paper2, ...]
 - estimated word count: N
-- reading status: [completed, not completed]
+- reading status: not completed
 -->
-如任一项不达标，在生成结束前自行补齐。
+如任一项不达标，在生成结束前自行补齐。`reading status` 由 AI 固定填写 `not completed`；只有读者本人完成阅读后才能手动改为 `completed`，AI 不得代改。
 
 【工作流】
 生成前先在 <!-- OUTLINE ... --> HTML 注释中给出章节大纲（h3 级别，含每节 1 句要点），然后再展开完整 HTML。
@@ -74,7 +74,7 @@
 ```
 【课程参数】
 - 课程：Functional Analysis
-- 目录：functional-analysis/src/lecture-XX.html
+- 目录：functional-analysis/lecture-XX.html
 - 主讲：MIT 18.102 (Dr. Casey Rodriguez)
 - 严谨基线：Rudin, *Functional Analysis*, 2e
 - 主教材：与主讲对齐时按 MIT 18.102 lecture notes，严谨定义按 Rudin
@@ -92,7 +92,7 @@
 ```
 【课程参数】
 - 课程：Stochastic Processes
-- 目录：stochastic-processes/src/lecture-XX.html
+- 目录：stochastic-processes/lecture-XX.html
 - 主教材：Durrett R., *Probability: Theory and Examples*, 5e（Cambridge, 2019）
 - SDE 主线：Le Gall J.-F., *Brownian Motion, Martingales, and Stochastic Calculus* (Springer GTM 274)
 - ML 桥接：Särkkä S., Solin A., *Applied SDE* (Cambridge, 2019)
@@ -111,7 +111,7 @@
 ```
 【课程参数】
 - 课程：Information Theory
-- 目录：information-theory/src/lecture-XX.html
+- 目录：information-theory/lecture-XX.html
 - 打底教材：Cover T., Thomas J., *Elements of Information Theory*, 2e（Wiley, 2006）
 - 现代研究：Polyanskiy Y., Wu Y., *Information Theory: From Coding to Learning*（作者公开草稿）
 - 推断桥接：MacKay D., *Information Theory, Inference, and Learning Algorithms*
@@ -237,8 +237,23 @@
 1. **静态检查**：
    - `[待核对]` 标签数是否 = 0？未清零不算完稿
    - `<!-- CHECKLIST -->` 各项是否达标？
-   - 打开渲染的 HTML 目测公式是否正常
+   - 在浏览器中打开 HTML，目测公式与布局是否正常
 2. **交叉验证**：任取一条**你完全不熟**的定理，去主教材原文核对陈述与证明
 3. **默写测试**：合上讲义写本讲三个关键定理陈述；对不上的地方精读
 
 无法通过三条测试的讲义，回炉重写，不要姑息。
+
+---
+
+## 6. 代码排版与内容密度补充规范
+
+生成或修改讲义时，以该课程已有的 `lecture-01.html` 为源码排版基准：
+
+- 固定模板保持紧凑：`<!DOCTYPE>`、`<head>`、MathJax 配置和 CSS 不要格式化成大量多行；CSS 每个选择器原则上占一行。
+- 正文按语义展开：标题、段落、定义框、定理框、证明框、remark、表格和习题各自独立书写；嵌套标签使用两个空格缩进，禁止把整节内容压在一行。
+- 正文块之间保留一个空行，不连续留多个空行。新增解释、例子和证明必须归入对应章节，不在习题后堆放“补充内容”。
+- 可见内容的末尾顺序固定为：小结表 → `§ 直觉与研究桥接` → `§ 常见误区` → `§ 习题` → `.footer-note`；CHECKLIST 放在 HTML 闭合标签之后。
+
+每讲应达到接近 `lecture-01.html` 的完整度，通常约 4000–6000 汉字；复杂主题可适当增加。内容不足时，优先补齐证明步骤与适用条件，其次增加具体例子、边界/反例和可计算案例，再说明与前后讲次及研究问题的连接。不得用重复表述、拆分简单结论或提前讲授 README 中的后续章节来凑篇幅。
+
+输出前检查：HTML 标签闭合；MathJax 命令反斜杠完整；footer 是最后一个可见块；`[待核对]` 为零；CHECKLIST 的定义、定理、证明、例子、习题和篇幅统计与正文一致；`reading status` 必须保持 `not completed`，AI 不得写成 `completed`。

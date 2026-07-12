@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>泛函分析 第二讲 - 有界线性算子与算子范数</title>
+<script>window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; } * { box-sizing: border-box; } body { font-family: "Noto Serif CJK SC","Source Han Serif SC","Songti SC",serif; font-size: 11pt; line-height: 1.8; color:#2c2c2c; } .container { max-width:720px; margin:auto; padding:30px 20px; } .title-block { text-align:center; margin-bottom:28px; padding-bottom:20px; border-bottom:2px solid #1a3a5c; } .title-block h1 { color:#1a3a5c; font-size:20pt; margin:0; } .title-block h2 { color:#2c5f8a; font-size:14pt; font-weight:400; } .meta { color:#888; font-size:9.5pt; } h3 { color:#1a3a5c; border-bottom:1.5px solid #d0dce8; margin-top:28px; } h4 { color:#2c5f8a; } p { text-align:justify; } .def-box { background:#f7f9fc; border:1px solid #d0dce8; padding:14px 18px; margin:12px 0; } .thm-box { background:#eaf2fa; border-left:4px solid #2c5f8a; padding:14px 18px; margin:12px 0; } .proof-box { background:#fefef6; border-left:3px solid #bbb; padding:12px 16px; margin:10px 0; } .remark { background:#fff9f0; border-left:3px solid #e67e22; padding:10px 14px; margin:10px 0; } .box-title { font-weight:700; color:#1a3a5c; } .def-box .box-title { color:#c0392b; } table.summary { width:100%; border-collapse:collapse; } table.summary th { background:#1a3a5c; color:white; padding:8px; } table.summary td { background:#f7f9fc; padding:8px; border-bottom:1px solid #d0dce8; } .exercise { margin:8px 0; padding-left:12px; border-left:2px solid #d0dce8; } .diff { color:#e67e22; font-weight:700; } .footer-note { margin-top:32px; padding-top:12px; border-top:1px solid #ccc; text-align:center; font-size:8.5pt; color:#999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="title-block">
+  <h1>泛函分析 (Functional Analysis)</h1>
+  <h2>第二讲：有界线性算子、算子范数与算子空间</h2>
+  <p class="meta">MIT 18.102 &middot; Rudin, <em>Functional Analysis</em>, 2e, §4.1–4.3</p>
+</div>
+
+<!-- OUTLINE
+1. 线性算子为何不自动连续
+2. 有界性、连续性与算子范数
+3. 典型算子的范数计算
+4. 算子代数与逆算子
+5. B(X,Y) 的完备性
+6. 小结、研究桥接、误区与习题
+-->
+
+<h3>1. 线性不再自动意味着连续</h3>
+
+<div class="def-box"><div class="box-title">定义 1.1 — 有界线性算子</div><p>线性映射 $T:X\to Y$ 若存在 $C\ge0$ 使 $\|Tx\|_Y\le C\|x\|_X$ 对所有 $x\in X$ 成立，则称为有界线性算子 (bounded linear operator)。全体有界线性算子记为 $\mathcal B(X,Y)$。</p></div>
+
+<p><strong>例：</strong>矩阵 $A:\mathbb K^d\to\mathbb K^m$ 在任意有限维范数下有界。<strong>反例：</strong>多项式空间配上上确界范数时，微分算子 $Dp=p'$ 不有界，因为 $p_n(t)=t^n$ 满足 $\|p_n\|_\infty=1$，但 $\|Dp_n\|_\infty=n$。</p>
+
+<div class="thm-box"><div class="box-title">定理 1.2 — 线性算子的有界性与连续性等价</div><p>线性算子 $T:X\to Y$ 有界，当且仅当它在 $0$ 连续；这又等价于它在每一点连续。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>若 $T$ 有界，则 $\|Tx-Tx_0\|\le C\|x-x_0\|$，故处处连续。若 $T$ 在 $0$ 连续，可取 $\delta>0$ 使 $\|u\|<\delta$ 时 $\|Tu\|<1$。对 $x\ne0$ 令 $u=\delta x/(2\|x\|)$，则 $\|Tx\|<2\|x\|/\delta$，所以有界。在任一点的连续性由 $T(x+h)-Tx=Th$ 归结到 $0$。</p></div>
+
+<h3>2. 算子范数</h3>
+
+<div class="def-box"><div class="box-title">定义 2.1 — 算子范数</div><p>对 $T\in\mathcal B(X,Y)$，定义 $\|T\|_{\mathrm{op}}=\sup_{\|x\|_X\le1}\|Tx\|_Y$。</p></div>
+
+<div class="thm-box"><div class="box-title">命题 2.2 — 算子范数的等价刻画</div><p>有 $\|T\|_{\mathrm{op}}=\sup_{x\ne0}\|Tx\|/\|x\|=\inf\{C:\|Tx\|\le C\|x\|\ \forall x\}$，并且 $\|Tx\|\le\|T\|_{\mathrm{op}}\|x\|$。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>对 $x\ne0$ 将 $x$ 归一化为 $x/\|x\|$，得到比值公式。任何可行常数 $C$ 都控制单位球上的像，故 $\|T\|_{\mathrm{op}}\le C$；反向由比值公式说明 $\|T\|_{\mathrm{op}}$ 本身可行。</p></div>
+
+<h4>2.1 三个范数计算</h4>
+
+<p><strong>求值泛函：</strong>$\delta_{t_0}:C([0,1])\to\mathbb K$，$\delta_{t_0}(f)=f(t_0)$，满足 $|\delta_{t_0}(f)|\le\|f\|_\infty$，且对常数函数 $1$ 取等，因此 $\|\delta_{t_0}\|=1$。</p>
+
+<p><strong>Volterra 算子：</strong>$(Tf)(t)=\int_0^t f(s)\,ds$ 从 $C([0,1])$ 到自身满足 $\|Tf\|_\infty\le\|f\|_\infty$；取 $f\equiv1$ 得 $\|T\|=1$。</p>
+
+<p><strong>对角算子：</strong>若 $T:\ell^p\to\ell^p$，$(Tx)_n=a_nx_n$，则 $T$ 有界当且仅当 $(a_n)\in\ell^\infty$，且 $\|T\|=\sup_n|a_n|$。</p>
+
+<h3>3. 复合、恒等与逆</h3>
+
+<div class="def-box"><div class="box-title">定义 3.1 — Banach 空间同构</div><p>若 $T\in\mathcal B(X,Y)$ 是双射且逆映射 $T^{-1}:Y\to X$ 也有界，则称 $T$ 为 Banach 空间同构 (isomorphism)。同构保持线性结构、收敛与完备性；若进一步满足 $\|Tx\|=\|x\|$，则称为等距同构 (isometric isomorphism)。</p></div>
+
+<p><strong>例：</strong>将 $\mathbb R^d$ 的向量写成某组基下的坐标，得到它与 $\mathbb R^d$ 标准坐标空间之间的 Banach 空间同构。<strong>边界：</strong>线性双射未必自动成为 Banach 空间同构；逆映射是否连续将在 L4 的开映射定理中解决。</p>
+
+<div class="thm-box"><div class="box-title">命题 3.1 — 算子范数的次乘性</div><p>若 $T\in\mathcal B(X,Y)$、$S\in\mathcal B(Y,Z)$，则 $ST\in\mathcal B(X,Z)$ 且 $\|ST\|\le\|S\|\|T\|$。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>对任意 $x$，$\|STx\|\le\|S\|\|Tx\|\le\|S\|\|T\|\|x\|$。对单位球取上确界。</p></div>
+
+<div class="thm-box"><div class="box-title">命题 3.2 — Neumann 级数</div><p>若 $X$ 为 Banach，$T\in\mathcal B(X)$ 且 $\|T\|<1$，则 $I-T$ 可逆，并且 $(I-T)^{-1}=\sum_{n=0}^\infty T^n$，其范数不超过 $(1-\|T\|)^{-1}$。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>由次乘性，$\sum_n\|T^n\|\le\sum_n\|T\|^n<\infty$。$\mathcal B(X)$ 的完备性由下节定理保证，所以级数收敛到某个 $S$。有限和满足 $(I-T)\sum_{n=0}^NT^n=I-T^{N+1}$；令 $N\to\infty$ 得 $(I-T)S=S(I-T)=I$。</p></div>
+
+<h3>4. 算子空间的完备性</h3>
+
+<div class="thm-box"><div class="box-title">定理 4.1 — $\mathcal B(X,Y)$ 的完备性</div><p>若 $Y$ 是 Banach，则 $\mathcal B(X,Y)$ 在算子范数下为 Banach；定义域 $X$ 不必完备。</p></div>
+
+<div class="proof-box"><div class="box-title">证明</div><p>设 $(T_n)$ 在算子范数下 Cauchy。对固定 $x$，$\|T_nx-T_mx\|\le\|T_n-T_m\|\|x\|$，故 $(T_nx)$ 在 $Y$ 中 Cauchy；令 $Tx=\lim_nT_nx$。逐点极限保持线性。Cauchy 列范数有界，设 $\|T_n\|\le M$，令 $n\to\infty$ 得 $\|Tx\|\le M\|x\|$。最后固定 $n$ 并令 $m\to\infty$，得 $\|T_n-T\|\le\sup_{m\ge n}\|T_n-T_m\|\to0$。</p></div>
+
+<div class="remark"><strong>为什么只要求 $Y$ 完备：</strong>构造 $Tx$ 时需要 $T_nx$ 在陪域中有极限；证明从未要求定义域中的 Cauchy 列收敛。</div>
+
+<h3>5. 小结</h3>
+
+<table class="summary"><tr><th>概念</th><th>核心结论</th><th>后续用途</th></tr><tr><td>有界线性算子</td><td>等价于连续线性映射</td><td>稳定性与扰动控制</td></tr><tr><td>算子范数</td><td>最小全局 Lipschitz 常数</td><td>复合、谱归一化</td></tr><tr><td>$\mathcal B(X,Y)$</td><td>$Y$ 完备则算子空间完备</td><td>算子级数与逆算子</td></tr></table>
+
+<h3>§ 直觉与研究桥接</h3>
+
+<p>神经网络线性层的谱范数控制其 Lipschitz 常数；残差块 $I+F$ 在 $\|F\|<1$ 时可用 Neumann 级数理解可逆性。Neural Operator 直接学习函数空间之间的非线性映射，其线性化属于 $\mathcal B(X,Y)$。本讲 → L3 商空间中的诱导算子；L4 开映射与逆算子定理。</p>
+
+<h3>§ 常见误区</h3>
+<ol><li>无穷维中线性映射不自动连续。</li><li>算子范数依赖定义域和陪域所选范数。</li><li>$\mathcal B(X,Y)$ 完备只需要陪域 $Y$ 完备。</li></ol>
+
+<h3>§ 习题</h3>
+<div class="exercise"><span class="diff">(★)</span>证明积分泛函 $f\mapsto\int_0^1f(t)dt$ 在 $C([0,1])$ 上的范数为 $1$。</div>
+<div class="exercise"><span class="diff">(★★)</span>计算左右移位算子在 $\ell^p$ 上的算子范数，并判断其是否可逆。</div>
+<div class="exercise"><span class="diff">(★★)</span>证明有限秩算子之和与复合仍为有限秩算子。</div>
+<div class="exercise"><span class="diff">(★★★)</span><strong>ML 开放题：</strong>对残差网络 $x\mapsto x+F(x)$，说明 $\operatorname{Lip}(F)<1$ 如何保证可逆，并讨论深层复合时逆映射的稳定性。</div>
+
+<div class="footer-note">来源：MIT 18.102；Rudin W., <em>Functional Analysis</em>, 2e, §4.1–4.3 &middot; 本讲义为个人学习整理，与原作者 / 机构无关。</div>
+</div>
+</body>
+</html>
+
+<!-- CHECKLIST
+- definitions: 3
+- theorems: 5 (proved: 5, sketch: 0)
+- examples: 7
+- exercises: 4
+- research bridge references: [Neural Operator, spectral normalization, invertible residual networks]
+- estimated word count: ~5000 non-whitespace characters
+- reading status: not completed
+-->

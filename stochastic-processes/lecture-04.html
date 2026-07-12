@@ -1,0 +1,273 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>随机过程 (Stochastic Processes) - 第四讲：可选停止定理与鞅不等式</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .container { max-width: 100%; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: 11pt; line-height: 1.8; color: #2c2c2c; background: #fff; }
+.container { max-width: 720px; margin: 0 auto; padding: 30px 20px; }
+.title-block { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #1a3a5c; }
+.title-block h1 { font-size: 20pt; color: #1a3a5c; margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; }
+.title-block h2 { font-size: 14pt; color: #2c5f8a; font-weight: 400; margin-bottom: 10px; }
+.title-block .meta { font-size: 9.5pt; color: #888; }
+h3 { font-size: 14pt; color: #1a3a5c; margin-top: 28px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1.5px solid #d0dce8; font-weight: 700; }
+h4 { font-size: 11.5pt; color: #2c5f8a; margin-top: 16px; margin-bottom: 8px; font-weight: 600; }
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin-left: 1.5em; margin-bottom: 10px; }
+li { margin-bottom: 4px; }
+strong { color: #1a3a5c; }
+.def-box { background: #f7f9fc; border: 1px solid #d0dce8; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+.def-box .box-title { font-weight: 700; color: #c0392b; font-size: 10.5pt; margin-bottom: 6px; }
+.thm-box { background: #eaf2fa; border-left: 4px solid #2c5f8a; border-radius: 0 6px 6px 0; padding: 14px 18px; margin: 12px 0; }
+.thm-box .box-title { font-weight: 700; color: #1a3a5c; font-size: 10.5pt; margin-bottom: 6px; }
+.proof-box { background: #fefef6; border-left: 3px solid #bbb; padding: 12px 16px; margin: 10px 0; font-size: 10.5pt; }
+.proof-box .box-title { font-weight: 700; color: #666; font-size: 10pt; margin-bottom: 4px; }
+.math-display { text-align: center; margin: 10px 0; font-size: 11pt; }
+.remark { background: #fff9f0; border-left: 3px solid #e67e22; padding: 10px 14px; margin: 10px 0; font-size: 10.5pt; color: #555; }
+.todo { background: #ffe0e0; color: #c0392b; padding: 0 4px; border-radius: 3px; font-weight: 700; }
+table.summary { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+table.summary th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+table.summary td { background: #f7f9fc; padding: 8px 12px; border-bottom: 1px solid #d0dce8; vertical-align: top; }
+table.summary tr:last-child td { border-bottom: none; }
+.exercise { margin: 8px 0; padding-left: 12px; border-left: 2px solid #d0dce8; }
+.exercise .diff { color: #e67e22; font-weight: 700; margin-right: 6px; }
+.footer-note { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; text-align: center; font-size: 8.5pt; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="title-block">
+  <h1>随机过程 (Stochastic Processes)</h1>
+  <h2>第四讲：可选停止定理与鞅不等式</h2>
+  <p class="meta">
+    主教材：Durrett 5e §4.4–4.5 &middot; 辅助：Williams, Probability with
+    Martingales
+  </p>
+</div>
+
+<!-- OUTLINE
+1. 停止时：只根据现在与过去决定是否停止
+2. 停止过程与有界可选停止
+3. Doob 最大不等式与上穿不等式
+4. 小结、研究桥接、误区与习题
+-->
+
+<h3>1. 停止时</h3>
+
+<div class="def-box">
+  <div class="box-title">定义 1.1 — 停止时 (stopping time)</div>
+  <p>
+    取值于 $\{0,1,2,\dots\}\cup\{\infty\}$ 的随机变量 $\tau$ 称为关于滤过
+    $\mathcal F_n$ 的停止时，若 $\{\tau\le n\}\in\mathcal F_n$ 对每个 $n$
+    成立。
+  </p>
+</div>
+
+<p>
+  <strong>例：</strong>首次 hitting time $\tau=\inf\{n:S_n\ge a\}$
+  是停止时。<strong>非例：</strong>“最后一次达到最大值”的时间通常要看未来，不是停止时。
+</p>
+
+<div class="def-box">
+  <div class="box-title">定义 1.2 — 停止过程</div>
+  <p>$M^\tau_n=M_{n\wedge\tau}$。它表示在 $\tau$ 后冻结赌局收益。</p>
+</div>
+
+<p><strong>例：</strong>若 $\tau=\inf\{n:|S_n|\ge a\}$，则 $S_{n\wedge\tau}$ 在首次退出区间 $(-a,a)$ 后保持不变。若某条路径永不退出，则在该路径上 $n\wedge\tau=n$。</p>
+
+<div class="thm-box">
+  <div class="box-title">命题 1.3 — 停止时的封闭性</div>
+  <p>若 $\sigma,\tau$ 是停止时，则 $\sigma\wedge\tau$、$\sigma\vee\tau$ 仍是停止时；停止时列 $(\tau_k)$ 的下确界 $\inf_k\tau_k$ 也是停止时。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>$\{\sigma\wedge\tau\le n\}=\{\sigma\le n\}\cup\{\tau\le n\}$，$\{\sigma\vee\tau\le n\}=\{\sigma\le n\}\cap\{\tau\le n\}$，而 $\{\inf_k\tau_k\le n\}=\cup_k\{\tau_k\le n\}$；右端都属于 $\mathcal F_n$。</p>
+</div>
+
+<h3>2. 可选停止</h3>
+
+<div class="thm-box">
+  <div class="box-title">命题 2.1 — 停止后的鞅仍为鞅</div>
+  <p>若 $M_n$ 是鞅，$\tau$ 是停止时，则 $M_{n\wedge\tau}$ 是鞅。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>
+    写增量
+    $M_{(n+1)\wedge\tau}-M_{n\wedge\tau}=\mathbf1_{\{\tau>n\}}(M_{n+1}-M_n)$。事件
+    $\{\tau>n\}$ 属于 $\mathcal
+    F_n$，由鞅变换命题和条件期望取出已知量，条件增量的期望为 0。
+  </p>
+</div>
+
+<div class="thm-box">
+  <div class="box-title">定理 2.2 — 有界可选停止定理</div>
+  <p>
+    若 $M_n$ 是鞅，$\tau\le N$ a.s.，则 $\mathbb E[M_\tau]=\mathbb
+    E[M_0]$。若 $M$ 是次鞅，则 $\mathbb E[M_\tau]\ge\mathbb E[M_0]$。
+  </p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>
+    由命题 2.1，$M^\tau_n$ 是鞅。取 $n=N$ 得
+    $M^\tau_N=M_\tau$，而鞅的期望恒定来自对定义取全期望：$\mathbb E
+    M_{k+1}=\mathbb E M_k$。次鞅情形同理给期望单调不减。
+  </p>
+</div>
+
+<p>
+  <strong>边界：</strong>有界条件不能任意删除。公平随机游走首次到达 $+1$
+  的停止时 a.s.
+  有限，但期望停止时间无界；直接套用可选停止会得到错误赌博策略。
+</p>
+
+<h4>2.1 两个停止时与常用推广条件</h4>
+
+<div class="thm-box">
+  <div class="box-title">定理 2.3 — 有界停止时之间的可选采样</div>
+  <p>若 $M_n$ 是鞅，$\sigma\le\tau\le N$ a.s.，则 $\mathbb E[M_\tau\mid\mathcal F_\sigma]=M_\sigma$ a.s.；次鞅情形将等号换为不等号 $ge$。</p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>对任意 $A\in\mathcal F_\sigma$，过程 $\mathbf1_A(M_{n\wedge\tau}-M_{n\wedge\sigma})$ 可写成有界可预测策略对鞅增量的和，因此期望为 $0$。取 $n=N$ 得 $\int_A M_\tau\,d\mathbb P=\int_A M_\sigma\,d\mathbb P$，由条件期望的刻画得到结论。</p>
+</div>
+
+<div class="remark"><strong>何时可去掉有界性：</strong>常见充分条件包括：停止过程族 $\{M_{n\wedge\tau}:n\ge0\}$ 一致可积；或 $\mathbb E\tau<\infty$ 且鞅增量一致有界；或鞅本身一致有界。它们的共同作用是允许把 $n\to\infty$ 与期望交换。L5 将系统解释一致可积。</div>
+
+<h4>2.2 赌徒破产：先截断再取极限</h4>
+
+<p>公平简单随机游走从 $0$ 出发，令 $\tau=\inf\{n:S_n=a\text{ 或 }S_n=-b\}$。对 $\tau_N=\tau\wedge N$ 使用定理 2.2 得 $\mathbb E S_{\tau_N}=0$。因为 $|S_{\tau_N}|\le\max(a,b)$ 且 $\tau<\infty$ a.s.，DCT 给 $\mathbb E S_\tau=0$。若 $p=\mathbb P(S_\tau=a)$，则 $ap-b(1-p)=0$，所以</p>
+<div class="math-display">$$\mathbb P(S_\tau=a)=\frac{b}{a+b},\qquad \mathbb P(S_\tau=-b)=\frac{a}{a+b}.$$</div>
+
+<p>同样地，对 L3 的鞅 $S_n^2-n$ 先在 $\tau\wedge N$ 上使用可选停止，再验证极限条件，可得 $\mathbb E\tau=ab$。关键步骤是截断与极限控制，而不是把无界 $\tau$ 直接代入定理 2.2。</p>
+
+<h3>3. 鞅不等式</h3>
+
+<div class="thm-box">
+  <div class="box-title">定理 3.1 — Doob 最大不等式（非负次鞅）</div>
+  <p>
+    若 $X_n$ 是非负次鞅，则对 $\lambda>0$，$\lambda\,\mathbb P(\max_{k\le
+    n}X_k\ge\lambda)\le\mathbb E[X_n;\max_{k\le n}X_k\ge\lambda]\le\mathbb
+    E[X_n]$。
+  </p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>令 $A_k=\{X_0<\lambda,\dots,X_{k-1}<\lambda,X_k\ge\lambda\}$。这些事件两两不交，$A_k\in\mathcal F_k$，且其并为 $A=\{\max_{j\le n}X_j\ge\lambda\}$。次鞅性质给 $\mathbb E[X_n\mathbf1_{A_k}]=\mathbb E[\mathbb E[X_n\mid\mathcal F_k]\mathbf1_{A_k}]\ge\mathbb E[X_k\mathbf1_{A_k}]\ge\lambda\mathbb P(A_k)$。对 $k$ 求和得到第一式；$X_n\ge0$ 给第二式。</p>
+</div>
+
+<h4>3.1 从终点控制到整条路径控制</h4>
+
+<p>若 $M_n\in L^2$ 是鞅，则由条件 Jensen，$M_n^2$ 是非负次鞅。定理 3.1 应用于 $M_k^2$ 得</p>
+<div class="math-display">$$\mathbb P\left(\max_{k\le n}|M_k|\ge\lambda\right)\le\frac{\mathbb E[M_n^2]}{\lambda^2}.$$</div>
+
+<p>Chebyshev 不等式只控制终点 $M_n$；Doob 不等式同时控制 $0$ 到 $n$ 的整段轨迹。这正是证明随机算法“整个训练过程中都不越界”所需要的形式。</p>
+
+<div class="thm-box">
+  <div class="box-title">定理 3.2 — Doob 上穿不等式</div>
+  <p>
+    设 $X_n$ 为次鞅，$U_n[a,b]$ 为路径在 $[0,n]$ 内从 $a$ 上穿到 $b$
+    的次数，则 $(b-a)\mathbb E U_n[a,b]\le\mathbb E[(X_n-a)^+]$。
+  </p>
+</div>
+
+<div class="proof-box">
+  <div class="box-title">证明</div>
+  <p>
+    构造可预测策略：低于 $a$ 后持有一单位资产，高于 $b$
+    后空仓。每完成一次上穿至少赚
+    $b-a$。鞅变换命题对次鞅给非负期望收益，再比较最终财富与
+    $(X_n-a)^+$，得到不等式。
+  </p>
+</div>
+
+<h3>4. 小结</h3>
+
+<table class="summary">
+  <tr>
+    <th>工具</th>
+    <th>条件</th>
+    <th>用途</th>
+  </tr>
+  <tr>
+    <td>停止时</td>
+    <td>是否停止只依赖当前信息</td>
+    <td>hitting time、首次退出</td>
+  </tr>
+  <tr>
+    <td>可选停止</td>
+    <td>停止时有界或需额外可积条件</td>
+    <td>赌徒破产、边界命中概率</td>
+  </tr>
+  <tr>
+    <td>Doob 不等式</td>
+    <td>非负次鞅</td>
+    <td>控制路径最大偏差</td>
+  </tr>
+</table>
+
+<h3>§ 直觉与研究桥接</h3>
+
+<p>停止时刻在强化学习中对应“由历史状态触发的终止规则”。early stopping 只有在每次决策只使用已经观察到的训练与验证历史时，才是相应滤过下的停止时；先查看全部未来轮次再挑最优点会产生选择偏差。Doob 最大不等式把终点矩控制升级为全路径越界概率控制，也是在线学习和 stochastic approximation 稳定性分析的通用语言。现代 anytime-valid inference 用非负超鞅构造允许任意数据依赖停止的置信序列。本讲 → L5 上穿与收敛定理。</p>
+
+<h3>§ 常见误区</h3>
+
+<ol>
+  <li>a.s. 有限不等于有界，也不足以保证可选停止。</li>
+  <li>停止时不是普通随机时间；它必须满足可观测性。</li>
+  <li>最大不等式控制的是概率尾部，不是逐点上界。</li>
+</ol>
+
+<h3>§ 习题</h3>
+
+<div class="exercise">
+  <span class="diff">(★)</span>证明首次达到集合 $A$
+  的时间是自然滤过下停止时。
+</div>
+
+<div class="exercise">
+  <span class="diff">(★★)</span>用有界可选停止计算公平随机游走先到 $+a$
+  再到 $-b$ 的命中概率。
+</div>
+
+<div class="exercise">
+  <span class="diff">(★★★)</span><strong>ML 开放题：</strong>解释 early
+  stopping
+  何时可视为停止时；若验证集未来信息参与选择，停止时假设哪里失效？
+</div>
+
+<div class="footer-note">
+  来源：Durrett R., Probability: Theory and Examples, 5e, §4.4–4.5
+  &middot; 本讲义为个人学习整理，与原作者 / 机构无关。
+</div>
+</div>
+</body>
+
+</html>
+
+<!-- CHECKLIST
+- definitions: 2
+- theorems: 6 (proved: 6, sketch: 0)
+- examples: 8
+- exercises: 3
+- [待核对] tags: 0
+- research bridge references: [online learning, stochastic approximation]
+- estimated word count: ~5200 汉字
+- reading status: not completed
+-->

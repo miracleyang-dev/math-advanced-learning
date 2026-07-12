@@ -14,15 +14,15 @@
 
 | 顺序 | 课程 | 主教材 / 主讲 | 状态 | 讲义生成进度 | 阅读进度 |
 |------|------|---------------|------|----------|---------------|
-| 1 | [泛函分析](./functional-analysis/) | MIT 18.102 (Rodriguez) + Rudin *Functional Analysis* | 重启 | 5 / 22 | 0 / 22 |
-| 2 | [随机过程](./stochastic-processes/) | Durrett *Probability: Theory and Examples* 5e + Le Gall + Särkkä | 进行中 | 5 / 20 | 0 / 20 |
-| 3 | [信息论](./information-theory/) | Cover & Thomas 2e + Polyanskiy & Wu *From Coding to Learning* + MIT 6.441 | 进行中 | 0 / 18 | 0 / 18 |
+| 1 | [泛函分析](./functional-analysis/) | MIT 18.102 (Rodriguez) + Rudin *Functional Analysis* | 进行中 | 3 / 22 | 0 / 22 |
+| 2 | [随机过程](./stochastic-processes/) | Durrett *Probability: Theory and Examples* 5e + Le Gall + Särkkä | 进行中 | 5 / 20 | 1 / 20 |
+| 3 | [信息论](./information-theory/) | Cover & Thomas 2e + Polyanskiy & Wu *From Coding to Learning* + MIT 6.441 | 未开始 | 0 / 18 | 0 / 18 |
 
 每门课的详细章节地图见各自目录下的 `README.md`。
 
 ## 讲义制作方式
 
-每讲一个自包含 HTML 文件（`<course>/src/lecture-XX.html`），MathJax 3 渲染公式，样式统一（`.def-box` / `.thm-box` / `.proof-box` / `.remark`）。用 `scripts/generate_pdf.py` 渲染为 PDF 提交到课程根目录。
+每讲只保留一个自包含 HTML 文件（`<course>/lecture-XX.html`），MathJax 3 渲染公式，样式统一（`.def-box` / `.thm-box` / `.proof-box` / `.remark`）。HTML 是唯一讲义产物，便于持续修改；仓库不使用 `src/` 中间目录，也不生成或保存对应 PDF。
 
 讲义由 AI 辅助生成，遵循 [`PROMPT.md`](./PROMPT.md) 中的规范；模板见 [`templates/lecture-template.html`](./templates/lecture-template.html)。
 
@@ -32,33 +32,19 @@
 math-advanced-learning/
 ├── functional-analysis/
 │   ├── README.md               # 泛函分析章节地图 + 符号约定
-│   └── src/                    # lecture-XX.html
+│   ├── lecture-01.html
+│   └── lecture-XX.html
 ├── stochastic-processes/
 │   ├── README.md
-│   └── src/
+│   └── lecture-XX.html
 ├── information-theory/
 │   ├── README.md
-│   └── src/
+│   └── lecture-XX.html
 ├── templates/
 │   └── lecture-template.html   # HTML 骨架
-├── scripts/
-│   └── generate_pdf.py         # HTML → PDF
 ├── PROMPT.md                   # AI 生成讲义的 prompt 规范（三种输入源）
 └── README.md
 ```
-
-## 生成 PDF
-
-Windows cmd：
-
-```cmd
-py -m pip install playwright
-py -m playwright install chromium
-py scripts\generate_pdf.py stochastic-processes\src\lecture-01.html ^
-  -o stochastic-processes\随机过程_L1.pdf
-```
-
-PDF 通过 Git LFS 存储（见 `.gitattributes`）。
 
 ## 来源声明
 
